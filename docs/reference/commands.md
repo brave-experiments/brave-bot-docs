@@ -1,0 +1,110 @@
+---
+sidebar_position: 2
+title: Slash commands
+description: The seven commands the interface acts on itself, and the rules every one of them shares.
+---
+
+# Slash commands
+
+A line beginning with `/` is acted on by the interface itself, in place of being sent anywhere.
+
+| Command | Argument | What it does |
+|---|---|---|
+| `/status` | | Report this session, what it may touch, and what it has spent |
+| `/model` | | Choose which model to think with |
+| `/add-dir` | `<path>` | Open another directory, and trust it for this session |
+| `/rename` | `<name>` | Call this conversation something else |
+| `/compact` | | Summarise the conversation so far, keeping the recent part |
+| `/clear` | | Start a new session here, keeping this one resumable |
+| `/exit` | | Leave |
+
+Typing `/` offers the list, and Tab completes.
+
+## `/status`
+
+Everything the session knows about itself:
+
+- the working directory, and anything opened with `/add-dir`;
+- the model in force, and whether it was chosen or defaulted;
+- which deployment the endpoint names, and whether premium is configured;
+- the confinement available here;
+- turns and tokens spent;
+- **every trust rule in force**, listed in full, each marked trusted or untrusted;
+- **every command you vouched for**, which now run unasked and whose output is read as trusted.
+
+The last two are the point. Every other prompt in a session announces itself by appearing; a vouched
+command is the one that stops appearing, so without this there would be nothing to tell you it now
+runs unasked.
+
+`/status` deliberately leaves out the endpoint host and the key id, though `bravebot doctor` prints
+both. A status panel is the thing people paste into an issue or a screenshot.
+
+## `/model`
+
+Opens a picker on the model in use. The list comes from the endpoint rather than a set compiled in, so
+it is whatever the backend offers today, and the choice is written to `~/.bravebot` — it outlives the
+session and applies in every directory. See
+[Configuration](../customize/configuration.md#choosing-a-model).
+
+## `/add-dir <path>`
+
+Makes a directory both reachable and trusted, for this session. `--resume` carries both halves and
+`/clear` closes it. A directory already inside the project is refused. See
+[Trusted directories](../security/trust.md#add-dir).
+
+An added directory contributes **no** standing instructions and no skills, whatever it contains.
+
+## `/rename <name>`
+
+Renaming rewrites the session record immediately, and the chosen name survives the next turn. An empty
+name is refused.
+
+## `/compact`
+
+Summarises the conversation so far and keeps the recent part, on demand, at any size, without
+consulting the budget. The **request** is shortened, never the record: the replaced messages go to an
+archive that the transcript still reads and the session record still stores. See
+[Sessions](../using/sessions.md#long-conversations).
+
+## `/clear`
+
+Begins a new session in this directory and keeps the current one resumable. Because it is a new
+session it asks the trust question again, restores no standing permissions, and closes any directory
+`/add-dir` had opened.
+
+## The rules every command shares
+
+**Only a line a person typed into the box.** A command is dispatched from a key press and from nowhere
+else: never a line the planner produced, never text read out of a file, never anything a processor
+returned, never a line reconstructed from a transcript. A model that writes `/clear` has written four
+characters, and they reach your screen as four characters.
+
+Every command here decides something a turn is not allowed to decide on its own — which directories are
+reachable, what the conversation consists of, which model thinks. The endorsement is the keystroke, so
+the keystroke is the only thing that may produce one.
+
+**The whole word, and an argument only after a space.** `/statusline` is not `/status`.
+
+**In shell mode the line is a command line, not a command.** `! /usr/bin/env` runs a program.
+
+**A command is never sent as a prompt.** A line that is a command is acted on and does not reach the
+model.
+
+**The argument is taken verbatim.**
+
+**A command name is written in this program, never read from a directory.** There is no way to add one
+by putting a file somewhere.
+
+## Skills are not slash commands
+
+Other agents let you type a skill's name after a slash. This one does not: a skill is advertised to
+the planner by name and description, and its body is fetched by the planner asking for it. Nothing in
+the input box knows skills exist, so `/commit-style` is a prompt like any other sentence. See
+[Skills](../customize/skills.md#skills-are-not-slash-commands).
+
+## Not a command, but typed in the same place
+
+| | |
+|---|---|
+| `@<path>` | include a workspace file as trusted context — [Adding context](../using/context.md) |
+| `!<line>` | run a line in your own shell — [Shell mode](../using/shell-mode.md) |
