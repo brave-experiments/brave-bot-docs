@@ -30,7 +30,39 @@ Enter on an empty line does nothing. Shift-Enter needs a terminal that reports t
 (Ghostty, Kitty, WezTerm) or one configured to send a newline; **Ctrl-J is the fallback that always
 works**, in every terminal and in shell mode too.
 
-Ctrl-G does nothing while a turn runs.
+## Composing in your editor
+
+**Ctrl-G** opens your editor on what is already in the box, so it continues a prompt rather than
+starting it again, and what you save replaces the line. It does nothing while a turn runs: handing
+the terminal to an editor mid-turn would take the screen from the turn drawing on it.
+
+Every path that does not end in a save ends in the line untouched. Quitting without saving leaves it
+exactly as it was, and so does an editor that failed or was killed — neither says anything about what
+you wanted, and the failure worth designing against is the one that blanks a paragraph you have just
+written. The newline an editor leaves at the end is dropped, one only. The file it opened holds your
+own words, is readable by nobody else, and does not outlive the edit.
+
+Which editor opens: `$VISUAL`, then `$EDITOR`, then the first of `vim`, `vi`, `emacs`, `nano` that is
+installed. An empty value is not an answer, since exporting a variable to nothing is how a profile
+takes one back. `nano` is the last resort because somebody with `vim` or `emacs` on their machine
+chose to install it and will not thank a guess for opening something else. An editor you named that
+will not start is reported as such and nothing else is tried: falling back past it would run an
+editor you did not ask for, and blame your configuration for it.
+
+An editor is started under the name it was asked for, rather than under the file a symbolic link
+behind that name points at. MacVim is why. It installs `vim`, `vi` and `gvim` as links to a single
+program that reads the name it was called by, staying in the terminal for the `vi` spellings and
+forking off a detached GUI window for the others; reached through the resolved path it is always the
+GUI one, so asking for `vim` opened a window, returned at once, and put the prompt back unedited with
+nothing saying why. The name is kept only while it still reaches the same program — a link that now
+points elsewhere is started by resolved path instead.
+
+That is the editor alone. Wherever a program is approved before it runs, the approval names the file
+that actually ran, because a name can be repointed afterwards. An editor is started rather than
+approved, and for it the name is part of what you asked for.
+
+A GUI editor that would otherwise return the moment its window opens is told to wait, but only where
+you wrote no arguments of your own.
 
 ## Looking up the keys
 
