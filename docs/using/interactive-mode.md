@@ -20,6 +20,7 @@ growing further. It keeps growing while a turn runs.
 | Enter | send |
 | Shift-Enter, Ctrl-J | start a new line without sending |
 | Ctrl-G | compose in `$VISUAL` or `$EDITOR` and take back what you saved |
+| Ctrl-S | put the line away, or bring back the one you put away |
 | Escape | discard a half-typed prompt, or stop a running turn |
 | Ctrl-C | stop the nearest thing there is to stop, and leave when there is nothing left |
 | Up / Down | walk back through prompts you have sent |
@@ -122,13 +123,52 @@ was never part of it.
 
 Stopping a turn leaves the queue alone: the next waiting prompt starts as it would after any turn.
 
+## Putting a line away
+
+A better thought arrives while a worse one is half written, most often during a turn, and the two
+ways out used to be sending the first or losing it. Escape is not a third — it discards, and there is
+nowhere to have got the words back from.
+
+**Ctrl-S** is read against the line rather than remembered. A line in the box is put away and the box
+emptied; an empty box is where a line you put away earlier comes back, with the caret at its end,
+where you carry on typing. There is one place to put a line, so a second one replaces the first, and
+a line that has come back is no longer there to come back again: the next press on the empty box it
+left has nothing to do, and says nothing.
+
+Nothing is sent, so a running turn refuses none of it — sending is the only thing a running turn
+refuses. What a line names is settled when it is sent rather than when it is put away, so a file
+attached to a stashed line is still staged, and is named again when the words holding it come back.
+
+**The words travel and the mode does not.** What is put away is what you typed, and `!` is a mode
+rather than a character, so it stays where you left it. A prompt comes back into an armed shell as
+the command you are writing now, and a command comes back onto an ordinary prompt as words.
+
+A line put away says so, on one row beneath the box — one row however long the line was — and names
+the key that returns it. Where the width will not hold both, the words stay and the reminder goes:
+which line is waiting is the part only that row can tell you, and the key is in the list `?` puts up
+as well. The row is the whole of what makes the key safe to press. A press that emptied the box and
+said nothing would be indistinguishable from one that threw a paragraph away, and the only way to
+find out which it had been would be to press again and hope.
+
+The caret is not carried back. It belongs to an edit that has finished, and restoring it would put
+you back in the middle of a sentence you have not looked at since.
+
+:::note
+Ctrl-S is the byte a terminal traditionally freezes its output with. It reaches bravebot because the
+session turns that flow control off for as long as it holds the terminal, which is what makes the key
+bindable at all. Behind a `tmux`, `screen` or `ssh` configured to keep flow control, the key can be
+taken before it arrives, and then it does nothing here. Nothing is lost when that happens, because
+the line stays in the box.
+:::
+
 ## The rows beneath the box
 
 They run in one order, nearest the box first:
 
 1. what the line in the box carries — attached files and pictures;
-2. prompts waiting for the turn in flight;
-3. what a half-typed line could still become — slash-command or `@path` completions.
+2. a line you have put away;
+3. prompts waiting for the turn in flight;
+4. what a half-typed line could still become — slash-command or `@path` completions.
 
 ## Markers
 

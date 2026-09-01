@@ -61,6 +61,7 @@ Without a channel, `stable` is what importing means. `--forget` removes what was
 | Enter | Send |
 | Shift-Enter, Ctrl-J | New line without sending |
 | Ctrl-G | Compose in `$VISUAL` or `$EDITOR` |
+| Ctrl-S | Stash the line, or bring back the stashed one |
 | Ctrl-V | Paste, including screenshots |
 | Ctrl-T | Toggle the audit trail |
 | Ctrl-O | Open the scroller over the transcript |
