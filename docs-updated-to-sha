@@ -1,0 +1,15 @@
+# The brave-bot commit this documentation is current as of.
+#
+# Everything on this site describes behaviour specified clause by clause in brave-bot's
+# docs/specs. This file records how far along that history the site has been brought, so
+# the next update knows where to start reading.
+#
+# Run `make docs-changes` to see what has landed since, and the update-docs skill
+# (agents/skills/update-docs) to fold it in. The skill rewrites the sha below; nothing
+# else should.
+#
+# walk away from a reply rather than waiting for it to start
+# 2026-08-30
+# https://github.com/brave-experiments/brave-bot/commit/8b6ad10445b3239fb56e09faf13968efba8449a3
+
+8b6ad10445b3239fb56e09faf13968efba8449a3
