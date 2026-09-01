@@ -69,6 +69,7 @@ Without a channel, `stable` is what importing means. `--forget` removes what was
 | Home / End | Jump to the start or the latest |
 | Esc | Cancel a running turn, or clear the input |
 | Ctrl-C | Stop the nearest thing; leave when there is nothing left |
+| `?` | List every key, on an empty line |
 
 The full behaviour is in [Interactive mode](../using/interactive-mode.md), and the scroller's own keys
 are in [Reading the transcript](../using/transcript.md#the-scroller).

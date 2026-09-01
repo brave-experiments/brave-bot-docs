@@ -24,12 +24,33 @@ growing further. It keeps growing while a turn runs.
 | Ctrl-C | stop the nearest thing there is to stop, and leave when there is nothing left |
 | Up / Down | walk back through prompts you have sent |
 | Tab | complete a slash command or an `@path` |
+| `?` | on an empty line, list every key |
 
 Enter on an empty line does nothing. Shift-Enter needs a terminal that reports the modifier
 (Ghostty, Kitty, WezTerm) or one configured to send a newline; **Ctrl-J is the fallback that always
 works**, in every terminal and in shell mode too.
 
 Ctrl-G does nothing while a turn runs.
+
+## Looking up the keys
+
+`?` on an empty line puts up every key and what it does. A second `?` takes the list down, as does
+Escape, or typing anything at all. It is a mode rather than a character, the way `!` is: nothing
+lands in the box, so there is nothing to delete afterwards.
+
+Only on an empty line. A `?` part-way through a sentence is the punctuation you are asking a
+question with, and in shell mode it is a glob for your shell to expand.
+
+The list is not a completion — there is nothing in it to choose, so Tab and the arrows go on meaning
+what they mean everywhere else while it is up. It folds into as many columns as the width holds, and
+no row runs past the edge. It is the one place the keys are written down, which is what stops it
+advertising a binding that has since changed.
+
+The row beneath the box carries what the session is doing — the trail, the confinement, and how full
+the context is — and then `? for shortcuts`. It names no binding of its own. The two used to share
+one line, and the line was wider than the terminal, so the end of it was cut: everything you could
+look up was taking room from the figures you had no other way to see. A binding cut off is one you
+learn once, and a context reading cut off is gone.
 
 ## Stopping and leaving
 
