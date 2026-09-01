@@ -35,6 +35,50 @@ so, and an ordinary one does not clutter the transcript saying what always happe
 
 A tiny terminal still renders.
 
+## Themes
+
+`/theme` opens a picker on the palette the interface is painted in. Up and Down — or `k` and `j` —
+move the cursor, Enter keeps the theme under it, and Escape puts back the one that was in force when
+the picker opened. `/theme <name>` applies a theme without opening the panel at all.
+
+The picker is a bordered panel in the middle of the screen rather than a full-screen list, because a
+full-screen list hides the thing a theme is for. Your session stays visible behind it and is redrawn
+every time the cursor moves, so what you are previewing is your own transcript rather than an empty
+page. On a tiny terminal the panel shrinks to stay inside the frame.
+
+Under the list is a row for whatever a theme does that its name does not say. Only `brave` has
+anything there — it is the only theme whose inks depend on your terminal, and its name says who it is
+from rather than what it does. The row is drawn empty for the rest, so the list does not shift under
+the cursor as it moves.
+
+### What a theme decides
+
+Where a colour is what tells one thing on the screen from another, `brave` uses a shade it mixes
+itself rather than one of the sixteen named colours. A named colour is a slot your terminal repaints,
+so it is a request rather than a colour: the same code drew something different in every profile,
+which is how one slot came to carry two meanings at once without anybody choosing that. The named
+slots are kept only where the meaning is your terminal's own — green for finished, red for failed,
+dim grey for an aside — which you read against whatever palette you chose rather than against each
+other. A mixed shade that has to stay legible against the background is picked for the background
+sensed at startup, and a terminal that will not say which it has is treated as dark.
+
+A theme you choose by name paints every role from its own palette, including the background and the
+default text. No named slots are used there, so two roles cannot collapse into one because your
+terminal remapped green.
+
+:::note
+The question about your background colour is asked once, before the first frame, and the answer is
+read straight off the terminal. Anything typed or pasted into the window before it arrives is read by
+that same question and discarded, and a terminal that answers with nothing holds the window open for
+its full 80 milliseconds. It happens once a session, before there is a box to type into.
+:::
+
+The palette never changes what a marking means. Quarantine stands on the margin, not on a colour, in
+every theme.
+
+See [Configuration](../customize/configuration.md#choosing-a-theme) for where the choice is stored
+and how to write one of your own.
+
 ## Scrolling at rest
 
 | Key | Where the view goes |

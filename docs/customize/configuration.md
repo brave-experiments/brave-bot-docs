@@ -40,10 +40,12 @@ Everything that should outlive a session lives here:
 | `~/.bravebot/sessions/<directory>/` | session records and audit trails |
 | `~/.bravebot/history` | prompts you have sent |
 | `~/.bravebot/model` | the model chosen with `/model` |
+| `~/.bravebot/theme` | the theme chosen with `/theme` |
+| `~/.bravebot/themes/<name>.json` | themes you wrote yourself |
 
-The directory rather than a per-project file, for the same reason in both cases: a question worth
-asking again is usually worth asking in another checkout too, and which model to think with is not a
-property of a checkout.
+The directory rather than a per-project file, for the same reason in every case: a question worth
+asking again is usually worth asking in another checkout too, and neither which model to think with
+nor which colours to draw in is a property of a checkout.
 
 Every operation here degrades to doing nothing. A missing home directory, a read-only disk or a
 corrupt file is not worth refusing to start over, because the session works without any of it.
@@ -75,6 +77,49 @@ resolve per request, and `automatic` itself picks per request.
 The names never reach a model. They are drawn for a person, who picks one, and what they picked
 becomes the `model` field of later requests — a routing field, endorsed by a person choosing it off a
 list they read.
+
+## Choosing a theme
+
+```
+/theme
+```
+
+opens a picker that live-previews over your own transcript; `/theme <name>` applies one directly. The
+choice is written to `~/.bravebot/theme`, so it outlives the session that made it and applies in every
+directory, exactly as the model choice does. A name that matches no theme, and an empty or corrupt
+file, is no choice at all and falls back to `brave`. A choice saved under the earlier name `system`
+still finds `brave` rather than being silently lost.
+
+A theme of your own is a JSON file under `~/.bravebot/themes/`, named for the theme: `nord.json` is
+the theme `nord`. Each key is one role, and any you leave out inherits from `brave`:
+
+```json
+{
+  "defs": { "ink": "#cdd6f4", "shell": "#1e1e2e" },
+  "background": "shell",
+  "text": "ink",
+  "muted": "#6c7086",
+  "ok": "#a6e3a1",
+  "fail": "#f38ba8",
+  "running": "#f9e2af",
+  "accent": "#cba6f7",
+  "note": "#fab387",
+  "primary": "#89b4fa"
+}
+```
+
+A value is a `#rrggbb` colour, a name from `defs`, or `none` to leave that role to your terminal's own
+default. A `defs` entry that names another `defs` entry is refused rather than chased, so a palette
+cannot loop. A file that will not parse is left out of the list rather than stopping the session.
+
+:::note
+Themes are read from `~/.bravebot/themes` and from nowhere else. A `.bravebot/themes` directory inside
+a project is **not** consulted, because a workspace is content: a repository you have just cloned must
+not be able to decide how your interface is painted, and colours are how you tell one thing on the
+screen from another.
+:::
+
+See [Reading the transcript](../using/transcript.md#themes) for what each role paints.
 
 ## Environment variables
 

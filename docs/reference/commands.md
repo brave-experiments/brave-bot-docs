@@ -1,7 +1,7 @@
 ---
 sidebar_position: 2
 title: Slash commands
-description: The seven commands the interface acts on itself, and the rules every one of them shares.
+description: The eight commands the interface acts on itself, and the rules every one of them shares.
 ---
 
 # Slash commands
@@ -12,6 +12,7 @@ A line beginning with `/` is acted on by the interface itself, in place of being
 |---|---|---|
 | `/status` | | Report this session, what it may touch, and what it has spent |
 | `/model` | | Choose which model to think with |
+| `/theme` | `[name]` | Choose the palette the interface is painted in |
 | `/add-dir` | `<path>` | Open another directory, and trust it for this session |
 | `/rename` | `<name>` | Call this conversation something else |
 | `/compact` | | Summarise the conversation so far, keeping the recent part |
@@ -45,6 +46,18 @@ Opens a picker on the model in use. The list comes from the endpoint rather than
 it is whatever the backend offers today, and the choice is written to `~/.bravebot` — it outlives the
 session and applies in every directory. See
 [Configuration](../customize/configuration.md#choosing-a-model).
+
+## `/theme [name]`
+
+Opens a picker on the palette in force. Up and Down move the cursor, and the theme under it is put in
+force while it is selected, so you are comparing themes against your own transcript rather than
+against a sample. Enter keeps the one on the cursor and Escape restores the one that was in force when
+the picker opened. With a name, `/theme nord` applies it without opening the panel.
+
+The choice is written to `~/.bravebot`, so it outlives the session and applies in every directory.
+Themes of your own are JSON files under `~/.bravebot/themes/`, and nothing in a workspace is read. See
+[Choosing a theme](../customize/configuration.md#choosing-a-theme) and
+[Themes](../using/transcript.md#themes).
 
 ## `/add-dir <path>`
 
