@@ -21,6 +21,15 @@ The margin is on every drawn **row**, not every line of the content. A line wide
 broken to the width by the same step that draws the margin, and each row it breaks into carries a bar
 of its own.
 
+**What the session says in its own voice is drawn in an ink of its own** — the trust question, a
+confinement that is unavailable, a status report. Never the ink that marks untrusted content, which
+is spoken for twice over already: a call still running, and the margin down every block the planner
+may not read. Drawing a note in it said the trust question was quarantined.
+
+Colour is never what makes that marking hold. A colour can be imitated by the content beside it,
+which is exactly why quarantine stands on the margin instead: no ink tells you whether something is
+quarantined, and a note drawn in the wrong one would still be outside a block.
+
 Where a result went is drawn only where that is not the ordinary answer — so a quarantined read says
 so, and an ordinary one does not clutter the transcript saying what always happens.
 
