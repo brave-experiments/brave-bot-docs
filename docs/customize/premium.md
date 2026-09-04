@@ -76,8 +76,11 @@ Finding nothing has two causes, and they are not the same fact.
 belonging to no environment, such as a local one, is this case too — no credential belongs near it by
 design.
 
-**A batch that exists and could not be read** is reported to you, naming the channel and the reason.
-That happens when the store refuses, or when another version wrote the entry.
+**A batch that exists and cannot be spent** is reported to you, with the reason and what to do about
+it. That covers a file that could not be read, one another version wrote, and one imported for an
+environment this endpoint does not accept — a credential only verifies against the deployment that
+signed it, so a batch from the wrong Brave channel is refused with the reason rather than passed
+over.
 
 The difference matters because of what happens next. The request goes out on the free tier, where the
 endpoint answers a premium model name by **substituting a weaker model rather than failing** — a 200
@@ -114,7 +117,8 @@ point is worse than one that omits it.
   is not supported.
 - The build must know the premium host. Without it, premium is unavailable.
 - A credential only works against the deployment that issued it, so import from the Brave channel
-  matching the environment the binary is configured for. Mismatching them returns a 401.
+  matching the environment the binary is configured for. A mismatch is refused before a request is
+  made, rather than sent and answered with a 401.
 - Sign in to Leo in that Brave install first: a subscription that is not in the profile cannot be
   imported.
 - The stored batch is a bearer secret in a file you own. It is not encrypted at rest, which is what
