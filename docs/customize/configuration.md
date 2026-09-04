@@ -43,6 +43,9 @@ Everything that should outlive a session lives here:
 | `~/.bravebot/theme` | the theme chosen with `/theme` |
 | `~/.bravebot/themes/<name>.json` | themes you wrote yourself |
 
+An imported Leo Premium subscription is kept here too, in a file only you can read — see
+[Leo Premium](premium.md#where-they-are-kept).
+
 The directory rather than a per-project file, for the same reason in every case: a question worth
 asking again is usually worth asking in another checkout too, and neither which model to think with
 nor which colours to draw in is a property of a checkout.

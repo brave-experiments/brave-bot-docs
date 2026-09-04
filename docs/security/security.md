@@ -113,7 +113,9 @@ ever written down**, by construction rather than by filtering, and quarantined c
 at all. A pasted picture is written, because it was part of your own message. Deleting the session
 removes it.
 
-Leo Premium credentials live in the system keychain, never in a file.
+Leo Premium credentials live in a mode-0600 file under `~/.bravebot`, readable only by you. They are
+not encrypted at rest, which is what the browser they are imported from does with the same secret.
+See [Leo Premium](../customize/premium.md#where-they-are-kept).
 
 ## Reporting a problem
 

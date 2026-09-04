@@ -45,11 +45,28 @@ touches the store.
 
 ## Where they are kept
 
-In the system keychain, not in a file, and each channel is stored separately. A malformed or empty
-entry is reported as such rather than treated as absent credentials, and a credential without a token
-is rejected on load.
+In one file under `~/.bravebot`, created mode 0600 before anything is written to it and still 0600
+after a re-import over an existing one. Nothing asks you for a password.
 
-Importing, and the first request of a session, may ask for your keychain password.
+**One file, not one per channel.** You have one subscription however many Brave builds are installed,
+so importing from Nightly replaces what was imported from Stable rather than sitting beside it. The
+channel only says which browser profile to read the order id from, which is a fact about your machine
+rather than about the agent — so `--forget` takes no channel. Forgetting removes the file, and is not
+an error when there was nothing to remove.
+
+A malformed or empty file is reported as such rather than treated as absent credentials, and a
+credential without a token is rejected on load. With no home directory there is nowhere a secret
+belongs, and that is reported rather than guessed at.
+
+**Why not the system keychain.** It was the keychain, and that was wrong on both halves of the trade.
+The browser these are imported from keeps the same secret unencrypted in its own profile, so a
+keychain here guarded a copy of something already readable in the file the copy came from. Nor did it
+hold against the threat it was written for — a program `run` launches reading the file — because
+those programs are [deliberately unconfined](../security/permissions.md), and anything that can read
+a file as you can already reach larger secrets on the same machine. What it cost was availability: it
+had one Linux backend, a desktop session's secret service, so a machine reached over SSH had no store
+to open at all and everybody in that position was silently on the free tier. And a password dialog,
+since the whole decrypted batch is held in memory for the session either way.
 
 ## When a subscription cannot be read
 
@@ -75,11 +92,10 @@ reason.
 compiled with. Before the first turn it says premium is *available*, rather than claiming it is or is
 not in use.
 
-The opening screen draws the tier beside the confinement, in the same words `/status` uses before a
-turn has run. It deliberately does **not** open the credential store: naming the real tier means
-unlocking it, which prompts for a password, and a dialog on every session opened before anybody has
-typed anything is how people are trained to approve dialogs unread. A pane too narrow for the
-wordmark still reports both.
+The opening screen draws the tier beside the confinement, from the configuration, in the same words
+`/status` uses before a turn has run. It deliberately does **not** read the credential store: a
+stored batch may be expired, exhausted, or issued for another environment, so finding one would not
+settle the tier either. A pane too narrow for the wordmark still reports both.
 
 Where the server reports using a model other than the one you asked for, **both are shown** — the
 choice you made and the model that actually answered — said once when it starts happening rather than
@@ -94,12 +110,15 @@ point is worse than one that omits it.
 
 ## Requirements and limits
 
-- **macOS and Linux.** Windows is not supported.
+- **macOS and Linux**, including a machine with no desktop session — nothing here needs one. Windows
+  is not supported.
 - The build must know the premium host. Without it, premium is unavailable.
 - A credential only works against the deployment that issued it, so import from the Brave channel
   matching the environment the binary is configured for. Mismatching them returns a 401.
 - Sign in to Leo in that Brave install first: a subscription that is not in the profile cannot be
   imported.
+- The stored batch is a bearer secret in a file you own. It is not encrypted at rest, which is what
+  the browser does with the same secret, and anything running as you can read it.
 
 ## Checking what you have
 
@@ -107,10 +126,6 @@ point is worse than one that omits it.
 bravebot doctor
 ```
 
-reports which channels have an imported subscription and how much of it is left:
-
-```
-  leo       stable subscription imported, 84 of 90 credentials unspent
-```
-
-Counts only. A credential is a bearer secret, so none of it is printed.
+reports whether a subscription is imported, which environment it was issued for, and how many of its
+credentials are still unspent. Counts only: a credential is a bearer secret, so none of it is
+printed.
