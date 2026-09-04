@@ -49,6 +49,24 @@ model, a file being written, a program being run, a request leaving the process.
 single question and refuses rather than warning, so there is no path to a consequence that does not go
 through one.
 
+## Compaction is recorded
+
+Every compaction gets a line: how many messages were summarised, how many were kept word for word,
+what the summary cost, and which tool-calling round it landed on. A `/compact` you asked for between
+rounds reports round zero, having interrupted nothing.
+
+It is recorded *after* the conversation is shortened, so a summary refused on the way back in leaves
+no line claiming one was made.
+
+A compaction is the point a session stops being able to remember what it did, and it gets read back
+afterwards to ask exactly two things: where that happened, and whether it helped. A record saying
+only that a summary was adopted answers neither, since one that gave up ninety messages and one that
+gave up three read identically. The round matters most for a compaction the budget forced, which
+lands in the middle of a turn's work — a timestamp says when in the session, and only the round says
+how far into the work.
+
+Counts and nothing else, so this carries no more content than the rest of the trail does.
+
 ## The trail holds no content
 
 Every field is a gate name, a capability, a label, a path or a slot id. That is exactly why it can be
