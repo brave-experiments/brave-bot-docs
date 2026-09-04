@@ -51,6 +51,24 @@ is rejected on load.
 
 Importing, and the first request of a session, may ask for your keychain password.
 
+## When a subscription cannot be read
+
+Finding nothing has two causes, and they are not the same fact.
+
+**Nothing imported** is the free tier working as intended, and nothing is said about it. An endpoint
+belonging to no environment, such as a local one, is this case too — no credential belongs near it by
+design.
+
+**A batch that exists and could not be read** is reported to you, naming the channel and the reason.
+That happens when the store refuses, or when another version wrote the entry.
+
+The difference matters because of what happens next. The request goes out on the free tier, where the
+endpoint answers a premium model name by **substituting a weaker model rather than failing** — a 200
+and an ordinary reply. So a request that silently lost its credential still returns something that
+reads like an answer, and nothing on your screen would connect that to the store. The downgrade has
+to be said out loud, because its only other symptom is the agent appearing to get worse for no
+reason.
+
 ## Requirements and limits
 
 - **macOS and Linux.** Windows is not supported.
