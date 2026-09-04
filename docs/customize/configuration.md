@@ -121,6 +121,46 @@ screen from another.
 
 See [Reading the transcript](../using/transcript.md#themes) for what each role paints.
 
+## Choosing a language
+
+Brave Bot reads the interface in your language where a translation for it has shipped, and in English
+otherwise. It takes the first of `BRAVEBOT_LOCALE`, `LC_ALL`, `LC_MESSAGES` and `LANG` that is set, so
+on a machine already set up for French there is nothing to do.
+
+```sh
+bravebot                          # whatever your shell says
+BRAVEBOT_LOCALE=fr bravebot       # this once
+export BRAVEBOT_LOCALE=fr         # from now on
+```
+
+`BRAVEBOT_LOCALE` is there so one program can be in a language the rest of your shell is not — which
+is usually wanted the other way round, an English interface on an otherwise French machine.
+
+A request widens rather than failing: `fr-CA` and `fr-BE` are answered by the French catalog where
+they have none of their own, and a language nothing has shipped for reads in English. `LC_ALL=C` asks
+for no translation at all. English and French are what ship today.
+
+### What stays in English
+
+- **The names of the slash commands**, so `/model` is `/model` everywhere.
+- **The letters a question is answered with**, `y` and `n`. These are both the key drawn and the key
+  matched, so a French reader is told to press `y` for *oui*. Changing that would mean changing what
+  the interface listens for, not just what it says.
+- **The audit trail.** It is a record rather than prose — fixed columns of gate and capability names
+  that are identifiers, read against the specs that use those same names.
+- **The words on the working indicator**, unless a language supplies its own list. They are chosen
+  for tone and variety rather than meaning, and translating one word for word keeps neither.
+
+Digit grouping and currency forms are not localized either; a catalog says only what separates a
+whole number from its fraction. A partial imitation of the full rules reads worse than a plain
+number, because it is wrong only sometimes.
+
+**Nothing the model is sent changes with your language.** Tool descriptions, the preamble and the
+sentence a refused tool answers with all stay as they are, because the words in them are load-bearing
+on what the planner does. Translating them would make the agent *behave* differently in French, which
+is a change nobody would find by reading the French. So switching language changes what you read and
+never what the agent does.
+
 ## Environment variables
 
 The environment wins when set, which is how a released binary is pointed at a local backend without
@@ -134,6 +174,7 @@ rebuilding it.
 | `BRAVE_SERVICES_KEY_ID` | the key id that goes with it |
 | `BRAVE_AI_CHAT_DEFAULT_MODEL` | the model to request when nobody has chosen one |
 | `BRAVEBOT_CONTEXT_BUDGET` | the token budget before a conversation is compacted |
+| `BRAVEBOT_LOCALE` | the language the interface is read in |
 
 To point a release build at a backend running locally:
 
