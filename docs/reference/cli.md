@@ -39,6 +39,7 @@ Anything that is not a recognised flag or subcommand is treated as the task prom
 |---|---|
 | `--file <path>` | include a workspace file as **trusted** context; repeatable |
 | `-p`, `--print` | non-interactive; reads piped stdin as quarantined context |
+| `--mode <turn\|manifest>` | how a one-shot is run; `turn` (the default) decides step by step, `manifest` plans the whole run first |
 | `--trace` | print the audit trail to stderr |
 | `-h`, `--help` | show the help |
 | `-V`, `--version` | show the version |

@@ -64,6 +64,56 @@ carried, and what was released.
 bravebot "what does this do?" --file src/main.rs --trace 2> trail.txt
 ```
 
+## Planning the whole run first
+
+```sh
+bravebot --mode manifest "collect every TODO comment into notes/todos.md"
+```
+
+The default, `--mode turn`, is what an unqualified `bravebot "task"` has always been: observe,
+decide, act, and decide again after each thing it reads. `--mode manifest` decides **everything
+first**. The planner emits a step list, that list is refused or frozen, and a driver walks it with
+no model anywhere in the control path.
+
+This is not a stricter policy — the gates are exactly the same ones. What changes is the scope of
+the precommitment, from one turn to a whole run.
+
+**A plan is a program, so every field in it is a decision.** The planner may write one only from a
+context holding your task and the driver's own words, having been shown nothing else. A plan built
+from anything an attacker wrote would be an attacker choosing the steps, and there is no repairing
+that. So a plan that fails validation fails the run whole: nothing is half adopted, no step is
+patched to make a plan usable, and **nothing re-plans** once a step has read something.
+
+Where every effect will land is locked in before the first byte is read. Steps take their
+destinations from that lock rather than from themselves, and the driver adds nothing — it cannot
+insert, skip, reorder or invent a step.
+
+### What a plan cannot use
+
+- **`edit_file`**, because locating a passage means having read the file, and the planner has read
+  nothing.
+- **`todo_write`**, because the manifest is already the task list.
+- **`run`, and any shell.** A command string is destination and payload at once.
+- **Piped stdin**, which is refused rather than dropped: a pipe is observed context, and this mode
+  does not observe before it plans. Name a workspace file with `--file` instead.
+
+Everything a step produces is quarantined, whatever its label — there is no planner left to show it
+to. The ways out of a step's result are a later processor, a write back into the workspace, and a
+release the plan named in advance. Nothing widens that set while the run is going.
+
+### What comes back
+
+The plain-words goal, the proposed plan verbatim, the frozen steps, and what each one did. They
+come back on success **and on failure** — an artefact is never dropped on the error path, and
+inspecting one is never behind a flag. A plan that would not parse has no rendered form, so the
+model's own words are the only thing left to look at, and those come back too.
+
+A failed plan is printed on stderr even without `--trace`, because otherwise a one-line complaint
+is all that survives of a document nobody can see. The plan never shares stdout with the reply.
+
+An unknown mode name is refused rather than guessed: guessing wrong here would silently run the
+mode you did not ask for.
+
 ## A one-shot turn is bounded
 
 A one-shot run carries a limit of 200 rounds of tool calls, where an interactive turn carries none.
