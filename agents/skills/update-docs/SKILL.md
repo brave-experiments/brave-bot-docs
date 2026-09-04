@@ -108,12 +108,23 @@ read. The test is whether somebody *using* bravebot would go looking for it in o
 thing better. If they would not, it does not go on a page, however clearly the commit explains
 itself.
 
+The reader to picture is a developer **using** bravebot on their own project, not one working on
+bravebot itself. Both are developers, which is what makes this easy to get wrong: a commit about
+tooling, editors, or agent configuration reads as relevant right up until you ask whose repository
+it is about.
+
 Things that routinely fail that test:
 
 - how the project is built, released, tested, or reviewed;
+- how a contributor sets up their checkout, their editor, or the agents that work on brave-bot;
 - how a contributor adds a message, a language, a spec clause, or a crate;
 - a refactor, a rename, or an internal boundary moving;
 - a behaviour that has landed but that nothing a user can reach exposes yet.
+
+**[development.md](../../../docs/development.md) is not an escape hatch for the above.** That page
+is for a reader building bravebot from source or asking how the project is specified, and its
+existence is not a reason to find a home for contributor workflow that would otherwise be dropped.
+A change that fails the test above fails it whatever page would have accepted it.
 
 That last one is the one worth being careful about, because the commit body reads exactly like a
 feature. A capability wired up but not yet offered anywhere a person can see is not behaviour this
