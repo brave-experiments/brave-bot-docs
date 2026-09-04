@@ -220,6 +220,20 @@ Ctrl-O opens the scroller over the transcript, and Ctrl-T toggles the audit trai
 
 ## Long turns
 
-A turn may make 40 rounds of tool calls. On the fortieth the next request offers no tools and the
-planner is told it has none left, so it answers with what it has. This is a bound on futility rather
-than a safety property: a gate refuses on the thousandth round what it refuses on the first.
+**An interactive turn has no round limit.** You can see what it is doing and a stop reaches it
+mid-round, so any number would only interrupt work that was going fine. This was a fixed 40 rounds
+everywhere, which cut real work short in a large repository.
+
+Whoever is watching decides the limit, so the limit belongs to the caller rather than to the
+program. A one-shot [`-p` run](headless.md) and a manifest run carry a bound, because an unwatched
+loop has nothing else to end it.
+
+Where a bound applies, reaching it costs the turn its tools rather than ending it: the next request
+offers none, the planner is told it has none left, and it answers with what it has. A call it asks
+for anyway is dropped rather than run. This is a bound on futility rather than a safety property —
+a gate refuses on the thousandth round what it refuses on the first.
+
+It is also not the same thing as [compaction](context.md), which bounds how full the context is
+rather than how long a turn runs. A planner globbing for a file it cannot name stays under any
+budget indefinitely, so compaction is what lets that run forever rather than what stops it. The two
+cover opposite failures: compaction stops a turn dying, this stops a turn never dying.

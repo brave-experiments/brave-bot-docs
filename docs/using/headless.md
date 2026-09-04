@@ -64,6 +64,16 @@ carried, and what was released.
 bravebot "what does this do?" --file src/main.rs --trace 2> trail.txt
 ```
 
+## A one-shot turn is bounded
+
+A one-shot run carries a limit of 200 rounds of tool calls, where an interactive turn carries none.
+Nobody is watching an unattended loop, and nothing else would end it; interactively you can see what
+a turn is doing and stop it mid-round. On the limiting round the planner is offered no tools and
+told it has none left, so it answers with what it has.
+
+The default is bounded because a default cannot know whether anybody is watching, and being wrong
+that way is the cheaper mistake.
+
 ## Exit codes
 
 A failure exits non-zero. A configuration error, a refused argument, and a turn that could not run

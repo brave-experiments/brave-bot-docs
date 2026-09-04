@@ -108,8 +108,10 @@ stages instead. To use a real shell, type `!` yourself. See
 `BRAVEBOT_CONTEXT_BUDGET`, which defaults to 24,000 prompt tokens — the default sits well below any
 real window on purpose, because a budget above the window never fires at all.
 
-**It stopped calling tools and just answered.** A turn may make 40 rounds. On the fortieth the planner
-is told it has no tools left, so it answers with what it has. Ask again with a narrower task.
+**It stopped calling tools and just answered.** A bounded turn reached its round limit: the planner
+is told it has no tools left, so it answers with what it has. Ask again with a narrower task. An
+interactive turn carries no such limit, so this is a one-shot or manifest run, where the default is
+200 rounds.
 
 ## Sessions
 

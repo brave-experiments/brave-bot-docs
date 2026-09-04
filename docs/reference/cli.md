@@ -119,5 +119,5 @@ one-shot run is pipeable.
 |---|---|
 | piped input | 10 MiB, refused rather than truncated past that |
 | a pasted picture | 10 MB |
-| tool rounds in one turn | 40, after which the planner answers with what it has |
+| tool rounds in one turn | unbounded interactively; 200 for a one-shot or manifest run, after which the planner answers with what it has |
 | default context budget | 24,000 prompt tokens before compaction |
