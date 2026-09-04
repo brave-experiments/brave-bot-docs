@@ -15,11 +15,13 @@ bravebot doctor
 
 ```
 configuration OK
+  offers    Brave Leo
   endpoint  https://ai-chat.bsg.brave.com/v1/chat/completions
   premium   https://ai-chat-premium.bsg.brave.com/v1/chat/completions
   key id    …
   model     automatic (default)
   key       … (never transmitted)
+  settings  no settings.json
 
 confinement …
   mechanisms       …
@@ -28,6 +30,12 @@ confinement …
 `doctor` changes nothing. It exists to answer "what will this actually use", so it reports a choice
 where one is in force rather than the default it overrode, and a configuration error makes it fail
 rather than pass with a warning. The signing key is named as never transmitted.
+
+It reports **every backend this build can reach**, not just one, so a machine with an AWS account
+configured shows a second `offers` block with its region, profile and tiers — see
+[Reaching Claude on AWS Bedrock](#reaching-claude-on-aws-bedrock). The `settings` line names which
+keys your settings file set, and never their values: a settings file holds credentials on some
+machines, and a diagnostic that prints one is a diagnostic people paste into issues.
 
 ## `~/.bravebot`
 
@@ -42,6 +50,7 @@ Everything that should outlive a session lives here:
 | `~/.bravebot/model` | the model chosen with `/model` |
 | `~/.bravebot/theme` | the theme chosen with `/theme` |
 | `~/.bravebot/themes/<name>.json` | themes you wrote yourself |
+| `~/.bravebot/settings.json` | an `env` block naming a backend — see [below](#settingsjson) |
 
 An imported Leo Premium subscription is kept here too, in a file only you can read — see
 [Leo Premium](premium.md#where-they-are-kept).
@@ -80,6 +89,10 @@ resolve per request, and `automatic` itself picks per request.
 The names never reach a model. They are drawn for a person, who picks one, and what they picked
 becomes the `model` field of later requests — a routing field, endorsed by a person choosing it off a
 list they read.
+
+With an AWS account configured the picker offers its tiers alongside this list rather than instead of
+it, and each row says which service will answer — see
+[Reaching Claude on AWS Bedrock](#reaching-claude-on-aws-bedrock).
 
 ## Choosing a theme
 
@@ -166,8 +179,9 @@ never what the agent does.
 
 ## Environment variables
 
-The environment wins when set, which is how a released binary is pointed at a local backend without
-rebuilding it.
+The environment wins when set — over both the built-in values and
+[`settings.json`](#settingsjson) — which is how a released binary is pointed at a local backend
+without rebuilding it.
 
 | Variable | What it sets |
 |---|---|
@@ -178,6 +192,9 @@ rebuilding it.
 | `BRAVE_AI_CHAT_DEFAULT_MODEL` | the model to request when nobody has chosen one |
 | `BRAVEBOT_CONTEXT_BUDGET` | the token budget before a conversation is compacted |
 | `BRAVEBOT_LOCALE` | the language the interface is read in |
+
+Six more name an AWS account rather than this build — see
+[Reaching Claude on AWS Bedrock](#reaching-claude-on-aws-bedrock).
 
 To point a release build at a backend running locally:
 
@@ -191,6 +208,116 @@ and that choice wins, so this applies until somebody makes one.
 `BRAVEBOT_CONTEXT_BUDGET` is deliberately never baked into a binary. The others are credentials and
 hosts, which belong to the build; this is a knob one person turns while working, and a value someone
 exported to debug a session should not ship to everyone who uses their release.
+
+## `settings.json`
+
+Long-lived configuration can go in a file instead of your shell profile:
+
+```json
+{
+  "env": {
+    "CLAUDE_CODE_USE_BEDROCK": "1",
+    "AWS_REGION": "us-west-2",
+    "AWS_PROFILE": "my-profile",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "arn:aws:bedrock:…"
+  }
+}
+```
+
+Only the `env` block is read, and only string values in it: `1` and `true` are not obviously `"1"` and
+`"true"` to whoever debugs this later, so a number or a boolean is skipped rather than coerced. Every
+name in the block is read rather than a chosen subset.
+
+**The file is the same shape as Claude Code's `~/.claude/settings.json`, down to the variable names**,
+so a block that configures one configures the other unedited. That is deliberate rather than
+incidental: the names below are `CLAUDE_CODE_*` and `ANTHROPIC_*` because a second spelling for the
+same handful of values would be another thing to learn in exchange for nothing.
+
+**The environment wins over the file.** A variable exported in your shell overrides the same name here,
+which is what makes the file a place to keep a durable default rather than a thing to edit when you
+want a one-off.
+
+Two limits are worth knowing because they fail silently, by design. A file over 64 KB is refused
+rather than parsed, and **every failure is treated as absence** — no file, a syntax error, an
+unparseable value — because the built-in configuration still describes a working backend. Nothing
+refuses to start over this; `bravebot doctor` is where a file nobody can parse shows up, since the
+person who mistyped it is not necessarily the person watching a session begin.
+
+:::note
+**Nothing in this file grants a permission.** It names destinations — a region, a credential profile, a
+model — and never vouches for a path or decides whether an effect is allowed. It does not become the
+process environment either: a value is consulted where a variable would be, and reaches a subprocess
+only where that subprocess is the thing it configures. The file is the easiest thing on the machine to
+write to, so a permission grantable from here would be a permission granted by whatever last edited it.
+:::
+
+## Reaching Claude on AWS Bedrock
+
+Two services can answer a request: the aichat endpoint Brave runs, and Claude on AWS Bedrock through
+your own AWS account. Every build can reach Brave; Bedrock is what you configure.
+
+| Variable | What it sets |
+|---|---|
+| `CLAUDE_CODE_USE_BEDROCK` | turns the backend on |
+| `AWS_REGION` | which region to reach Bedrock in — **required** once it is on |
+| `AWS_PROFILE` | which profile names the credentials to sign with (optional) |
+| `ANTHROPIC_DEFAULT_OPUS_MODEL` | the model the Opus tier names |
+| `ANTHROPIC_DEFAULT_SONNET_MODEL` | the model the Sonnet tier names |
+| `ANTHROPIC_DEFAULT_HAIKU_MODEL` | the model the Haiku tier names |
+
+Each tier takes either a model id or an inference-profile ARN. With `AWS_PROFILE` unset the AWS CLI
+resolves credentials as it would for any other command, which is what a machine on instance
+credentials already relies on.
+
+**A tier you do not name is left out rather than guessed at.** An ARN cannot be derived from a model
+name, so an invented entry would be a row in the picker that fails at the far end for a reason nothing
+local could explain. Set one tier and one tier is offered.
+
+### What it changes, and what it does not
+
+**Configuring Bedrock takes nothing away from Brave.** Both rosters are offered together in `/model`,
+so this adds models rather than replacing them. It also does not move the default: what answers when
+nobody has chosen stays what it was.
+
+**The model names the service.** A request goes to whichever service offers the model it names, and
+nothing else participates — not which configuration is present, not which service answered last.
+Bedrock refuses a model it does not recognise rather than substituting one, and the aichat endpoint has
+never heard of an inference-profile ARN.
+
+Your tiers read as `Opus (your my-profile AWS profile)`, or `Opus (your AWS account)` with no profile
+set. The profile is named because it is what decides which credentials sign the request, and because
+Brave serves part of its own roster through Bedrock too — so the word "Bedrock" on a row would
+distinguish nothing. Every configured tier is marked free: premium means a Leo subscription, and
+reaching a model through your own account does not involve one.
+
+There is no `automatic` among them. There it means "let the server choose", which Bedrock does not
+offer — a request names one model and gets it or an error.
+
+If one service cannot say what it offers, the models known from your configuration alone are still
+offered; a choice is refused only when nothing is left to choose. That is the position somebody
+offline is most likely to be in.
+
+### Signing in
+
+Where AWS has no usable session, the sign-in happens **before the turn starts**, and only for the
+service the next request will actually go to — a turn served entirely by Brave never stops to
+authenticate against AWS. The screen stays yours: the URL and code the AWS CLI prints appear line by
+line where you are already reading, because those lines *are* the flow rather than a report of it, and
+collected up and printed at the end they would arrive once the code had stopped working.
+
+Credentials are resolved by running the AWS CLI, which is the tool you already sign in with. It holds
+short-lived keys that expire during a session. `aws sso logout` clears them, and note it takes no
+option to narrow itself: it removes every cached token, so other tools sharing that cache need a fresh
+`aws sso login` afterwards.
+
+### The assumed context window
+
+Every configured tier is assumed to have a 131,072-token window. Nothing at AWS reports a context
+window, and an inference-profile ARN does not say which model it resolves to, so one figure stands in
+for all of them — deliberately a low one. Being wrong upward would not shorten a conversation late, it
+would stop shortening it at all: every round asks, no round qualifies, and the session runs to
+exhaustion looking like one with nothing to summarise. Set `BRAVEBOT_CONTEXT_BUDGET` if you know your
+model's real window and want to use it.
 
 ## Context budget
 
