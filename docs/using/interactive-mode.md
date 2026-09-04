@@ -131,18 +131,12 @@ line. Nothing is waiting afterwards, so the rows under the box that said so go w
 line stays below them, where the caret is, and what each prompt named comes back staged with it — a
 marker in a recalled line stands for the same file or picture it stood for when it went.
 
-They stay in the prompt history. From your side they were sent, and taking them back does not unsay
-them.
+They stay in the prompt history — from your side they were sent, and taking them back does not
+unsay them.
 
 With nothing waiting the key is unchanged: it walks the history, and scrolls once there is nothing
-left to walk. Inside a paragraph it moves between rows first, and reaches the queue from the top row
-the same way it reaches the history there.
-
-Up is how you reach for the last thing you said, and while something is waiting the last thing you
-said is in the queue. The history holds a copy of every queued line from the moment it is queued, so
-the key used to hand back a *copy*: you rewrote it, sent it, and the original went as well. Taking a
-queued prompt back meant stopping the turn in flight, which is aimed at something else entirely and
-costs you the answer being written.
+left to walk. Inside a paragraph it moves between rows first, and reaches the queue from the top
+row the same way it reaches the history there.
 
 ## Putting a line away
 
@@ -221,19 +215,9 @@ Ctrl-O opens the scroller over the transcript, and Ctrl-T toggles the audit trai
 ## Long turns
 
 **An interactive turn has no round limit.** You can see what it is doing and a stop reaches it
-mid-round, so any number would only interrupt work that was going fine. This was a fixed 40 rounds
-everywhere, which cut real work short in a large repository.
-
-Whoever is watching decides the limit, so the limit belongs to the caller rather than to the
-program. A one-shot [`-p` run](headless.md) and a manifest run carry a bound, because an unwatched
+mid-round. A one-shot [`-p` run](headless.md) and a manifest run do carry one, since an unwatched
 loop has nothing else to end it.
 
-Where a bound applies, reaching it costs the turn its tools rather than ending it: the next request
-offers none, the planner is told it has none left, and it answers with what it has. A call it asks
-for anyway is dropped rather than run. This is a bound on futility rather than a safety property —
-a gate refuses on the thousandth round what it refuses on the first.
-
-It is also not the same thing as [compaction](context.md), which bounds how full the context is
-rather than how long a turn runs. A planner globbing for a file it cannot name stays under any
-budget indefinitely, so compaction is what lets that run forever rather than what stops it. The two
-cover opposite failures: compaction stops a turn dying, this stops a turn never dying.
+Where a bound applies, reaching it costs the turn its tools rather than ending it: the planner is
+told it has none left and answers with what it has. This is a bound on futility rather than a
+safety property — a gate refuses on the thousandth round what it refuses on the first.

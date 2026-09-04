@@ -38,18 +38,11 @@ A tiny terminal still renders.
 ## The end of a turn is said
 
 A finished turn gets a row of its own: which turn it was, what it cost, and how long it took. A turn
-that failed is reported as stopped, without a cost, since that figure is settled as a turn is
-abandoned rather than as it finishes. The row lasts until the next turn starts, and a session that
-has not run one shows nothing.
+that failed is reported as stopped, without a cost. The row lasts until the next turn starts.
 
-The working indicator going out used to be the only thing that said a turn was over, and an
-announcement made by something disappearing is one nobody reads. It matters most for the turn that
-ends on a sentence like `now let me look at the dispatch code`: the planner asked for no tool, so
-the turn ended there, and the last thing on your screen was a promise with nothing to distinguish it
-from a hang.
-
-The cost is on the row because a turn that spent forty rounds and one that spent a single round look
-identical in scrollback, and the difference is most of the explanation.
+This is how you tell a turn that ended from one that is hanging — a reply that asked for no tool
+ends the turn, so one ending on `now let me look at the dispatch code` would otherwise leave a
+promise as the last thing on screen.
 
 ## Themes
 
@@ -117,10 +110,7 @@ it, coming back exactly as it was when the scroller closes.
 
 The transcript gets every row of the screen but the last, which is the footer. The input box goes,
 the working indicator above it goes, and anything being offered beneath it goes; all of them come
-back the moment you close it. Each one is something you are invited to type at, and no key reaches
-any of them from in here — a box drawn under a mode that cannot reach it is rows spent inviting a
-keystroke that would do nothing, and a caret blinking in it says the opposite of what is true. What
-they cost goes to the transcript, which is the whole of what you opened a pager to look at.
+back the moment you close it.
 
 ### Moving
 
@@ -172,15 +162,8 @@ something you are still writing. A transcript is a record of what happened, and 
 edit back into the session is not one. No later turn reads that file, and no path in your workspace
 gains anything from its having existed.
 
-A pager can search a screen. Everything past that — reading two passages side by side, keeping a
-copy, grepping the lot — is a text editor's job, and you have one.
+Use it for anything past searching a screen: reading two passages side by side, keeping a copy,
+grepping the lot.
 
-A turn goes on underneath while the scroller is open, and the view does not move to follow it. What
-arrives joins the transcript without dragging you to the tail, and the footer says that more has
-come in below and how much, so holding your place costs you no knowledge that it did. `G` reaches
-it. The footer also says that a turn is still running, in the word the indicator would have used,
-since the indicator is not on the screen to say so itself.
-
-Holding the view is the whole of what the scroller is for. Somebody reading back through a turn
-that is going wrong is reading precisely because it is going wrong, and a view yanked to the bottom
-by the next line the model writes takes away the only thing they were trying to do.
+A turn goes on underneath while the scroller is open, and the view does not move to follow it. The
+footer says how much has arrived below, and that a turn is still running; `G` reaches it.

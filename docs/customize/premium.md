@@ -105,12 +105,6 @@ choice you made and the model that actually answered — said once when it start
 every turn. `automatic` resolving to a concrete model is not a substitution: that is the server
 choosing per request, which is what `automatic` means.
 
-Every build that knows a premium host would otherwise report itself as premium, which is a fact about
-compilation and not about any request. A session reported "premium configured" while ten consecutive
-requests went out on the free tier and were answered by a model a third the size, which then
-announced tool calls it never emitted and stalled the turn. A panel that cannot be trusted on this
-point is worse than one that omits it.
-
 ## Requirements and limits
 
 - **macOS and Linux**, including a machine with no desktop session — nothing here needs one. Windows

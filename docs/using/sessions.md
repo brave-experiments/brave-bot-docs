@@ -63,20 +63,11 @@ session recorded by a different build says so, beside the note about a changed b
 
 ## What the record accounts for
 
-The record keeps the model that answered and what **each turn** spent, alongside the total. The
-breakdown adds up to the total, and a turn that compacted part way through is charged for that too,
-since it was asked for in the middle of that turn's work.
+The record keeps the model that answered and what **each turn** spent, alongside the total — so a
+session with one turn that ran away can be told from one that was evenly expensive.
 
-The name recorded is the one that **answered**, not the one you asked for. An endpoint may serve
-something other than the name it was given, and the record is an account of what happened rather
-than of what was requested. A record written before either was kept reads as no model and an empty
-breakdown, which is not the same as a session that cost nothing — the total is still there.
-
-A transcript is read after the fact to work out why a session went the way it did, and a total alone
-answers neither question worth asking. Twenty even turns and one turn that ran away come to the same
-figure and want different fixes. Two sessions cannot be compared at all without knowing which model
-produced each, and a global setting read afterwards is today's answer rather than the one in force
-at the time.
+The name recorded is the one that **answered**, not the one you asked for, since an endpoint may
+serve something other than the name it was given.
 
 ## What is never written down
 
