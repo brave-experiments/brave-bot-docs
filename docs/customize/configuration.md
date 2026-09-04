@@ -151,14 +151,32 @@ exported to debug a session should not ship to everyone who uses their release.
 ## Context budget
 
 A conversation is compacted when it grows past its token budget: an older stretch of it is replaced by
-a summary, in the request only. The default is 24,000 prompt tokens.
+a summary, in the request only.
 
-A budget that makes no sense falls back to the default rather than disabling compaction, so a
-misconfiguration cannot quietly turn the mechanism off.
+**The budget is the window the model advertises.** The model listing reports a figure per model, and
+that figure is the budget for whichever model you chose. You do not normally set this at all.
 
-The default sits well below any real context window on purpose. A budget *above* the window never
-fires, so being wrong upward does not make compaction late — it removes it. Anyone running a larger
-model raises it rather than discovering it was never doing anything:
+A budget you set by hand outranks the advertised one. The built-in default of 24,000 prompt tokens
+only stands in for two cases: `automatic`, whose model is resolved per request so no single window
+describes it, and a model that advertises nothing.
+
+An advertised figure is believed even where it is small, and never raised toward something more
+comfortable. A budget that makes no sense falls back to the default rather than disabling compaction,
+so a misconfiguration cannot quietly turn the mechanism off.
+
+The window is looked up whenever a model is in force, not only when you pick one in the picker. A
+choice outlives the session that made it and nothing on disk remembers the window that came with it,
+so a session starting on a model you chose earlier asks again. If that lookup fails the default stays
+in place and nothing is said — being offline should not make a session open with a complaint about a
+request you never asked for.
+
+This replaced a single constant standing in for a figure that varies across the roster by a factor of
+thirty. Sessions compacted at 24,000 against a model advertising 102,400, giving up three quarters of
+the conversation they could have held, while models advertising 6,400 had a budget their window could
+never reach, so compaction could not fire for them at all. One number cannot be right for both.
+
+Setting it by hand is still there for when you want a shorter conversation than your model would
+allow:
 
 ```sh
 BRAVEBOT_CONTEXT_BUDGET=120000 bravebot
