@@ -8,8 +8,8 @@
 # (agents/skills/update-docs) to fold it in. The skill rewrites the sha below; nothing
 # else should.
 #
-# feat(agent): send a request to whichever backend offers the model it names
-# 2026-09-02
-# https://github.com/brave-experiments/brave-bot/commit/031268ed02e2b870f05eab214bf9b4e65a7b3263
+# fix(tui): paint the theme's background inside the trust prompt
+# 2026-09-03
+# https://github.com/brave-experiments/brave-bot/commit/e6718c5b714a5b0c8aa899e23c8f800431f334b7
 
-031268ed02e2b870f05eab214bf9b4e65a7b3263
+e6718c5b714a5b0c8aa899e23c8f800431f334b7
