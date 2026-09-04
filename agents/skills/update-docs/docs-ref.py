@@ -19,6 +19,13 @@ Usage:
     python3 agents/skills/update-docs/docs-ref.py show
     python3 agents/skills/update-docs/docs-ref.py changes [--all] [--full]
     python3 agents/skills/update-docs/docs-ref.py set <rev>
+    python3 agents/skills/update-docs/docs-ref.py defer <rev> <why>
+    python3 agents/skills/update-docs/docs-ref.py resolve <rev>
+
+A commit deliberately left for a later run is recorded with `defer`, because the baseline
+alone cannot express it: `set` claims everything up to a sha has been folded in, and the
+next span starts after it, so a commit skipped mid-span becomes invisible to every run
+that follows. `changes` replays whatever is still deferred ahead of the new span.
 """
 
 import argparse
@@ -31,6 +38,11 @@ from pathlib import Path
 # .../<repo>/agents/skills/update-docs/docs-ref.py -> parents[3] == <repo>
 _ROOT = Path(__file__).resolve().parents[3]
 _REF_FILE = _ROOT / 'docs-updated-to-sha'
+
+# Commits reviewed and consciously left undocumented, one `<sha> <reason>` per line. Kept
+# beside the baseline rather than in it because the two answer different questions: the
+# baseline is how far reading got, this is what reading decided to come back to.
+_DEFERRED_FILE = _ROOT / 'docs-deferred'
 
 _SOURCE_URL = 'https://github.com/brave-experiments/brave-bot'
 _SHA = re.compile(r'^[0-9a-f]{40}$')
@@ -103,6 +115,40 @@ def write_ref(sha: str, subject: str, date: str) -> None:
 ''')
 
 
+def read_deferred() -> list[tuple[str, str]]:
+    """Every (sha, reason) still waiting, oldest recorded first."""
+    if not _DEFERRED_FILE.is_file():
+        return []
+    out = []
+    for line in _DEFERRED_FILE.read_text().splitlines():
+        line = line.strip()
+        if not line or line.startswith('#'):
+            continue
+        sha, _, reason = line.partition(' ')
+        if _SHA.match(sha):
+            out.append((sha, reason.strip()))
+    return out
+
+
+def write_deferred(entries: list[tuple[str, str]]) -> None:
+    """Rewrite the ledger, or remove it once nothing is deferred."""
+    if not entries:
+        if _DEFERRED_FILE.is_file():
+            _DEFERRED_FILE.unlink()
+        return
+    body = '\n'.join(f'{sha} {reason}' for sha, reason in entries)
+    _DEFERRED_FILE.write_text(
+        '# brave-bot commits reviewed by the update-docs skill and deliberately left for a\n'
+        '# later run, with why. The baseline in docs-updated-to-sha cannot hold these: it\n'
+        '# says everything before it was folded in, and the next span begins after it, so a\n'
+        '# commit skipped mid-span would never be offered again.\n'
+        '#\n'
+        '# `docs-ref.py changes` replays these ahead of the new span. Drop one with\n'
+        '# `docs-ref.py resolve <sha>` once its behaviour is documented.\n'
+        '\n'
+        f'{body}\n')
+
+
 def _describe(repo: Path, rev: str) -> tuple[str, str, str]:
     """(sha, date, subject) for one revision, or a Problem if it is unknown here."""
     try:
@@ -144,13 +190,36 @@ def show(_args) -> int:
     print(f'brave-bot head       {head_sha[:9]}  {head_date}  {head_subject}')
     print(f'link                 {_SOURCE_URL}/commit/{ref_sha}')
     print()
+    deferred = read_deferred()
+    if deferred:
+        print(f'deferred             {len(deferred)} commit(s) awaiting a decision '
+              f'(see `make docs-changes`)')
     if behind == '0':
-        print('Up to date.')
+        print('Up to date.' if not deferred else
+              'Baseline is current, but deferred commits are still undocumented.')
     else:
         print(f'{behind} commit(s) behind, {doc_behind} of them touching '
               f'{" or ".join(_DOC_PATHS)}.')
         print('Run `make docs-changes` to see them.')
     return 0
+
+
+def _print_deferred(repo: Path) -> None:
+    """Replay the ledger ahead of the span, since the span itself excludes it."""
+    entries = read_deferred()
+    if not entries:
+        return
+    print(f'Deferred by earlier runs — these are behind the baseline and will not appear')
+    print(f'below. Decide each one again:')
+    for sha, reason in entries:
+        try:
+            _, date, subject = _describe(repo, sha)
+        except Problem:
+            print(f'  {sha[:9]}  (not in this checkout — fetch, or resolve it)  {reason}')
+            continue
+        print(f'  {sha[:9]}  {date}  {subject}')
+        print(f'             deferred because: {reason}')
+    print()
 
 
 def changes(args) -> int:
@@ -168,6 +237,8 @@ def changes(args) -> int:
     print(f'brave-bot {ref_sha[:9]}..{head_sha[:9]}, commits touching {scope}, oldest first')
     print(f'new ref once folded in: {head_sha}')
     print()
+
+    _print_deferred(repo)
 
     count = 0
     for record in _git(repo, 'log', '--reverse', '--no-merges',
@@ -217,6 +288,38 @@ def set_ref(args) -> int:
     return 0
 
 
+def defer(args) -> int:
+    repo = _source_repo()
+    sha, date, subject = _describe(repo, args.rev)
+    reason = ' '.join(args.why).strip()
+    if not reason:
+        raise Problem('A reason is required: it is what the next run reads to decide again.')
+    entries = read_deferred()
+    if any(existing == sha for existing, _ in entries):
+        entries = [(s, reason if s == sha else r) for s, r in entries]
+        print(f'{sha[:9]} already deferred; reason updated.')
+    else:
+        entries.append((sha, reason))
+        print(f'deferred {sha[:9]}  {date}  {subject}')
+    write_deferred(entries)
+    print(f'{_DEFERRED_FILE.name}: {len(entries)} commit(s) awaiting a decision.')
+    return 0
+
+
+def resolve(args) -> int:
+    repo = _source_repo()
+    sha, _, subject = _describe(repo, args.rev)
+    entries = read_deferred()
+    remaining = [(s, r) for s, r in entries if s != sha]
+    if len(remaining) == len(entries):
+        print(f'{sha[:9]} was not deferred. Nothing written.')
+        return 0
+    write_deferred(remaining)
+    print(f'resolved {sha[:9]}  {subject}')
+    print(f'{_DEFERRED_FILE.name}: {len(remaining)} commit(s) awaiting a decision.')
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -235,8 +338,23 @@ def main() -> int:
     p_set = sub.add_parser('set', help='Record a new commit as the docs baseline.')
     p_set.add_argument('rev', help='A sha, tag, or ref resolved in the brave-bot checkout.')
 
+    p_defer = sub.add_parser(
+        'defer', help='Record a commit as reviewed but deliberately not documented yet.')
+    p_defer.add_argument('rev', help='The commit being left for a later run.')
+    p_defer.add_argument('why', nargs='+', help='Why it was left, in a few words.')
+
+    p_resolve = sub.add_parser('resolve',
+                               help='Drop a commit from the deferred ledger.')
+    p_resolve.add_argument('rev', help='The commit whose behaviour is now documented.')
+
     args = parser.parse_args()
-    handler = {'show': show, 'changes': changes, 'set': set_ref}.get(args.command or 'show')
+    handler = {
+        'show': show,
+        'changes': changes,
+        'set': set_ref,
+        'defer': defer,
+        'resolve': resolve,
+    }.get(args.command or 'show')
 
     try:
         return handler(args)
