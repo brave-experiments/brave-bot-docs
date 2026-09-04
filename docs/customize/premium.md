@@ -69,6 +69,29 @@ reads like an answer, and nothing on your screen would connect that to the store
 to be said out loud, because its only other symptom is the agent appearing to get worse for no
 reason.
 
+## Which tier a turn actually ran on
+
+**What `/status` says about the tier is what the last turn actually did**, not what the build was
+compiled with. Before the first turn it says premium is *available*, rather than claiming it is or is
+not in use.
+
+The opening screen draws the tier beside the confinement, in the same words `/status` uses before a
+turn has run. It deliberately does **not** open the credential store: naming the real tier means
+unlocking it, which prompts for a password, and a dialog on every session opened before anybody has
+typed anything is how people are trained to approve dialogs unread. A pane too narrow for the
+wordmark still reports both.
+
+Where the server reports using a model other than the one you asked for, **both are shown** — the
+choice you made and the model that actually answered — said once when it starts happening rather than
+every turn. `automatic` resolving to a concrete model is not a substitution: that is the server
+choosing per request, which is what `automatic` means.
+
+Every build that knows a premium host would otherwise report itself as premium, which is a fact about
+compilation and not about any request. A session reported "premium configured" while ten consecutive
+requests went out on the free tier and were answered by a model a third the size, which then
+announced tool calls it never emitted and stalled the turn. A panel that cannot be trusted on this
+point is worse than one that omits it.
+
 ## Requirements and limits
 
 - **macOS and Linux.** Windows is not supported.

@@ -26,8 +26,10 @@ Typing `/` offers the list, and Tab completes.
 Everything the session knows about itself:
 
 - the working directory, and anything opened with `/add-dir`;
-- the model in force, and whether it was chosen or defaulted;
-- which deployment the endpoint names, and whether premium is configured;
+- the model in force, and whether it was chosen or defaulted — with the model that actually answered
+  shown beside it where the server substituted a different one;
+- which deployment the endpoint names, and **which tier the last turn ran on**, rather than which
+  tier the build was compiled to reach;
 - the confinement available here;
 - turns and tokens spent;
 - **every trust rule in force**, listed in full, each marked trusted or untrusted;
