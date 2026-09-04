@@ -33,6 +33,16 @@ The list is sorted on what each record says it was last written, not by id.
 **Leaving a session prints the command that resumes it**, after the terminal is handed back, so it
 stays on the screen you are left looking at. A session that never wrote a record prints nothing.
 
+### A manifest run is recorded, but cannot be continued
+
+A [plan-then-execute run](headless.md#planning-the-whole-run-first) writes its goal, its proposed
+plan, its frozen steps and what each one did into the record, finished or not. Its conversation is
+empty, because a session is turns over one conversation and a manifest run has none.
+
+So the picker marks the row and refuses Enter, rather than loading an empty session and asking the
+model to carry on from nothing. Naming one on the command line prints what it produced, and still
+does not continue it.
+
 ## What a resume restores
 
 The conversation, the plan each turn was working to, what the session has spent, the branch it ran
