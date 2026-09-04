@@ -146,6 +146,24 @@ Stdin is content: the planner names a quarantined reference and the policy layer
 so `sed` and `awk` work on a file nobody vouched for without the planner or the driver ever reading
 it. A stage that reads stdin and was given none receives nothing, never the terminal.
 
+### A pipeline has five minutes
+
+Every pipeline is given 300 seconds. When that runs out the stages are killed, and **what they
+printed before that comes back exactly as it would from a pipeline that ended on its own**, under
+the same label. Reaching the limit ends a run; it does not fail it. How long the run took comes
+back alongside the output, so which of the two happened is answerable without reading a byte of
+what was printed.
+
+The limit is there for the program that never ends, and the commonest such program is doing exactly
+what it was asked to. A server told to serve a page serves it, prints as it goes, and never exits.
+Returning a bare failure would throw away everything it printed and leave a program that hung
+looking identical to one that was working.
+
+**This is not a safety property.** A program that finishes inside the limit is no safer than one
+that outstays it, and nothing may be concluded about what a program did from the fact that it
+stopped in time. Being cut short neither raises nor lowers the label on the output — that is
+settled by who vouched for the command, exactly as it is for a pipeline that ran to completion.
+
 See [Vouching for a command](../security/permissions.md#vouching-for-a-command) for what `a` grants.
 
 ## `read_output`
