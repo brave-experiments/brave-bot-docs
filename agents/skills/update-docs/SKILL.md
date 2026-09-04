@@ -102,7 +102,31 @@ does not tell you what to write.
 
 ### 3. Decide what each change touches here
 
-For every changed clause, find the page that owns it. The mapping is stable:
+**First decide whether it belongs here at all.** Most spans carry commits this site has nothing to
+say about, and folding one in anyway is how a documentation site fills with text nobody came to
+read. The test is whether somebody *using* bravebot would go looking for it in order to use the
+thing better. If they would not, it does not go on a page, however clearly the commit explains
+itself.
+
+Things that routinely fail that test:
+
+- how the project is built, released, tested, or reviewed;
+- how a contributor adds a message, a language, a spec clause, or a crate;
+- a refactor, a rename, or an internal boundary moving;
+- a behaviour that has landed but that nothing a user can reach exposes yet.
+
+That last one is the one worth being careful about, because the commit body reads exactly like a
+feature. A capability wired up but not yet offered anywhere a person can see is not behaviour this
+site can describe: the pages a user would need do not exist yet, and writing them means inventing
+the surface. Leave it, say so in the summary, and let the run that lands the rest of it pick the
+whole thing up.
+
+**Never reconstruct a user-facing story out of the source.** If the specs and commit bodies in the
+span do not settle what a person sees, that is the answer — report it as an open question. Reading
+Rust to recover a flag name, a default, or a settings key is the point at which this skill has
+started inventing.
+
+For every change that survives that filter, find the page that owns it. The mapping is stable:
 
 | A brave-bot spec about | Belongs on |
 |---|---|
