@@ -143,7 +143,21 @@ screen says which.
 
 `?` says what the scroller takes, and the scroller says that it is open.
 
-`v` opens the transcript in your editor, and reads nothing back.
+### Getting the text out
+
+`v` opens the transcript in your editor. What goes is the rows as they are drawn, margins and all,
+so untrusted content is marked in the file exactly the way it is marked on the screen. It is written
+to a temporary file **outside the workspace**, opened with `$VISUAL` or `$EDITOR` the same way a
+prompt is, and the file goes when the editor exits. The key does nothing while a turn is running:
+an editor needs the screen, and a running turn is drawing it.
+
+**Nothing comes back.** The key that edits a prompt takes back what you saved, because a prompt is
+something you are still writing. A transcript is a record of what happened, and a record you can
+edit back into the session is not one. No later turn reads that file, and no path in your workspace
+gains anything from its having existed.
+
+A pager can search a screen. Everything past that — reading two passages side by side, keeping a
+copy, grepping the lot — is a text editor's job, and you have one.
 
 A turn goes on underneath while the scroller is open, and the view does not move to follow it. What
 arrives joins the transcript without dragging you to the tail, and the footer says that more has
