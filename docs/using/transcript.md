@@ -35,6 +35,22 @@ so, and an ordinary one does not clutter the transcript saying what always happe
 
 A tiny terminal still renders.
 
+## The end of a turn is said
+
+A finished turn gets a row of its own: which turn it was, what it cost, and how long it took. A turn
+that failed is reported as stopped, without a cost, since that figure is settled as a turn is
+abandoned rather than as it finishes. The row lasts until the next turn starts, and a session that
+has not run one shows nothing.
+
+The working indicator going out used to be the only thing that said a turn was over, and an
+announcement made by something disappearing is one nobody reads. It matters most for the turn that
+ends on a sentence like `now let me look at the dispatch code`: the planner asked for no tool, so
+the turn ended there, and the last thing on your screen was a promise with nothing to distinguish it
+from a hang.
+
+The cost is on the row because a turn that spent forty rounds and one that spent a single round look
+identical in scrollback, and the difference is most of the explanation.
+
 ## Themes
 
 `/theme` opens a picker on the palette the interface is painted in. Up and Down — or `k` and `j` —
