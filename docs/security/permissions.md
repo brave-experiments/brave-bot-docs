@@ -34,12 +34,6 @@ An untrusted body is marked as such, and command output is drawn inside a margin
 margin is on every drawn row, not every line of content, so a line wider than the box is broken to the
 width by the same step that draws the margin and each row carries a bar of its own.
 
-Every cell inside a prompt's border carries the theme's own background and text colour, whatever is
-drawn over them. The boundary between what the system is asking and what somebody else's bytes say is
-what you read when you answer, and a frame half in the theme and half in your terminal's own colours
-is a weaker one — as well as, under a light theme in a dark terminal, a route to text you cannot read
-at all.
-
 A review stays legible or says it could not: a long body keeps the question on screen and offers the
 rest to scroll to, a small edit in a large file shows only the change, an empty output says so, and a
 diff that cannot be computed says so rather than showing nothing.
