@@ -121,7 +121,28 @@ when its own turn begins.
 What a queued prompt names is settled when it is queued, so a file you took off the line afterwards
 was never part of it.
 
-Stopping a turn leaves the queue alone: the next waiting prompt starts as it would after any turn.
+Stopping a turn leaves the queue alone: the next waiting prompt starts as it would after any turn,
+and the rest go on waiting in order.
+
+### Taking the queue back
+
+**Up** puts everything waiting back into the box in one press, in the order you typed it, one to a
+line. Nothing is waiting afterwards, so the rows under the box that said so go with it. A half-typed
+line stays below them, where the caret is, and what each prompt named comes back staged with it — a
+marker in a recalled line stands for the same file or picture it stood for when it went.
+
+They stay in the prompt history. From your side they were sent, and taking them back does not unsay
+them.
+
+With nothing waiting the key is unchanged: it walks the history, and scrolls once there is nothing
+left to walk. Inside a paragraph it moves between rows first, and reaches the queue from the top row
+the same way it reaches the history there.
+
+Up is how you reach for the last thing you said, and while something is waiting the last thing you
+said is in the queue. The history holds a copy of every queued line from the moment it is queued, so
+the key used to hand back a *copy*: you rewrote it, sent it, and the original went as well. Taking a
+queued prompt back meant stopping the turn in flight, which is aimed at something else entirely and
+costs you the answer being written.
 
 ## Putting a line away
 
