@@ -8,7 +8,7 @@ description:
   docs-changes, docs are out of date, sync docs with brave-bot, docs drift,
   bump the docs ref.'
 argument-hint: '[rev] [--all] [dry-run]'
-allowed-tools: Bash(python3 agents/skills/update-docs/*), Bash(make docs-changes*), Bash(make docs-updated-to-sha*), Bash(make build*), Bash(git*)
+allowed-tools: Bash(python3 agents/skills/update-docs/*), Bash(make docs-changes*), Bash(make docs-updated-to-sha*), Bash(make build*), Bash(git*), Bash(grep*), Bash(rg*), Read
 ---
 
 # Bring the docs up to date with brave-bot
@@ -24,6 +24,10 @@ head, then moves the record forward.
 - `--all` widens the review to commits that touched only code, for when a behaviour change
   arrived without its spec.
 - `dry-run` reports what would change and writes nothing.
+
+Two files carry state between runs: `docs-updated-to-sha`, the commit the site is current as of,
+and `docs-deferred`, the commits reviewed and consciously postponed. The second exists because the
+first cannot express "seen, not yet written".
 
 ---
 
@@ -52,6 +56,8 @@ python3 agents/skills/update-docs/docs-ref.py show              # where the docs
 python3 agents/skills/update-docs/docs-ref.py changes           # commits to fold in
 python3 agents/skills/update-docs/docs-ref.py changes --full    # with bodies and file lists
 python3 agents/skills/update-docs/docs-ref.py set <rev>         # record a new baseline
+python3 agents/skills/update-docs/docs-ref.py defer <rev> <why> # leave one for a later run
+python3 agents/skills/update-docs/docs-ref.py resolve <rev>     # that one is now documented
 ```
 
 `make docs-updated-to-sha` and `make docs-changes` are the same first two commands.
@@ -124,15 +130,47 @@ These fail the gate every time:
 - a refactor, a rename, or an internal boundary moving;
 - a fix that makes something behave the way a reader already assumed it did;
 - a behaviour landed but not yet reachable — the commit body reads exactly like a feature, and
-  documenting it means inventing the surface. Leave it whole for the run that lands the rest.
+  documenting it means inventing the surface. Leave it whole for the run that lands the rest, and
+  **`defer` it** so that run is offered it.
 
 [development.md](../../../docs/development.md) is not an escape hatch: a change that fails the gate
 fails it whatever page would have accepted it.
 
-**Never reconstruct a user-facing story out of the source.** If the specs and commit bodies do not
-settle what a person sees, that is the answer — report it as an open question. Reading Rust to
-recover a flag name, a default or a settings key is the point at which this skill has started
-inventing.
+### Deferring is a written record, never a note in the summary
+
+A span boundary can land mid-feature: the configuration arrives in one commit and the interface that
+exposes it in the next, and the honest call on the first is to wait. That call has to be **recorded**:
+
+```sh
+python3 agents/skills/update-docs/docs-ref.py defer <sha> "config landed, no picker yet"
+```
+
+**Saying it only in the summary loses the feature permanently.** The baseline claims everything
+before it was folded in, and the next span starts *after* it, so a commit skipped mid-span is never
+offered again. `changes` replays the ledger ahead of each new span; drop an entry with `resolve
+<sha>` once its behaviour is on a page. This is not bookkeeping — it is the difference between "later"
+and "never".
+
+Anything still in that ledger is a live obligation. If the commits that complete it have since
+landed, the feature is now documentable, and the deferral is what tells you so.
+
+### Configuration outranks the gate
+
+**A change that adds or renames something a person must write in a file or export is user-facing, and
+the gate does not get to drop it.** Backends, settings keys, credential and region names, model
+selection, authentication: somebody who does not know the spelling cannot use the feature at all.
+This is the failure mode the gate produces most reliably, because a settings key reads as plumbing.
+
+**Read the source for a key name when the specs do not carry one.** A spec often argues what a
+settings file may say without naming a single variable, and a configuration page that omits its key
+names is not usable. Recovering an exact spelling is not inventing — it is the opposite — so read
+`crates/config/` and write the names down. What you must not do is reconstruct a *story* out of the
+source: if the specs and commit bodies do not settle what a person sees or why, that part is an open
+question, and the key names are still not.
+
+Check the span against [coverage.md](coverage.md) before deciding it is finished. It lists the
+subjects readers expect documented, and it exists because the gate judges commits one at a time and
+so cannot notice that an entire topic never arrived.
 
 Expect most commits in a span to fail the gate. A span that yields one corrected number is a good
 result, not a thin one.
@@ -152,6 +190,9 @@ For every change that passes, find the page that owns it. The mapping is stable:
 | skills, AGENTS.md | [customize/skills.md](../../../docs/customize/skills.md), [customize/instructions.md](../../../docs/customize/instructions.md) |
 | the trace | [security/audit-trail.md](../../../docs/security/audit-trail.md) |
 | flags, environment variables, defaults | [reference/cli.md](../../../docs/reference/cli.md), [customize/configuration.md](../../../docs/customize/configuration.md) |
+| backends, which service answers, model rosters | [customize/configuration.md](../../../docs/customize/configuration.md) |
+| `settings.json`, its keys, what wins over what | [customize/configuration.md](../../../docs/customize/configuration.md) |
+| reaching a model through the user's own cloud account, and signing in to it | [customize/configuration.md](../../../docs/customize/configuration.md) |
 | slash commands | [reference/commands.md](../../../docs/reference/commands.md) |
 | premium, credentials | [customize/premium.md](../../../docs/customize/premium.md) |
 
@@ -224,6 +265,12 @@ git add docs-updated-to-sha
 git commit -m "docs: track brave-bot up to <short-sha>"
 ```
 
+If this run documented something an earlier one deferred, clear it in the same commit:
+
+```sh
+python3 agents/skills/update-docs/docs-ref.py resolve <sha>
+```
+
 The baseline commit goes **last**. It is the claim that everything before it has been
 folded in, so it must not land while a page is still wrong. If the run stops early, having
 folded in part of the span, record the last commit actually covered rather than head, and
@@ -242,7 +289,10 @@ End with a short summary:
 - the pages changed, one line each, saying what behaviour moved;
 - **what failed the gate**, one line each, so the decisions are reviewable rather than silent.
   This list is normally the longer of the two;
-- open questions the commits did not settle.
+- **what was deferred and what was resolved**, naming the shas, so the ledger and the summary agree;
+- which [coverage.md](coverage.md) rows this span touched, and any row it showed to be missing;
+- open questions the commits did not settle. A key name is never one of these — read it from the
+  source instead.
 
 If nothing needed changing because the span touched no documented behaviour, say that and
 still move the baseline. A span reviewed and found irrelevant is a real result, and leaving
