@@ -132,6 +132,23 @@ jobs:
             exit 1
           fi
 
+      # A fold takes minutes, and main can move while it runs: Renovate merging a dependency
+      # bump is enough. Rebasing here rather than force-pushing later means whatever landed
+      # meanwhile survives, and the build below covers the result rather than the tree the
+      # run started from. A conflict fails the run, because resolving one unattended would
+      # mean guessing at somebody else's change.
+      - name: Rebase onto the latest main
+        if: ${{ steps.behind.outputs.behind == 'true' && !inputs.dry_run }}
+        working-directory: brave-bot-docs
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          if ! git rebase origin/main; then
+            git rebase --abort || true
+            echo 'main moved under this run and the changes conflict with it.'
+            exit 1
+          fi
+
       # docusaurus.config.js throws on a broken link or anchor, so this is the whole of the
       # site's correctness check, and it runs again here because the thing about to be
       # pushed is the thing that has to build.
@@ -140,6 +157,8 @@ jobs:
         working-directory: brave-bot-docs
         run: make build
 
+      # Never forced. A push refused here means main moved in the seconds since the rebase,
+      # so the answer is to rebase onto it again and try once more, not to overwrite it.
       - name: Push
         if: ${{ steps.behind.outputs.behind == 'true' && !inputs.dry_run }}
         working-directory: brave-bot-docs
@@ -150,4 +169,13 @@ jobs:
             exit 0
           fi
           git log --oneline origin/main..HEAD
-          git push origin HEAD:main
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            echo "Push $attempt refused; main moved. Rebasing onto it and retrying."
+            git fetch origin main
+            git rebase origin/main || { git rebase --abort || true; exit 1; }
+          done
+          echo 'main kept moving under three attempts.'
+          exit 1
