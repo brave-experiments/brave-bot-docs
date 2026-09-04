@@ -1,0 +1,153 @@
+name: Update Docs From brave-bot
+
+# This site is downstream of brave-bot's docs/specs, so it goes stale on its own. This job
+# runs the update-docs skill on a schedule and pushes what it produces, which keeps the lag
+# bounded without anybody remembering to look.
+#
+# The run is deliberately all-or-nothing. It pushes only when the working tree is clean and
+# `make build` passes, because a half-folded update on main is worse than one more day of
+# being behind: docs-updated-to-sha would claim ground the pages have not covered, and the
+# next run would skip it.
+
+on:
+  schedule:
+    # Daily, well clear of the hour boundary that every other cron on GitHub piles onto.
+    - cron: '17 13 * * *'
+  workflow_dispatch:
+    inputs:
+      rev:
+        description: 'Stop at this brave-bot rev instead of head (optional)'
+        required: false
+        type: string
+      dry_run:
+        description: 'Report what would change and write nothing'
+        required: false
+        type: boolean
+        default: false
+
+# The push goes out over the deploy key, not GITHUB_TOKEN. That is what lets it trigger
+# gh-pages.yml: GitHub refuses to fire workflows on a push made with GITHUB_TOKEN, so the
+# site would never rebuild if this job pushed as itself.
+permissions:
+  contents: read
+
+# Two of these overlapping would fold the same span in twice and race on the baseline, so
+# a run in flight is left to finish rather than cancelled part-way.
+concurrency:
+  group: update-docs
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    env:
+      # The skill reaches for the brave-bot checkout at ../brave-bot, so the two repositories
+      # are laid out as siblings here exactly as they are on a developer's machine.
+      BRAVE_BOT_REPO: ${{ github.workspace }}/brave-bot
+
+    steps:
+      - name: Checkout docs
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: brave-bot-docs
+          fetch-depth: 0
+          ssh-key: ${{ secrets.DOCS_DEPLOY_KEY }}
+
+      # Full history, not a shallow clone: the skill reads commit bodies across the span and
+      # shows specs at the new head, and neither works against depth 1.
+      - name: Checkout brave-bot
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: brave-experiments/brave-bot
+          path: brave-bot
+          fetch-depth: 0
+
+      # Cheap enough to run before installing anything, and most days it ends the job here.
+      - name: Check whether the docs are behind
+        id: behind
+        working-directory: brave-bot-docs
+        run: |
+          set -euo pipefail
+          python3 agents/skills/update-docs/docs-ref.py show | tee show.txt
+          if grep -qx 'Up to date.' show.txt; then
+            echo 'behind=false' >> "$GITHUB_OUTPUT"
+          else
+            echo 'behind=true' >> "$GITHUB_OUTPUT"
+          fi
+          rm show.txt
+
+      - name: Setup Node.js 24.x
+        if: ${{ steps.behind.outputs.behind == 'true' }}
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: 24.x
+          cache: npm
+          cache-dependency-path: brave-bot-docs/package-lock.json
+
+      # `make init` is what puts the skill where Claude Code looks for it: agents/ is the
+      # source of truth and no tool reads it directly.
+      - name: Install dependencies and link agent configuration
+        if: ${{ steps.behind.outputs.behind == 'true' }}
+        working-directory: brave-bot-docs
+        run: make init
+
+      - name: Install Claude Code
+        if: ${{ steps.behind.outputs.behind == 'true' }}
+        run: npm install -g @anthropic-ai/claude-code
+
+      # The commits are the skill's, so it needs an identity to make them under.
+      - name: Configure git identity
+        if: ${{ steps.behind.outputs.behind == 'true' }}
+        working-directory: brave-bot-docs
+        run: |
+          git config user.name 'Brian R. Bondy'
+          git config user.email 'netzen@gmail.com'
+
+      # acceptEdits covers the page rewrites; everything that shells out is named explicitly
+      # so the run cannot wander. git push is denied outright: the skill is not allowed to
+      # publish, and this job pushes only after the build has passed below.
+      - name: Fold in what has landed
+        if: ${{ steps.behind.outputs.behind == 'true' }}
+        working-directory: brave-bot-docs
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          claude -p "/update-docs ${{ inputs.rev }} ${{ inputs.dry_run && 'dry-run' || '' }}" \
+            --permission-mode acceptEdits \
+            --allowedTools "Bash(make *),Bash(python3 agents/skills/update-docs/docs-ref.py *),Bash(git *),Read,Edit,Write,Grep,Glob" \
+            --disallowedTools "Bash(git push *)"
+
+      # A dirty tree means the run stopped part-way through a page. Nothing is pushed, and
+      # the failure is left visible for somebody to pick up.
+      - name: Refuse to publish a half-finished run
+        if: ${{ steps.behind.outputs.behind == 'true' && !inputs.dry_run }}
+        working-directory: brave-bot-docs
+        run: |
+          set -euo pipefail
+          if [ -n "$(git status --porcelain)" ]; then
+            echo 'Uncommitted changes left behind:'
+            git status --short
+            exit 1
+          fi
+
+      # docusaurus.config.js throws on a broken link or anchor, so this is the whole of the
+      # site's correctness check, and it runs again here because the thing about to be
+      # pushed is the thing that has to build.
+      - name: Build website
+        if: ${{ steps.behind.outputs.behind == 'true' && !inputs.dry_run }}
+        working-directory: brave-bot-docs
+        run: make build
+
+      - name: Push
+        if: ${{ steps.behind.outputs.behind == 'true' && !inputs.dry_run }}
+        working-directory: brave-bot-docs
+        run: |
+          set -euo pipefail
+          if git diff --quiet origin/main HEAD; then
+            echo 'Nothing to push: the span touched no documented behaviour.'
+            exit 0
+          fi
+          git log --oneline origin/main..HEAD
+          git push origin HEAD:main
