@@ -102,42 +102,42 @@ does not tell you what to write.
 
 ### 3. Decide what each change touches here
 
-**First decide whether it belongs here at all.** Most spans carry commits this site has nothing to
-say about, and folding one in anyway is how a documentation site fills with text nobody came to
-read. The test is whether somebody *using* bravebot would go looking for it in order to use the
-thing better. If they would not, it does not go on a page, however clearly the commit explains
-itself.
+**Every change passes a gate before it reaches a page.** Ask one question about it, and answer it
+out loud in the summary:
 
-The reader to picture is a developer **using** bravebot on their own project, not one working on
-bravebot itself. Both are developers, which is what makes this easy to get wrong: a commit about
-tooling, editors, or agent configuration reads as relevant right up until you ask whose repository
-it is about.
+> Does somebody using bravebot need to know this?
 
-Things that routinely fail that test:
+**The default is no.** It passes only if you can finish the sentence *"a reader who did not know
+this would ___"* with something real: do the wrong thing, hit a limit they cannot explain, fail to
+find a feature they would want, or trust a page that is now wrong. If the honest ending is "read
+one more paragraph", it fails.
 
-- how the project is built, released, tested, or reviewed;
+The reader is a developer **using** bravebot on their own project, not one working on bravebot
+itself. Both are developers, which is what makes this easy to get wrong: a commit about tooling,
+editors or agent configuration reads as relevant right up until you ask whose repository it is
+about.
+
+These fail the gate every time:
+
+- how the project is built, released, tested, reviewed, or specified;
 - how a contributor sets up their checkout, their editor, or the agents that work on brave-bot;
-- how a contributor adds a message, a language, a spec clause, or a crate;
 - a refactor, a rename, or an internal boundary moving;
-- a behaviour that has landed but that nothing a user can reach exposes yet.
+- a fix that makes something behave the way a reader already assumed it did;
+- a behaviour landed but not yet reachable — the commit body reads exactly like a feature, and
+  documenting it means inventing the surface. Leave it whole for the run that lands the rest.
 
-**[development.md](../../../docs/development.md) is not an escape hatch for the above.** That page
-is for a reader building bravebot from source or asking how the project is specified, and its
-existence is not a reason to find a home for contributor workflow that would otherwise be dropped.
-A change that fails the test above fails it whatever page would have accepted it.
+[development.md](../../../docs/development.md) is not an escape hatch: a change that fails the gate
+fails it whatever page would have accepted it.
 
-That last one is the one worth being careful about, because the commit body reads exactly like a
-feature. A capability wired up but not yet offered anywhere a person can see is not behaviour this
-site can describe: the pages a user would need do not exist yet, and writing them means inventing
-the surface. Leave it, say so in the summary, and let the run that lands the rest of it pick the
-whole thing up.
+**Never reconstruct a user-facing story out of the source.** If the specs and commit bodies do not
+settle what a person sees, that is the answer — report it as an open question. Reading Rust to
+recover a flag name, a default or a settings key is the point at which this skill has started
+inventing.
 
-**Never reconstruct a user-facing story out of the source.** If the specs and commit bodies in the
-span do not settle what a person sees, that is the answer — report it as an open question. Reading
-Rust to recover a flag name, a default, or a settings key is the point at which this skill has
-started inventing.
+Expect most commits in a span to fail the gate. A span that yields one corrected number is a good
+result, not a thin one.
 
-For every change that survives that filter, find the page that owns it. The mapping is stable:
+For every change that passes, find the page that owns it. The mapping is stable:
 
 | A brave-bot spec about | Belongs on |
 |---|---|
@@ -171,6 +171,31 @@ even if the commit body does not mention documentation.
 Match the voice already on the page. This site explains behaviour to somebody using
 bravebot, so it says what happens and why it is safe, not which function does it. It does
 not name Rust types, crates, modules, or spec clause ids: a reader here has no checkout.
+
+**Write the least that leaves the page correct.** The reader is busy and is here to get
+something done. A sentence earns its place only if they would do something differently for
+having read it, or would be surprised or misled without it. Nothing else does, however true
+it is and however well the commit explains it.
+
+Three habits to resist, in the order they cost the most:
+
+- **Do not transcribe the spec's "Why."** A spec argues its decisions because it has to
+  justify them to somebody who could change them. A reader here cannot and has no stake in
+  it. The history of a fix — what the figure used to be, what broke, what was tried — is the
+  commonest way a page doubles in length without gaining anything. Rationale belongs on the
+  page where a rule **constrains the reader**: why a thing is refused, why they must approve
+  something, why a limit exists they will hit. Not behind every behaviour.
+- **Say nothing about behaviour a reader already assumes.** A fix that makes something work
+  the way anybody would have expected it to leaves the page alone. If a theme applies to the
+  interface, it applies to a prompt too, and a clause pinning that is a promise to the
+  implementer rather than news to a reader.
+- **Do not restate the mechanism twice**, once plainly and once in the spec's own words.
+  Pick the plain one.
+
+Prefer amending a sentence that is already there to adding a paragraph, and prefer adding a
+sentence to adding a section. Most spans should leave most pages shorter than a full
+accounting of them would. A span that ends with one corrected number and nothing else is a
+good outcome, not a thin one.
 
 Keep the site's own conventions:
 
@@ -215,7 +240,8 @@ End with a short summary:
 
 - the span folded in, as `<baseline> -> <new ref>`, and how many commits;
 - the pages changed, one line each, saying what behaviour moved;
-- anything deliberately not documented, and why;
+- **what failed the gate**, one line each, so the decisions are reviewable rather than silent.
+  This list is normally the longer of the two;
 - open questions the commits did not settle.
 
 If nothing needed changing because the span touched no documented behaviour, say that and
