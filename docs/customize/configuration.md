@@ -269,6 +269,12 @@ Each tier takes either a model id or an inference-profile ARN. With `AWS_PROFILE
 resolves credentials as it would for any other command, which is what a machine on instance
 credentials already relies on.
 
+**Claude models only, despite Bedrock hosting many others.** A request is sent as the Anthropic
+Messages API, which is the format Claude answers and other models on Bedrock do not. Nothing local
+checks the name you set — an ARN for Llama, Mistral, Titan or Nova is signed and sent like any other,
+and Bedrock rejects the request body. Point a tier at a non-Claude model and every request on it
+fails remotely.
+
 **A tier you do not name is left out rather than guessed at.** An ARN cannot be derived from a model
 name, so an invented entry would be a row in the picker that fails at the far end for a reason nothing
 local could explain. Set one tier and one tier is offered.
