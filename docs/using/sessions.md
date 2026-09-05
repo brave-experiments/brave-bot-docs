@@ -114,6 +114,13 @@ the view.
 History persists across runs under `~/.bravebot/history` and is capped. Consecutive duplicates
 collapse into one, and a prompt you cancelled is removed again.
 
+**Ctrl-R searches it**, which is the way in when the prompt you want is the hundredth rather than the
+last — see [Interactive mode](interactive-mode.md#searching-the-prompts-you-have-sent). Each prompt is
+stored with when it was sent and which workspace it was sent from, both of which that search reads and
+neither of which can be worked out afterwards: the file's own timestamp describes the newest line and
+nothing else, and a prompt's workspace is gone the moment the session ends. A history written before
+either was kept still reads, as prompts with neither, and is written back out the way it came in.
+
 ## Long conversations
 
 A conversation that grows past its token budget is **compacted**: an older stretch of it is replaced

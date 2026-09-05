@@ -24,6 +24,7 @@ growing further. It keeps growing while a turn runs.
 | Escape | discard a half-typed prompt, or stop a running turn |
 | Ctrl-C | stop the nearest thing there is to stop, and leave when there is nothing left |
 | Up / Down | walk back through prompts you have sent |
+| Ctrl-R | search every prompt you have sent |
 | Tab | complete a slash command or an `@path` |
 | `?` | on an empty line, list every key |
 
@@ -170,6 +171,32 @@ unsay them.
 With nothing waiting the key is unchanged: it walks the history, and scrolls once there is nothing
 left to walk. Inside a paragraph it moves between rows first, and reaches the queue from the top
 row the same way it reaches the history there.
+
+## Searching the prompts you have sent
+
+**Ctrl-R** opens a search over every prompt in your history, drawn over the transcript in place of the
+box, newest at the bottom and seeded with whatever single line you had already typed. Up walks one
+prompt at a time, which is the right way in when the one you want is the last one and no way in at all
+when it is the hundredth — what you remember of an old prompt is a word out of the middle of it rather
+than how far back it was.
+
+| Key | What it does |
+|---|---|
+| letters | narrow the list; every word you type has to match somewhere in the prompt |
+| Up / Down | walk the matches |
+| Ctrl-S | swap between every prompt and the ones sent from this workspace |
+| Enter | put the prompt under the cursor into the box |
+| Escape, Ctrl-C, Backspace past the start | close the search and leave the box as it was |
+
+Each row says how long ago that prompt was sent, and the one under the cursor is drawn in full beside
+the list with a word for the lines that did not fit. A terminal too narrow for two columns keeps the
+list, which is the half that answers the question, and a search matching nothing says so rather than
+showing an empty panel.
+
+**Enter puts the prompt in the box rather than sending it.** A history file can be edited, on a shared
+machine by somebody else, so the keystroke that sends a stored line is your own, after you have read
+it — exactly as if you had typed it. The search answers while a turn is running, on the same footing
+as the scroller, since searching sends nothing.
 
 ## Putting a line away
 

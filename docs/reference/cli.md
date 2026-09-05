@@ -67,6 +67,7 @@ Without a channel, `stable` is what importing means. `--forget` removes what was
 | Ctrl-T | Toggle the audit trail |
 | Ctrl-O | Open the scroller over the transcript |
 | Up / Down | Walk back through sent prompts |
+| Ctrl-R | Search every prompt you have sent |
 | Wheel, PageUp / PageDown | Scroll the transcript |
 | Home / End | Jump to the start or the latest |
 | Esc | Cancel a running turn, or clear the input |
