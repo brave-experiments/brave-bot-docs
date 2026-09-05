@@ -93,6 +93,48 @@ the binary.
 Programs are not confined. They run with the access your own shell would give them, because `git push`
 needs `~/.ssh` and the set of programs someone might ask for cannot be listed in advance.
 
+## Rules you write down in advance
+
+The `permissions` block of `~/.bravebot/settings.json` holds three lists — `deny`, `ask` and `allow` —
+saying which actions to refuse outright and which to stop and ask you about. They are the same three
+lists Claude Code keeps, with the same spellings, so a block copied out of `~/.claude/settings.json`
+governs bravebot unedited. See
+[Configuration](../customize/configuration.md#permissions) for how a rule is written.
+
+**A rule decides whether you are asked, and whether an action happens at all. Nothing else.**
+
+**A deny rule refuses before the file is opened or the program is looked for.** A denied file is not
+read, not enumerated, not searched and not written, and a `Read` deny rule also stops a write to the
+path it covers — a file whose contents are off limits is not protected if it can be overwritten.
+Naming the path through a reference reaches the same refusal, including on the one route allowed to
+read what nobody vouched for: a processor is handed no denied file either. The planner is told the
+rule refused and that retrying is not the answer.
+
+A deny rule also holds against **a workspace you trusted**, which is what makes one worth writing:
+saying yes at startup trusts the whole tree, and a rule is how one file is kept out of that answer
+without declining the rest of it.
+
+**An allow rule stops the asking and grants nothing else.** It does not make a command's output
+trusted — output carries what it would have carried. Pressing `a` grants those two together because
+you are looking at one command and can answer for both; a pattern covers commands nobody has read, so
+it cannot carry the second claim. If a rule could trust output, one line in a settings file would turn
+fetched bytes into routing, which is the whole thing labels exist to prevent. Nor does an allow rule
+extend reach: it cannot open a path the workspace and the directories you opened do not already cover.
+
+**Two prompts no rule can answer.** A run that would put your private data into a program asks
+whatever the rules say, because a rule saying which commands may run is not consent to hand one your
+data. A write whose destination is known only through a reference asks too: that prompt is the only
+moment such a path is shown to anybody, so nothing a pattern says can stand in for having looked.
+
+:::note
+**A `deny` list is not a sandbox.** A rule is matched against a program's argv rather than against
+what the program then does, so `Bash(git *)` covers `git -c core.fsmonitor=<script> diff`, which runs
+a program the rule never named. And a path rule does not reach a program's own file access at all:
+`run cat .env` is checked against the `Bash` rules and against the run prompt, not against a `Read`
+rule covering `.env`. What confines a process is [confinement](security.md#confinement); what holds
+regardless is the label on the output.
+:::
+
 ## What survives, and what does not
 
 Two grants are standing, and both are written into the session record and restored by `--resume`,

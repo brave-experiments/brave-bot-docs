@@ -231,6 +231,7 @@ These keys are read, and anything else in the file is ignored rather than refuse
 |---|---|
 | `model` | the model to request when nobody has chosen one — [below](#model) |
 | `env` | variables, in Claude Code's own shape |
+| `permissions` | which actions to refuse, and which to ask about — [below](#permissions) |
 
 In `env`, only string values: `1` and `true` are not obviously `"1"` and `"true"` to whoever debugs
 this later, so a number or a boolean is skipped rather than coerced. Every name in the block is read
@@ -252,11 +253,16 @@ refuses to start over this; `bravebot doctor` is where a file nobody can parse s
 person who mistyped it is not necessarily the person watching a session begin.
 
 :::note
-**Nothing in this file grants a permission.** It names destinations — a region, a credential profile, a
-model — and never vouches for a path or decides whether an effect is allowed. It does not become the
-process environment either: a value is consulted where a variable would be, and reaches a subprocess
-only where that subprocess is the thing it configures. The file is the easiest thing on the machine to
-write to, so a permission grantable from here would be a permission granted by whatever last edited it.
+**What this file names is destinations, not capabilities.** A region, a credential profile, a model:
+nothing in `env` vouches for a path, decides whether an effect is allowed, or names a command to run.
+The file is the easiest thing on the machine to write to, so a capability grantable from here would be
+a capability granted by whatever last edited it. It does not become the process environment either — a
+value is consulted where a variable would be, and reaches a subprocess only where that subprocess is
+the thing it configures.
+
+A [`permissions`](#permissions) block is the exception that proves the rule. It can refuse an action
+and it can answer a prompt, and it can do nothing else: no rule there makes a path reachable, and no
+rule makes a command's output trusted.
 :::
 
 ### `model`
@@ -276,6 +282,98 @@ named for that tier, and otherwise that tier's name on the Brave roster. A tier 
 written, because a service has never heard of it — Bedrock refuses a model it does not recognise, and
 the aichat endpoint silently resets one to `automatic`, which is the key appearing to work while
 changing nothing. Any other name is used exactly as you wrote it.
+
+### `permissions`
+
+```json
+{
+  "permissions": {
+    "deny": ["Read(.env)", "Edit(src/**)", "Bash(curl *)"],
+    "ask": ["Bash(git push *)"],
+    "allow": ["Bash(cargo test)", "Bash(ls *)"],
+    "additionalDirectories": ["../shared-lib"]
+  }
+}
+```
+
+The same three lists Claude Code keeps, with the same spellings, so a block copied out of
+`~/.claude/settings.json` works unedited. What a rule is allowed to decide — and the reason it may
+never trust a command's output — is on
+[Approvals and permissions](../security/permissions.md#rules-you-write-down-in-advance).
+
+A rule is `Tool` or `Tool(specifier)`, and names one of three **families**:
+
+| Family | Covers |
+|---|---|
+| `Read` | every tool that reads or enumerates a file |
+| `Edit` | every tool that changes one |
+| `Bash` | running a program |
+
+These are categories rather than tool names, as they are in Claude Code, so there is no rule spelled
+`Write` or `Glob`. `Bash` names no shell — there is none — and its specifier is matched against one
+pipeline stage's program and arguments.
+
+**`deny`, then `ask`, then `allow`, and the first match decides.** Specificity does not enter into
+it: a broad deny beats a narrow allow, and a matching `ask` rule prompts even where a more specific
+`allow` also matches. That is what makes a `deny` list readable as a flat statement about what will
+not happen.
+
+A **path** specifier is gitignore-shaped. `*` matches within one segment and `**` across them, and a
+trailing `/**` covers the directory it names as well as what is under it. Four anchors decide where a
+pattern begins:
+
+| Written | Starts at |
+|---|---|
+| `//x` | the filesystem root |
+| `~/x` | your home directory |
+| `/x` | the directory the settings file is in |
+| `x` or `./x` | the workspace |
+
+So a single leading slash is **not** the filesystem root. A specifier with no slash in it is a name
+and matches at any depth, which makes `Read(.env)` and `Read(**/.env)` one rule. Relative and
+absolute patterns are separate namespaces and neither reaches into the other.
+
+One further asymmetry, worth knowing before you write `allow`: **a one-segment relative pattern
+floats where it restricts and not where it grants.** `Edit(src/**)` in `deny` or `ask` covers a `src`
+directory at any depth, including a copy under `vendor`; the same pattern in `allow` covers only the
+`src` at the top. A rule that restricts should catch the copy you forgot about, and one that grants
+should cover what it says and no more. Anchor it as `Edit(/src/**)` to pin it to one place in either
+list.
+
+A **command** specifier matches the whole line, with `*` standing in for any text:
+
+| Rule | Matches | Does not match |
+|---|---|---|
+| `Bash(cargo test)` | `cargo test` | `cargo test --release` |
+| `Bash(ls *)` | `ls`, `ls -la` | `lsof` |
+| `Bash(ls*)` | `ls`, `lsof` | |
+| `Bash(* --help *)` | `npm run --help x` | `npm --help` |
+
+A trailing ` *` also matches the bare command, but only when it is the rule's only wildcard. The
+space before it is part of the rule. A trailing `:*` is the same rule as a trailing ` *`, and a colon
+anywhere else is an ordinary character.
+
+**Every stage of a pipeline is judged on its own.** Restricting any one stage restricts the pipeline;
+granting it needs every stage granted, because one stage no rule covers is a program nobody has
+answered for, and what it prints is what the next stage reads. An argument is never re-split, so a
+denied program cannot be smuggled inside one.
+
+`additionalDirectories` opens directories by the same route [`/add-dir`](../reference/commands.md)
+takes, and they are trusted for the session on the same terms. A relative name means a path under the
+workspace.
+
+`defaultMode` is parsed so that a file carrying it is not rejected, and **acted on by nothing**: if
+you wrote `acceptEdits` you get the prompts you would have got without it.
+
+**An unreadable rule is dropped, named, and takes nothing with it.** A line that is not a rule, names
+no family, or has an anchor that cannot be resolved is reported by `doctor` and in the session where
+the file was read, and the rest of the file still applies. Refusing the whole file instead would mean
+a typo in an `allow` rule quietly removed a `deny` rule's protection — and a misspelled `deny` rule
+reads as protection that is not there, which is the one failure here worth interrupting somebody over.
+
+The rules are read **once per session**, so a file you edit while a session is open describes the next
+one. A session with no `permissions` block behaves exactly as one did before the block existed: every
+gate asks what it asked before, and nothing is refused for being unmentioned.
 
 ## Reaching Claude on AWS Bedrock
 

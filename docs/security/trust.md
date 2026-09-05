@@ -81,6 +81,11 @@ inspected content.
 | `/add-dir <path>` | that directory: reachable **and** trusted, for this session |
 | yes at a quarantined read | that one path, for the rest of the session |
 
+A directory listed in `permissions.additionalDirectories` in your
+[settings file](../customize/configuration.md#permissions) is opened by the same route `/add-dir`
+takes and trusted on the same terms, which is what keeps a directory you named in a file and one you
+typed from being reachable on different terms.
+
 ### The quarantined-read prompt
 
 When a turn reads a file nobody has vouched for, you are shown the path and the first lines of it and
@@ -124,7 +129,7 @@ says so rather than being passed over.
 ## Reach stays confined
 
 No rule extends reach. Reading, writing, editing, listing and searching are confined to the working
-directory and to whatever `/add-dir` has opened. `..` and absolute paths outside those are refused
+directory and to whatever has been opened beside it. `..` and absolute paths outside those are refused
 rather than resolved — in an added directory exactly as in the project — and a symlink leaving one is
 refused. A relative path always means the project, so no file has two spellings.
 
