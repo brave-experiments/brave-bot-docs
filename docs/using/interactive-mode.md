@@ -114,12 +114,34 @@ scrolling the transcript all do exactly what they do at rest. **The only thing a
 refuses is sending.**
 
 Enter mid-turn takes the line out of the box and holds it. It is drawn under the box, marked, so you
-can see that what you sent went somewhere. Waiting prompts run in the order you typed them, one turn
-each, as soon as the session is free. A waiting prompt is not in the transcript — it moves there
-when its own turn begins.
+can see that what you sent went somewhere.
 
-What a queued prompt names is settled when it is queued, so a file you took off the line afterwards
-was never part of it.
+**The turn in flight takes it.** A turn asks between rounds — after the round's tool calls have run,
+before the next request goes out — and everything waiting joins the conversation there, in the order
+you typed it. So "no, the other file" reaches the planner while the work it is about is still
+happening, instead of arriving after the thing it was meant to prevent. A prompt still waiting when
+the turn ends becomes a turn of its own.
+
+Between rounds and nowhere else: a round is a set of calls the planner asked for together, so
+answering some and abandoning the rest would leave calls hanging, and mid-round the request is already
+in flight. Stopping part way is what Escape and Ctrl-C are for.
+
+**An interjection cannot change where effects may land.** Routing is settled by the prompt that began
+the turn and stays that way, so what you type mid-turn reaches the planner as words to read, and every
+effect it goes on to ask for is gated against the routing the turn started with. It is trusted, on the
+footing of the prompt that opened the turn and by the same act — a keystroke has no author but the
+person at the keyboard — and the audit trail records it as your own input, so a turn that changed
+course halfway through does not read as one that thought of it unprompted.
+
+**What it carries is text.** A running turn fixed the shape of its context before it read anything, so
+there is no trusted slot for a file to arrive in: markers resolve to words when the line is sent. A
+dropped file becomes its name, which the planner can go and read through the gate it reads anything
+else through, and a pasted picture says it cannot be shown. The box and the transcript keep the
+marker, because that is what you are looking at.
+
+A waiting prompt is not in the transcript — it moves there the moment the planner is given it, whether
+that is inside the running turn or as a turn of its own. What it names is settled when it is queued, so
+a file you took off the line afterwards was never part of it.
 
 Stopping a turn leaves the queue alone: the next waiting prompt starts as it would after any turn,
 and the rest go on waiting in order.
@@ -130,6 +152,11 @@ and the rest go on waiting in order.
 line. Nothing is waiting afterwards, so the rows under the box that said so go with it. A half-typed
 line stays below them, where the caret is, and what each prompt named comes back staged with it — a
 marker in a recalled line stands for the same file or picture it stood for when it went.
+
+**Only what the planner has not been given.** A prompt the running turn has already taken is in the
+conversation, so it cannot come back: offering it to the box would leave you editing a line that had
+gone, and sending it again would say it twice. Where the turn has taken every waiting prompt, the
+press leaves the box exactly as it was.
 
 They stay in the prompt history — from your side they were sent, and taking them back does not
 unsay them.
