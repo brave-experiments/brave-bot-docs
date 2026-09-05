@@ -1,7 +1,7 @@
 ---
 sidebar_position: 2
 title: Slash commands
-description: The eight commands the interface acts on itself, and the rules every one of them shares.
+description: The nine commands the interface acts on itself, and the rules every one of them shares.
 ---
 
 # Slash commands
@@ -14,6 +14,7 @@ A line beginning with `/` is acted on by the interface itself, in place of being
 | `/model` | | Choose which model to think with |
 | `/theme` | `[name]` | Choose the palette the interface is painted in |
 | `/add-dir` | `<path>` | Open another directory, and trust it for this session |
+| `/loop` | `[interval] <prompt>` | Send one prompt again and again until you stop it |
 | `/rename` | `<name>` | Call this conversation something else |
 | `/compact` | | Summarise the conversation so far, keeping the recent part |
 | `/clear` | | Start a new session here, keeping this one resumable |
@@ -33,7 +34,10 @@ Everything the session knows about itself:
 - the confinement available here;
 - turns and tokens spent;
 - **every trust rule in force**, listed in full, each marked trusted or untrusted;
-- **every command you vouched for**, which now run unasked and whose output is read as trusted.
+- **every command you vouched for**, which now run unasked and whose output is read as trusted;
+- what a [`/loop`](#loop-interval-prompt) is repeating and when the next tick is due, where one is
+  running — what happens next without anybody typing anything being the one thing about a session that
+  cannot be read off the transcript.
 
 The last two are the point. Every other prompt in a session announces itself by appearing; a vouched
 command is the one that stops appearing, so without this there would be nothing to tell you it now
@@ -70,6 +74,68 @@ Makes a directory both reachable and trusted, for this session. `--resume` carri
 [Trusted directories](../security/trust.md#add-dir).
 
 An added directory contributes **no** standing instructions and no skills, whatever it contains.
+
+## `/loop [interval] <prompt>`
+
+Sends one prompt again and again until you stop it.
+
+```
+/loop 5m check the deploy          # now, and every five minutes
+/loop check the deploy every 20m   # the same, written the other way round
+/loop watch the build              # now, and each turn says when the next is due
+```
+
+An interval is read off the front of the argument, or off an `every` clause at the end, in that order
+and nowhere else. A leading token counts only when it is a number and one of `s`, `m`, `h` or `d`, and
+a trailing clause only when a time expression is the whole of what follows `every` — which is what
+keeps `/loop check every PR` a sentence rather than one with its last two words taken off. Given no
+interval, each turn says when the next tick is due.
+
+**The line a loop repeats is the one you typed.** It is settled the moment you press Enter and sent
+unchanged for the life of the loop: nothing a turn reads, writes or returns can add to it, edit it or
+replace it. A schedule a turn could write its next prompt into would be a turn rewriting its own
+instructions, and the point of a loop is that it asks the same question again.
+
+**A tick is a prompt, never a command.** `/loop 5m /status` sends the seven characters `/status` to
+the planner every five minutes; it does not run the status command. A command is dispatched from a key
+press, and a timer is not one.
+
+The first tick goes at once, so you can see it happen while you are still watching and decide whether
+it was the right thing to ask for. The gap is measured from the end of a tick rather than its start,
+so `every 5m` means five minutes between runs. A due tick waits for an idle session and never
+interrupts, and a prompt you type in the middle of a loop is not a tick of it.
+
+| The wait | Shortest | Longest |
+|---|---|---|
+| an interval you gave | 5 seconds | 7 days |
+| a delay a turn asked for | 1 minute | 1 hour |
+
+A number outside those becomes the nearer bound, and you are told what it became rather than left
+believing you are watching something ten times more closely than you are. A turn's number is held far
+more tightly than yours because a turn that wants longer than an hour can say so in its answer, where
+somebody reads it. Where you gave an interval, no turn can change it; a self-paced tick that says
+nothing is woken once more twenty minutes later, and a second silence ends the loop.
+
+Each tick is announced with its number, and with how many in a row have reported finding nothing —
+which is the difference between a loop that is working and a loop with nothing to do. Four things end
+one, and each says so:
+
+| What | When |
+|---|---|
+| you interrupt | Ctrl-C, reached after the turn in flight and the half-typed line, and before leaving |
+| a turn is stopped | any turn cancelled while a loop runs, tick or not |
+| the session moves on | `/clear`, and leaving |
+| age | seven days after it started |
+
+**A loop is never written down.** It is not in the session record, so `--resume` restores none and it
+does not outlive the process — a schedule that survived the session that set it would start sending
+prompts at somebody who opened a conversation only to read it.
+
+:::caution
+**A loop keeps spending.** Every tick is a turn with the whole conversation re-sent, and nothing bounds
+the total but the interval and the session's own life. A five-minute loop left open overnight is a
+hundred and fifty turns nobody read.
+:::
 
 ## `/rename <name>`
 

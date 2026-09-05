@@ -6,7 +6,7 @@ description: Every tool the model may call, what it takes, and what it is allowe
 
 # Tools
 
-Eleven tools, and no way to add a twelfth from a configuration file. Each one splits its arguments
+Eleven tools, and no way to add another from a configuration file. Each one splits its arguments
 into **routing** — the part that decides where the effect lands — and **content** — the part that is
 merely carried.
 
@@ -23,6 +23,9 @@ merely carried.
 | [`load_skill`](#load_skill) | `name` | — | no |
 | [`ask_user`](#ask_user) | the questions | — | it *is* the question |
 | [`todo_write`](#todo_write) | — | `todos` | no |
+
+A twelfth, [`schedule_next`](#schedule_next), is offered to a turn inside a self-paced
+[`/loop`](commands.md#loop-interval-prompt) and to no other turn.
 
 An unknown tool is reported to the planner rather than ignored.
 
@@ -267,6 +270,27 @@ Records the task list for what the planner is doing.
 
 The whole list every time — it replaces the previous one. There is no routing here, because nothing is
 touched. An unrecognised status reads as outstanding work.
+
+## `schedule_next`
+
+Says when a self-paced [`/loop`](commands.md#loop-interval-prompt) should run again.
+
+| Parameter | |
+|---|---|
+| `delay_seconds` | how long to wait — routing, and required |
+| `noop` | whether this tick found anything — routing, and required |
+| `reason` | what the turn is waiting on, in its own words — content |
+
+**There is no argument for what the next run asks.** The prompt is the line you typed when you started
+the loop, and it is sent again unchanged. That is what makes the call approvable on its own: "ask me
+that again in twenty minutes" can be read and agreed to without knowing what "that" is, where a field
+naming the next prompt would let a turn write its own next instruction.
+
+Offered to a tick of a self-paced loop and to nothing else; a call from any other turn is answered the
+way any unoffered name is. The wait is held between a minute and an hour **before** it is reported
+back, so the number the planner is told is the number it is getting. A call missing the delay or the
+verdict is refused rather than filled in, since the count of quiet ticks you are shown is built from
+the second one. `reason` reaches your screen and stops there.
 
 ---
 

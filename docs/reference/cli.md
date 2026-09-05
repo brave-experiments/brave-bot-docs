@@ -85,6 +85,7 @@ are in [Reading the transcript](../using/transcript.md#the-scroller).
 | `/model` | Choose which model to think with |
 | `/theme [name]` | Choose the palette the interface is painted in |
 | `/add-dir <path>` | Open another directory, and trust it for this session |
+| `/loop [interval] <prompt>` | Send one prompt again and again until you stop it |
 | `/rename <name>` | Call this conversation something else |
 | `/compact` | Summarise the conversation so far, keeping the recent part |
 | `/clear` | Start a new session here, keeping this one resumable |

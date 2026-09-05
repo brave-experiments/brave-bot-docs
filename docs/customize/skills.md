@@ -74,6 +74,12 @@ is counted rather than named. See [Instructions](instructions.md#trust).
 
 A project skill replaces a global one of the same name.
 
+A few skills are written into bravebot itself rather than found on disk — the one that tells a
+[`/loop`](../reference/commands.md#loop-interval-prompt) tick how to pace itself is one. There is no
+file and no directory behind them, so they pass no trust gate and are offered in every session,
+including one in a directory nobody trusts. They are the least specific source, so a skill of your own
+with the same name shadows one.
+
 :::caution
 A skill downloaded into `~/.bravebot/skills` is trusted exactly as far as a config file you pasted
 is. The name, the description and the body all go to the model as instructions, and nothing
