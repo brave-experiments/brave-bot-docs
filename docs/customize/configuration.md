@@ -50,7 +50,7 @@ Everything that should outlive a session lives here:
 | `~/.bravebot/model` | the model chosen with `/model` |
 | `~/.bravebot/theme` | the theme chosen with `/theme` |
 | `~/.bravebot/themes/<name>.json` | themes you wrote yourself |
-| `~/.bravebot/settings.json` | an `env` block naming a backend — see [below](#settingsjson) |
+| `~/.bravebot/settings.json` | long-lived settings — see [below](#settingsjson) |
 
 An imported Leo Premium subscription is kept here too, in a file only you can read — see
 [Leo Premium](premium.md#where-they-are-kept).
@@ -215,6 +215,7 @@ Long-lived configuration can go in a file instead of your shell profile:
 
 ```json
 {
+  "model": "sonnet",
   "env": {
     "CLAUDE_CODE_USE_BEDROCK": "1",
     "AWS_REGION": "us-west-2",
@@ -224,9 +225,16 @@ Long-lived configuration can go in a file instead of your shell profile:
 }
 ```
 
-Only the `env` block is read, and only string values in it: `1` and `true` are not obviously `"1"` and
-`"true"` to whoever debugs this later, so a number or a boolean is skipped rather than coerced. Every
-name in the block is read rather than a chosen subset.
+These keys are read, and anything else in the file is ignored rather than refused:
+
+| Key | What it holds |
+|---|---|
+| `model` | the model to request when nobody has chosen one — [below](#model) |
+| `env` | variables, in Claude Code's own shape |
+
+In `env`, only string values: `1` and `true` are not obviously `"1"` and `"true"` to whoever debugs
+this later, so a number or a boolean is skipped rather than coerced. Every name in the block is read
+rather than a chosen subset.
 
 **The file is the same shape as Claude Code's `~/.claude/settings.json`, down to the variable names**,
 so a block that configures one configures the other unedited. That is deliberate rather than
@@ -250,6 +258,24 @@ process environment either: a value is consulted where a variable would be, and 
 only where that subprocess is the thing it configures. The file is the easiest thing on the machine to
 write to, so a permission grantable from here would be a permission granted by whatever last edited it.
 :::
+
+### `model`
+
+```json
+{ "model": "sonnet" }
+```
+
+The model to request when nobody has chosen one. This is the one key in the file that **outranks the
+model baked into the binary**: every release bakes one in, so ranked with the rest of the file it
+would parse, be reported by `doctor`, and change nothing. An exported
+`BRAVE_AI_CHAT_DEFAULT_MODEL` still wins over it, and a choice recorded by `/model` wins over both.
+
+`opus`, `sonnet` and `haiku` name a **tier** rather than a model, since that is what a settings file
+written for another tool puts here. Each resolves to something reachable: the model your AWS account
+named for that tier, and otherwise that tier's name on the Brave roster. A tier word is never sent as
+written, because a service has never heard of it — Bedrock refuses a model it does not recognise, and
+the aichat endpoint silently resets one to `automatic`, which is the key appearing to work while
+changing nothing. Any other name is used exactly as you wrote it.
 
 ## Reaching Claude on AWS Bedrock
 
