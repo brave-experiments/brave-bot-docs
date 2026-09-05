@@ -8,8 +8,8 @@
 # (agents/skills/update-docs) to fold it in. The skill rewrites the sha below; nothing
 # else should.
 #
-# fix(tui): paint the theme's background inside the trust prompt
-# 2026-09-03
-# https://github.com/brave-experiments/brave-bot/commit/e6718c5b714a5b0c8aa899e23c8f800431f334b7
+# feat(tui): search the prompts already sent, with ctrl-r
+# 2026-09-05
+# https://github.com/brave-experiments/brave-bot/commit/0469ff3307069574ae83d1810726b6ebba448420
 
-e6718c5b714a5b0c8aa899e23c8f800431f334b7
+0469ff3307069574ae83d1810726b6ebba448420
