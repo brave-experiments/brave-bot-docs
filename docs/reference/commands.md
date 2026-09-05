@@ -46,8 +46,10 @@ both. A status panel is the thing people paste into an issue or a screenshot.
 
 Opens a picker on the model in use. The list comes from the endpoint rather than a set compiled in, so
 it is whatever the backend offers today, and the choice is written to `~/.bravebot` — it outlives the
-session and applies in every directory. See
-[Configuration](../customize/configuration.md#choosing-a-model).
+session and applies in every directory.
+
+Typing narrows the list rather than walking it, and rows are grouped under the service that answers
+them. See [Configuration](../customize/configuration.md#choosing-a-model).
 
 ## `/theme [name]`
 

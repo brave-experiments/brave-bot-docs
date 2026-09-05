@@ -81,9 +81,20 @@ home, or the name is empty, everything kept there is simply absent.
 /model
 ```
 
-opens a picker on the model currently in use. The list comes from the endpoint rather than from a set
-compiled in, so it is whatever the backend actually offers today. The choice is written to
-`~/.bravebot/model`, so it outlives the session that made it and applies in every directory.
+opens a picker on the model currently in use, as a panel in the middle of the screen. The list comes
+from the endpoint rather than from a set compiled in, so it is whatever the backend actually offers
+today. The choice is written to `~/.bravebot/model`, so it outlives the session that made it and
+applies in every directory.
+
+**Type to narrow the list rather than arrowing through it.** A search matches the name shown, the name
+a request would carry and the service that answers, ignoring case and anywhere in any of them, and
+every word you type has to match something. The cursor stays on the model it was on while the list
+narrows, and falls to the first match once that model no longer matches. A search matching nothing
+says so, and there is nothing to select while it does.
+
+Rows are **grouped under the service that answers them**, one heading per service, and the heading of
+the section you are scrolling through is held on the top line — a gateway's roster is longer than a
+screen, and a row that has lost its heading no longer says who bills for it.
 
 `automatic` lets the server triage per request, and is what an unrecognised name is reset to. Note
 that the model requested is not necessarily the model used: some entries are weighted ensembles that
@@ -93,9 +104,10 @@ The names never reach a model. They are drawn for a person, who picks one, and w
 becomes the `model` field of later requests — a routing field, endorsed by a person choosing it off a
 list they read.
 
-With an AWS account configured the picker offers its tiers alongside this list rather than instead of
-it, and each row says which service will answer — see
-[Reaching Claude on AWS Bedrock](#reaching-claude-on-aws-bedrock).
+With an AWS account or a gateway configured the picker offers those models alongside this list rather
+than instead of it, each under its own heading — see
+[Reaching Claude on AWS Bedrock](#reaching-claude-on-aws-bedrock) and
+[Reaching an OpenAI-compatible gateway](#reaching-an-openai-compatible-gateway).
 
 ## Choosing a theme
 
@@ -439,11 +451,11 @@ nothing else participates — not which configuration is present, not which serv
 Bedrock refuses a model it does not recognise rather than substituting one, and the aichat endpoint has
 never heard of an inference-profile ARN.
 
-Your tiers read as `Opus (your my-profile AWS profile)`, or `Opus (your AWS account)` with no profile
-set. The profile is named because it is what decides which credentials sign the request, and because
-Brave serves part of its own roster through Bedrock too — so the word "Bedrock" on a row would
-distinguish nothing. Every configured tier is marked free: premium means a Leo subscription, and
-reaching a model through your own account does not involve one.
+Your tiers sit under a heading reading `Bedrock, your my-profile AWS profile`, or
+`Bedrock, your AWS account` with no profile set. The profile is named because it is what decides which
+credentials sign the request, and because Brave serves part of its own roster through Bedrock too — so
+that word alone would distinguish nothing. Every configured tier is marked free: premium means a Leo
+subscription, and reaching a model through your own account does not involve one.
 
 There is no `automatic` among them. There it means "let the server choose", which Bedrock does not
 offer — a request names one model and gets it or an error.
