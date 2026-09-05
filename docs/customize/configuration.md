@@ -233,7 +233,7 @@ Long-lived configuration can go in a file instead of your shell profile:
 {
   "model": "sonnet",
   "env": {
-    "CLAUDE_CODE_USE_BEDROCK": "1",
+    "BRAVEBOT_USE_BEDROCK": "1",
     "AWS_REGION": "us-west-2",
     "AWS_PROFILE": "my-profile",
     "ANTHROPIC_DEFAULT_OPUS_MODEL": "arn:aws:bedrock:…"
@@ -255,10 +255,18 @@ In `env`, only string values: `1` and `true` are not obviously `"1"` and `"true"
 this later, so a number or a boolean is skipped rather than coerced. Every name in the block is read
 rather than a chosen subset.
 
-**The file is the same shape as Claude Code's `~/.claude/settings.json`, down to the variable names**,
-so a block that configures one configures the other unedited. That is deliberate rather than
-incidental: the names below are `CLAUDE_CODE_*` and `ANTHROPIC_*` because a second spelling for the
-same handful of values would be another thing to learn in exchange for nothing.
+**The file is the same shape as Claude Code's `~/.claude/settings.json`**, so a block that configures
+one largely configures the other unedited. That is deliberate rather than incidental: a second
+spelling for the same handful of values would be another thing to learn in exchange for nothing.
+
+Where a variable names **your** deployment the spelling is kept, which is why the tiers below are
+`ANTHROPIC_DEFAULT_*_MODEL`. A switch that decides which backend bravebot itself uses belongs to
+bravebot, so that one is `BRAVEBOT_USE_BEDROCK`.
+
+:::caution
+`BRAVEBOT_USE_BEDROCK` was called `CLAUDE_CODE_USE_BEDROCK`. The old name now **reads as unset**, so a
+file or a profile still setting it falls back to the Brave backend without an error. Rename it.
+:::
 
 **The environment wins over the file.** A variable exported in your shell overrides the same name here,
 which is what makes the file a place to keep a durable default rather than a thing to edit when you
@@ -419,7 +427,7 @@ configured. Every build can reach Brave; the other two are what you configure.
 
 | Variable | What it sets |
 |---|---|
-| `CLAUDE_CODE_USE_BEDROCK` | turns the backend on |
+| `BRAVEBOT_USE_BEDROCK` | turns the backend on |
 | `AWS_REGION` | which region to reach Bedrock in — **required** once it is on |
 | `AWS_PROFILE` | which profile names the credentials to sign with (optional) |
 | `ANTHROPIC_DEFAULT_OPUS_MODEL` | the model the Opus tier names |
