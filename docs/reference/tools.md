@@ -146,6 +146,34 @@ Stdin is content: the planner names a quarantined reference and the policy layer
 so `sed` and `awk` work on a file nobody vouched for without the planner or the driver ever reading
 it. A stage that reads stdin and was given none receives nothing, never the terminal.
 
+### What a program is handed
+
+A stage gets the environment bravebot is running in, **less the credentials bravebot authenticates to
+its own backend with** — `SERVICES_KEY_AICHAT` and `BRAVE_SERVICES_KEY_ID`. Every stage, not only the
+first, and removed rather than blanked, so a program that tells an unset variable from an empty one
+sees what a machine that never held the credential sees.
+
+You approve the argv, the resolved binary and the directory. The environment is not among those, so a
+credential travelling alongside them would be handed over without your ever having seen it, and "run
+`git log`" would be approved as an inspection of the repository.
+
+**The rest of your environment stays, and that is not an oversight.** `run aws s3 ls` and `run gh pr
+list` are ordinary requests, and no rule matching variable names can tell one of those from an
+exfiltration, so `AWS_PROFILE`, `GITHUB_TOKEN` and `NPM_TOKEN` are left where they are. What the run
+prompt tells you about the remainder is the truth: a run has the access your own shell has. Anything
+of your own you want withheld can be named in
+[`run.scrubEnv`](../customize/configuration.md#runscrubenv).
+
+:::note
+**This is not confinement.** A program that reaches the network is unpoliced and can send anything it
+can read — a file, the workspace, a credential of your own. What closes here is the narrow part of the
+gap: the credentials you could not have been shown at the prompt and had no way to withhold. Nothing
+is established about what the program then does, and the label on its output is unaffected.
+:::
+
+A line you typed yourself in [shell mode](../using/shell-mode.md) is not this and keeps your whole
+environment, since it is meant to behave as your own terminal does.
+
 ### A pipeline has five minutes
 
 Every pipeline is given 300 seconds. When that runs out the stages are killed, and **what they

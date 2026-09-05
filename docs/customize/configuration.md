@@ -195,6 +195,7 @@ without rebuilding it.
 | `BRAVE_AI_CHAT_DEFAULT_MODEL` | the model to request when nobody has chosen one |
 | `BRAVEBOT_CONTEXT_BUDGET` | the token budget before a conversation is compacted |
 | `BRAVEBOT_LOCALE` | the language the interface is read in |
+| `BRAVEBOT_SUBPROCESS_ENV_SCRUB` | `0` hands a program the agent runs bravebot's own credentials — [`run.scrubEnv`](#runscrubenv) |
 
 Six more name an AWS account rather than this build — see
 [Reaching Claude on AWS Bedrock](#reaching-claude-on-aws-bedrock).
@@ -236,6 +237,7 @@ These keys are read, and anything else in the file is ignored rather than refuse
 | `env` | variables, in Claude Code's own shape |
 | `permissions` | which actions to refuse, and which to ask about — [below](#permissions) |
 | `provider` | an OpenAI-compatible gateway to reach — [below](#reaching-an-openai-compatible-gateway) |
+| `run.scrubEnv` | further variables to keep from a program the agent runs — [below](#runscrubenv) |
 
 In `env`, only string values: `1` and `true` are not obviously `"1"` and `"true"` to whoever debugs
 this later, so a number or a boolean is skipped rather than coerced. Every name in the block is read
@@ -286,6 +288,24 @@ named for that tier, and otherwise that tier's name on the Brave roster. A tier 
 written, because a service has never heard of it — Bedrock refuses a model it does not recognise, and
 the aichat endpoint silently resets one to `automatic`, which is the key appearing to work while
 changing nothing. Any other name is used exactly as you wrote it.
+
+### `run.scrubEnv`
+
+```json
+{ "run": { "scrubEnv": ["MY_TOKEN", "OTHER_SECRET"] } }
+```
+
+Variables to withhold from a program the agent runs, on top of bravebot's own credentials, which are
+withheld with no configuration at all. See [`run`](../reference/tools.md#what-a-program-is-handed).
+
+**Names only, and that is the whole reason this may live in a file.** A list of names can only ever
+take something away; a list of values here would put a credential in front of every command the agent
+starts, which is the larger claim the `env` block declines to make. The list is read when the process
+starts, so editing it describes your next session.
+
+`BRAVEBOT_SUBPROCESS_ENV_SCRUB=0` turns the withholding off entirely. Only that exact spelling does
+it: somebody who writes `false`, `no` or `off` meant to switch something off, and a credential
+reaching every subprocess is not a thing to switch off by near-miss.
 
 ### `permissions`
 

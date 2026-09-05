@@ -91,7 +91,10 @@ the binary.
 :::
 
 Programs are not confined. They run with the access your own shell would give them, because `git push`
-needs `~/.ssh` and the set of programs someone might ask for cannot be listed in advance.
+needs `~/.ssh` and the set of programs someone might ask for cannot be listed in advance. The one
+exception is bravebot's **own** credentials, which are withheld from every program it runs: you
+approve an argv, never an environment, so a credential travelling alongside one would be handed over
+without your having seen it. See [`run`](../reference/tools.md#what-a-program-is-handed).
 
 ## Rules you write down in advance
 
