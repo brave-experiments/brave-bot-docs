@@ -109,9 +109,15 @@ is an order to keep.
 
 ## Sending while a turn runs
 
-Typing, editing, pasting, dropping a file, completing, walking back through earlier prompts and
-scrolling the transcript all do exactly what they do at rest. **The only thing a running turn
-refuses is sending.**
+Typing, editing, pasting, dropping a file, putting a line away, walking back through earlier prompts,
+scrolling the transcript, toggling the audit trail and asking what the keys are all do exactly what
+they do at rest. **The only thing a running turn refuses is sending.**
+
+Two things follow from that rather than contradict it. Nothing is offered to **complete**, because
+what appears beneath the box is machinery for finishing a line that is about to be sent — where the
+key list is documentation you asked for, and is drawn whether or not a turn is running. And **Ctrl-G**
+is refused, because handing the terminal to an editor would take the screen from the turn drawing on
+it.
 
 Enter mid-turn takes the line out of the box and holds it. It is drawn under the box, marked, so you
 can see that what you sent went somewhere.
