@@ -32,7 +32,8 @@ Everything the session knows about itself:
 - which deployment the endpoint names, and **which tier the last turn ran on**, rather than which
   tier the build was compiled to reach;
 - the confinement available here;
-- turns and tokens spent;
+- turns and tokens spent, and **where the time went** — how much was spent waiting on the model,
+  running tools, and waiting for you to answer a prompt;
 - **every trust rule in force**, listed in full, each marked trusted or untrusted;
 - **every command you vouched for**, which now run unasked and whose output is read as trusted;
 - what a [`/loop`](#loop-interval-prompt) is repeating and when the next tick is due, where one is

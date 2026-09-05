@@ -69,6 +69,20 @@ session with one turn that ran away can be told from one that was evenly expensi
 The name recorded is the one that **answered**, not the one you asked for, since an endpoint may
 serve something other than the name it was given.
 
+Every turn's wall clock is written down **split four ways**: waiting on the model, running tools,
+waiting for you to answer a prompt, and whatever is left over. A duration alone conflates three things
+that want three different fixes — four minutes on the model, four minutes running a test suite, and
+four minutes with a diff on the screen while you were at lunch are the same number, and only a
+breakdown tells you which. The four are a partition rather than four separate measures, so an approval
+drawn from inside a tool call is taken off the tool figure rather than counted in both, and the
+remainder means something. `/status` reports the session total and each part that actually happened,
+leaving out a part that did not rather than showing it as zero.
+
+A turn that failed is recorded like any other, being the one most worth reading afterwards, and a
+`/compact` asked for mid-turn is charged to the turn it interrupted, as its tokens are. A record
+written before any of this was kept reads as an empty breakdown, which is not the same as a session
+that took no time: the durations that were kept are still there.
+
 ## What is never written down
 
 **Nothing untrusted.** Every message in the record has already passed the gate that decides what the
