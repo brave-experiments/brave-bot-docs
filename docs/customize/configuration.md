@@ -179,6 +179,21 @@ A value is a `#rrggbb` colour, a name from `defs`, or `none` to leave that role 
 default. A `defs` entry that names another `defs` entry is refused rather than chased, so a palette
 cannot loop. A file that will not parse is left out of the list rather than stopping the session.
 
+An ink may also be a **pair**, one colour for each terminal background:
+
+```json
+{ "muted": { "dark": "#6c7086", "light": "#8c8fa1" } }
+```
+
+The arm matching the background sensed at startup is the one used. Neither arm is a special kind of
+value, so a pair composes with `defs` and with `none` exactly as a lone value does. A pair missing an
+arm is refused and the file holding it is not a theme, because filling the missing one in would let a
+typo paint half a palette — and the wrong half is the one its author never sees.
+
+Write a pair where a scheme was published for a light terminal and a dark one: that is one theme you
+name, not two, and shipping it as two files leaves whoever installs it working out which their terminal
+wants. A theme that gives at least one pair says so under the picker's list.
+
 :::note
 Themes are read from `~/.bravebot/themes` and from nowhere else. A `.bravebot/themes` directory inside
 a project is **not** consulted, because a workspace is content: a repository you have just cloned must
