@@ -55,10 +55,22 @@ full-screen list hides the thing a theme is for. Your session stays visible behi
 every time the cursor moves, so what you are previewing is your own transcript rather than an empty
 page. On a tiny terminal the panel shrinks to stay inside the frame.
 
-Under the list is a row for whatever a theme does that its name does not say. Only `brave` has
-anything there — it is the only theme whose inks depend on your terminal, and its name says who it is
-from rather than what it does. The row is drawn empty for the rest, so the list does not shift under
-the cursor as it moves.
+Under the list is a row for whatever a theme does that its name does not say, which today is one
+thing: whether its inks were picked for the background sensed at startup. `brave` has it filled, as
+does every scheme published in both polarities and any theme of your own that gave a pair. No name on
+the list can carry that — `brave` says who it is from, and `gruvbox` names a scheme without saying it
+has two halves. The row is drawn empty rather than dropped for the themes with nothing to add, so the
+list does not shift under the cursor as it moves.
+
+**A scheme published in both polarities is one row.** `catppuccin`, `gruvbox` and `solarized` are each
+a single entry, painted from the half matching the background sensed at startup, so which of the two
+your terminal wants is not a question you answer here and then answer again on the next machine.
+
+Sensing is a guess wherever a terminal will not say, though, so the six fixed halves keep their names
+and still resolve through `/theme`: being guessed wrong about costs one `/theme solarized-light`, and
+it stays fixed. They are left out of the list apart from the half already in force, which the picker
+needs a row to open on. A scheme published in one polarity only — and a second dark scheme from the
+same authors, like `catppuccin-macchiato` — is its own row as before.
 
 ### What a theme decides
 
