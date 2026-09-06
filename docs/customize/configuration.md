@@ -51,6 +51,7 @@ Everything that should outlive a session lives here:
 | `~/.bravebot/sessions/<directory>/` | session records and audit trails |
 | `~/.bravebot/history` | prompts you have sent |
 | `~/.bravebot/model` | the model chosen with `/model` |
+| `~/.bravebot/effort` | the effort level chosen with `/effort` |
 | `~/.bravebot/theme` | the theme chosen with `/theme` |
 | `~/.bravebot/themes/<name>.json` | themes you wrote yourself |
 | `~/.bravebot/settings.json` | long-lived settings — see [below](#settingsjson) |
@@ -59,8 +60,8 @@ An imported Leo Premium subscription is kept here too, in a file only you can re
 [Leo Premium](premium.md#where-they-are-kept).
 
 The directory rather than a per-project file, for the same reason in every case: a question worth
-asking again is usually worth asking in another checkout too, and neither which model to think with
-nor which colours to draw in is a property of a checkout.
+asking again is usually worth asking in another checkout too, and neither which model to think with,
+nor how hard to think, nor which colours to draw in is a property of a checkout.
 
 Every operation here degrades to doing nothing. A missing home directory, a read-only disk or a
 corrupt file is not worth refusing to start over, because the session works without any of it.
@@ -108,6 +109,39 @@ With an AWS account or a gateway configured the picker offers those models along
 than instead of it, each under its own heading — see
 [Reaching Claude on AWS Bedrock](#reaching-claude-on-aws-bedrock) and
 [Reaching an OpenAI-compatible gateway](#reaching-an-openai-compatible-gateway).
+
+## Choosing how hard to think
+
+```
+/effort
+```
+
+opens a picker of five levels, cheapest first — `low`, `medium`, `high`, `xhigh` and `max` — above a
+row for asking for no level at all. `/effort high` takes one without opening the panel. The choice is
+written to `~/.bravebot/effort`, so it outlives the session and applies in every directory, and
+`/status` reports it beside the model, since the two together are what a turn costs.
+
+**Nothing infers a level.** Until you choose one the request carries no such field at all and each
+service applies its own default, so the only thing that can spend this is you asking for it. Taking
+the row for no level removes the record rather than writing an empty one, which puts you back where
+you were before you ever chose, and a word bravebot does not define changes nothing and says so.
+
+**A level goes only where the roster says it is read.** Reasoning is two parameters rather than one on
+a gateway, so a model can reason and still not read a level sent this way. Where the listing describing
+your model says it reads none, no level is sent and `/status` says so. The choice is kept either way
+and applies again the moment you pick a model that reads one, so what a request carries does not depend
+on the order you typed two commands in. A model no listing described is not a model stated to read
+nothing: a name from your settings file, a roster reporting no parameters, and a listing that could not
+be fetched all leave the level to go out and be judged at the far end. A row that does advertise the
+parameter says it reads one without saying which words it accepts, so a model may reject or silently
+round a level it does not know.
+
+:::caution
+**The Brave endpoint accepts the level and discards it.** Measured against it: a nonsense value is
+answered exactly as a real one is, and a model that reports a reasoning-token count reports the same
+count whatever level was asked for. So a level chosen against a Brave-served model is carried, sent and
+dropped, while the interface goes on reporting it as in force. Bedrock and gateways are unaffected.
+:::
 
 ## Choosing a theme
 

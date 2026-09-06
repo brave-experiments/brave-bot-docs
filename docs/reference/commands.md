@@ -1,7 +1,7 @@
 ---
 sidebar_position: 2
 title: Slash commands
-description: The ten commands the interface acts on itself, and the rules every one of them shares.
+description: The eleven commands the interface acts on itself, and the rules every one of them shares.
 ---
 
 # Slash commands
@@ -13,6 +13,7 @@ A line beginning with `/` is acted on by the interface itself, in place of being
 | `/status` | | Report this session, what it may touch, and what it has spent |
 | `/model` | | Choose which model to think with |
 | `/theme` | `[name]` | Choose the palette the interface is painted in |
+| `/effort` | `[level]` | Choose how hard to think before answering |
 | `/add-dir` | `<path>` | Open another directory, and trust it for this session |
 | `/cd` | `<path>` | Work in another directory from now on, and trust it for this session |
 | `/loop` | `[interval] <prompt>` | Send one prompt again and again until you stop it |
@@ -30,6 +31,7 @@ Everything the session knows about itself:
 - the working directory, and anything opened with `/add-dir`;
 - the model in force, and whether it was chosen or defaulted — with the model that actually answered
   shown beside it where the server substituted a different one;
+- the [effort level](#effort-level), and whether this model reads one;
 - which deployment the endpoint names, and **which tier the last turn ran on**, rather than which
   tier the build was compiled to reach;
 - the confinement available here;
@@ -68,6 +70,18 @@ The choice is written to `~/.bravebot`, so it outlives the session and applies i
 Themes of your own are JSON files under `~/.bravebot/themes/`, and nothing in a workspace is read. See
 [Choosing a theme](../customize/configuration.md#choosing-a-theme) and
 [Themes](../using/transcript.md#themes).
+
+## `/effort [level]`
+
+Opens a picker of the five levels — `low`, `medium`, `high`, `xhigh` and `max` — above a row for
+asking for no level at all, so a first pick is not permanent. With a word, `/effort high` takes it
+directly, and a word that names no level changes nothing and says so rather than reaching a request
+field.
+
+The choice is written to `~/.bravebot`, so it outlives the session and applies in every directory. See
+[Choosing how hard to think](../customize/configuration.md#choosing-how-hard-to-think), which is also
+where the two cases worth knowing are: the models that read no level, and the Brave endpoint, which
+accepts one and discards it.
 
 ## `/add-dir <path>`
 

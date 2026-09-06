@@ -86,6 +86,7 @@ are in [Reading the transcript](../using/transcript.md#the-scroller).
 | `/status` | Report this session, what it may touch, and what it has spent |
 | `/model` | Choose which model to think with |
 | `/theme [name]` | Choose the palette the interface is painted in |
+| `/effort [level]` | Choose how hard to think before answering |
 | `/add-dir <path>` | Open another directory, and trust it for this session |
 | `/cd <path>` | Work in another directory from now on, and trust it for this session |
 | `/loop [interval] <prompt>` | Send one prompt again and again until you stop it |
