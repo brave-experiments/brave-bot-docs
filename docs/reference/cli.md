@@ -14,6 +14,7 @@ Usage:
   bravebot "<task>" [--file <path>]...   Run a single task
   cat file | bravebot -p "<task>"        ...with piped input, never trusted
   bravebot --resume [id]                 Pick up a session in this directory
+  bravebot --continue                    Pick up the most recent session in this directory
   bravebot doctor                        Check configuration and confinement
   bravebot import-leo-creds [channel]    Import a Leo Premium subscription
 ```
@@ -26,6 +27,7 @@ Usage:
 | `bravebot "<task>"` | run one task and print the reply |
 | `bravebot --resume`, `-r` | choose a session in this directory to pick up |
 | `bravebot --resume <id>` | resume that session by id |
+| `bravebot --continue`, `-c` | pick up the most recent session in this directory |
 | `bravebot doctor` | report configuration and confinement, changing nothing |
 | `bravebot import-leo-creds [channel]` | import a Leo Premium subscription |
 | `bravebot --version`, `-V` | print the build |

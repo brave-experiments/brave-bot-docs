@@ -26,9 +26,19 @@ running, and it is opaque because the name gets printed on a screen and pasted i
 bravebot --resume          # choose from the sessions in this directory
 bravebot --resume <id>     # name one outright
 bravebot -r <id>           # the same
+bravebot --continue        # carry on with the most recent one, unnamed
+bravebot -c                # the same
 ```
 
 The list is sorted on what each record says it was last written, not by id.
+
+`--continue` takes the session the picker would offer first and picks it up exactly as naming its id
+would, because "carry on with what I was just doing" is the question people actually have most of the
+time and answering it with an id means finding the line that printed one — in a terminal that is often
+the thing that went away. A [manifest run](#a-manifest-run-is-recorded-but-cannot-be-continued) is
+passed over rather than refused, since there is no conversation inside one to carry on from. Where
+this directory holds nothing continuable it says so and fails, rather than starting a fresh session:
+an empty transcript is indistinguishable from a session that was lost.
 
 **Leaving a session prints the command that resumes it**, after the terminal is handed back, so it
 stays on the screen you are left looking at. A session that never wrote a record prints nothing.
