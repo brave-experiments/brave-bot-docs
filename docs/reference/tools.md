@@ -6,7 +6,7 @@ description: Every tool the model may call, what it takes, and what it is allowe
 
 # Tools
 
-Eleven tools, and no way to add another from a configuration file. Each one splits its arguments
+Twelve tools, and no way to add another from a configuration file. Each one splits its arguments
 into **routing** — the part that decides where the effect lands — and **content** — the part that is
 merely carried.
 
@@ -20,11 +20,12 @@ merely carried.
 | [`run`](#run) | `program`, `args` | stdin | **yes, unless vouched for** |
 | [`read_output`](#read_output) | `ref` | — | **yes** |
 | [`spawn_processor`](#spawn_processor) | `about` | `reads`, `instruction` | no |
+| [`spawn_agent`](#spawn_agent) | `kind` | `task` | not the call — but its writes and runs do |
 | [`load_skill`](#load_skill) | `name` | — | no |
 | [`ask_user`](#ask_user) | the questions | — | it *is* the question |
 | [`todo_write`](#todo_write) | — | `todos` | no |
 
-A twelfth, [`schedule_next`](#schedule_next), is offered to a turn inside a self-paced
+A thirteenth, [`schedule_next`](#schedule_next), is offered to a turn inside a self-paced
 [`/loop`](commands.md#loop-interval-prompt) and to no other turn.
 
 An unknown tool is reported to the planner rather than ignored.
@@ -225,6 +226,47 @@ screen and stops there, is part of no file, and cannot be another processor's in
 marker names no document and can be written nowhere.
 
 See [How Brave Bot works](../how-it-works.md#processors).
+
+## `spawn_agent`
+
+Hands a sub-task to a [delegate](../how-it-works.md#delegates) — a second planner with a narrower set
+of capabilities — and gets back one report.
+
+| Parameter | |
+|---|---|
+| `kind` | `reader`, `checker` or `worker` |
+| `task` | the whole of what the delegate is told |
+
+| Kind | Holds | For |
+|---|---|---|
+| `reader` | reading | finding something out |
+| `checker` | reading, and running programs | finding out whether something works |
+| `worker` | reading, running programs, and writing files | finishing a sub-task |
+
+A delegate holds its kind's capabilities **narrowed by its parent's**, so delegation redistributes
+authority and never creates it, and a kind asking for more gets a delegate without it. What it is told
+about itself is a constant its kind chose: the planner supplies the task and nothing else, so there is
+no sentence it can write that changes what a delegate *is* rather than what it is doing.
+
+The delegate cannot see the conversation the task came from, so a task that leaves something out is a
+delegate that never learns it — and it cannot come back for more, since there is no channel to ask
+along. A run whose own context has met something untrusted cannot delegate at all.
+
+**Delegation saves context, never an approval.** Every write and every run a delegate makes reaches you
+with its own single-use endorsement, so you see the path and the diff whoever proposed them. What you
+vouched for inside one comes back to the session, because that answer was about your machine rather
+than about the run that happened to be going.
+
+Nothing but the report crosses back: the exchange, the tool results and the quarantine end with the
+delegate, and a reference minted inside one names nothing afterwards. A delegate is offered neither
+this tool nor [`ask_user`](#ask_user) nor a task list, so it cannot delegate again and puts no question
+of its own to you — what it could not settle goes in the report, and the planner asks.
+
+:::note
+The confirmation for a write shows the path and the diff, as it always does, but it does not say that
+a delegate rather than the turn is asking. Where a turn spawns delegates one after another, reading
+only the prompt means approving a change whose reason is a task you did not read.
+:::
 
 ## `load_skill`
 

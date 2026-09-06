@@ -92,6 +92,36 @@ the call was about. Everything before the document marker in its reply is a rema
 watching: it reaches your screen and stops there. No model reads it, it is part of no file, and it
 cannot be another processor's input.
 
+## Delegates
+
+Where a sub-task would fill the conversation with reading, the planner can hand it to a **delegate**:
+a second planner with a context of its own and a narrower set of capabilities.
+
+| | |
+|---|---|
+| Tools | its kind's, and never a way to delegate again |
+| Memory | none of its parent's exchange: it begins with the task it was given |
+| Conversation | a loop of its own, bounded |
+| Reads | whatever its capabilities and the paths you vouched for allow |
+| Writes | files, each shown to you first, and slots in a quarantine of its own |
+
+A planner that runs the build reads the whole log. A planner that asks a delegate to run the build is
+told what failed. The work happens either way and only one of them spends the conversation on it.
+
+None of this is about trusting a second model more than the first. A delegate holds capabilities and
+holds no untrusted content — what it may not read is quarantined and it is handed a reference, exactly
+as its parent would be — so there is no point in the run where untrusted bytes and a capability are in
+the same context. It is also why a run whose own context has already met something untrusted cannot
+delegate at all: the task it would compose is a function of those bytes.
+
+The report that comes back is labelled by the integrity of the delegate's own context and passes the
+same gate as any other result, so nothing is trusted on a delegate's say-so. Its gate decisions go into
+the same audit trail as the turn that spawned it, named so the two can be told apart — a nested run
+recording somewhere else would leave a hole in the record exactly over the part of the turn nobody
+watched.
+
+See [`spawn_agent`](reference/tools.md#spawn_agent).
+
 ## Routing and content
 
 Every effect splits in two:
