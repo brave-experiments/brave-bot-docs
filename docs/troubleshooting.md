@@ -116,7 +116,10 @@ interactive turn carries no such limit, so this is a one-shot or manifest run, w
 ## Sessions
 
 **`--resume` cannot find my session.** Sessions belong to the directory they ran in. Resume from the
-same working directory, or pass the id printed when the session ended.
+same working directory, or pass the id printed when the session ended. A session that moved with
+[`/cd`](reference/commands.md#cd-path) is recorded where it moved to, and the line printed on the way
+out names that directory — resume it from there, or the same id in the directory you started in finds
+the session as it was before the move.
 
 **A resumed session asked a question I already answered.** Answers to the planner's own questions live
 only in the running session. Standing permissions — the trust map and vouched-for commands — do come
