@@ -79,6 +79,7 @@ inspected content.
 | [`@path`](../using/context.md#naming-a-file-path) or `--file` | that one file, for the rest of the session |
 | [dropping a file](../using/context.md#dropping-a-file) | that one file, wherever on disk it is, plus reach to it |
 | `/add-dir <path>` | that directory: reachable **and** trusted, for this session |
+| `/cd <path>` | that directory, as the new working directory, for this session |
 | yes at a quarantined read | that one path, for the rest of the session |
 
 A directory listed in `permissions.additionalDirectories` in your
@@ -125,6 +126,31 @@ on every edit.
 It lasts the session, `--resume` carries both halves, and `/clear` closes it. A directory already
 inside the project is refused. A directory a resume cannot open again, because it has moved or gone,
 says so rather than being passed over.
+
+## Moving the working directory
+
+```
+/cd ~/projects/other
+```
+
+makes that directory the working directory and vouches for it, on the same terms `/add-dir` uses: you
+typed the path, and a later decision replaces an earlier one. See
+[`/cd`](../reference/commands.md#cd-path) for everything else it moves.
+
+**The map comes with you, re-spelled rather than carried over.** Every rule is rewritten to say what
+it always said about the same files: one inside the new working directory becomes relative to it, and
+one outside becomes absolute. That grants nothing and withdraws nothing, which is what makes it
+something bravebot can do without asking you.
+
+The alternative would be worse in both directions. A relative rule means a path under the working
+directory, so leaving the rules alone would point every one of them at a file you never decided
+anything about: the yes you gave for one project would vouch for another, and every no you gave inside
+the old one would be forgotten.
+
+Anything overlapping the new working directory closes — the directory you left, and any `/add-dir`
+directory holding it or sitting inside it. That is not tidiness. A file reachable both relatively and
+by absolute path has a rule in each namespace, and the two are kept apart precisely so that one file
+has one answer.
 
 ## Reach stays confined
 

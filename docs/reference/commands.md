@@ -1,7 +1,7 @@
 ---
 sidebar_position: 2
 title: Slash commands
-description: The nine commands the interface acts on itself, and the rules every one of them shares.
+description: The ten commands the interface acts on itself, and the rules every one of them shares.
 ---
 
 # Slash commands
@@ -14,6 +14,7 @@ A line beginning with `/` is acted on by the interface itself, in place of being
 | `/model` | | Choose which model to think with |
 | `/theme` | `[name]` | Choose the palette the interface is painted in |
 | `/add-dir` | `<path>` | Open another directory, and trust it for this session |
+| `/cd` | `<path>` | Work in another directory from now on, and trust it for this session |
 | `/loop` | `[interval] <prompt>` | Send one prompt again and again until you stop it |
 | `/rename` | `<name>` | Call this conversation something else |
 | `/compact` | | Summarise the conversation so far, keeping the recent part |
@@ -75,6 +76,23 @@ Makes a directory both reachable and trusted, for this session. `--resume` carri
 [Trusted directories](../security/trust.md#add-dir).
 
 An added directory contributes **no** standing instructions and no skills, whatever it contains.
+
+## `/cd <path>`
+
+Moves the working directory. From then on that is what a relative path means, where a program runs,
+where `AGENTS.md` and the project's skills are looked for, and what `@` completes against. The path is
+taken against where the session is now, so `..` and a name inside the project both work, and the
+directory is trusted for the session on the same terms `/add-dir` grants.
+
+The directory you left closes, and so does anything `/add-dir` had opened that holds the new working
+directory or sits inside it — each said out loud as it happens, with the line that opens it again.
+Nothing may overlap the working directory, because a file reachable both relatively and by absolute
+path would have a rule in each namespace and so two answers.
+
+Your trust map comes with you rather than being carried over unchanged. See
+[Moving the working directory](../security/trust.md#moving-the-working-directory) for what happens to
+each rule, and [Sessions](../using/sessions.md#a-session-that-changed-directory) for where the record
+goes.
 
 ## `/loop [interval] <prompt>`
 

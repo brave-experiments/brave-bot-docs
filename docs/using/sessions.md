@@ -33,6 +33,22 @@ The list is sorted on what each record says it was last written, not by id.
 **Leaving a session prints the command that resumes it**, after the terminal is handed back, so it
 stays on the screen you are left looking at. A session that never wrote a record prints nothing.
 
+### A session that changed directory
+
+[`/cd`](../reference/commands.md#cd-path) takes the record with it, written into the new directory
+straight away rather than at the end of the next turn — until it is saved there, there is nothing
+there to find. The turns already written stay where they were written: they happened in that
+directory and are still worth resuming there.
+
+So the line printed on the way out **names the directory** when the session ended somewhere other
+than where the shell is standing, since `--resume` looks an id up under the directory it is run in.
+Without the name the same id in the old directory would not fail; it would quietly resume the session
+as it was before the move.
+
+The trail does not follow the session either, being appended beside whichever record was current, so
+a move splits it. A resume replays the whole conversation and shows the gate decisions made in the
+directory you resumed from.
+
 ### A manifest run is recorded, but cannot be continued
 
 A [plan-then-execute run](headless.md#planning-the-whole-run-first) writes its goal, its proposed
