@@ -8,8 +8,8 @@
 # (agents/skills/update-docs) to fold it in. The skill rewrites the sha below; nothing
 # else should.
 #
-# feat(tui): search the prompts already sent, with ctrl-r
-# 2026-09-05
-# https://github.com/brave-experiments/brave-bot/commit/0469ff3307069574ae83d1810726b6ebba448420
+# fix(bedrock): name a profile that is not configured rather than signing in to it
+# 2026-09-06
+# https://github.com/brave-experiments/brave-bot/commit/d700e50482241e37c16a48ca4aaf2bb5e29aff64
 
-0469ff3307069574ae83d1810726b6ebba448420
+d700e50482241e37c16a48ca4aaf2bb5e29aff64
