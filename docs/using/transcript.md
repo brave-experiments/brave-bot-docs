@@ -78,10 +78,13 @@ Where a colour is what tells one thing on the screen from another, `brave` uses 
 itself rather than one of the sixteen named colours. A named colour is a slot your terminal repaints,
 so it is a request rather than a colour: the same code drew something different in every profile,
 which is how one slot came to carry two meanings at once without anybody choosing that. The named
-slots are kept only where the meaning is your terminal's own — green for finished, red for failed,
-dim grey for an aside — which you read against whatever palette you chose rather than against each
-other. A mixed shade that has to stay legible against the background is picked for the background
-sensed at startup, and a terminal that will not say which it has is treated as dark.
+slots are kept only where the meaning is your terminal's own and the slot is one schemes agree about —
+green for finished, red for failed, yellow for a call still running — which you read against whatever
+palette you chose rather than against each other. A mixed shade that has to stay legible against the
+background is picked for the background sensed at startup, and a terminal that will not say which it
+has is treated as dark. An aside is one of those: it would otherwise take bright black, the slot
+terminals disagree about most, where in the great majority of published schemes it is too faint
+against its own background to read.
 
 A theme you choose by name paints every role from its own palette, including the background and the
 default text. No named slots are used there, so two roles cannot collapse into one because your
