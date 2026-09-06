@@ -156,7 +156,9 @@ file, is no choice at all and falls back to `brave`. A choice saved under the ea
 still finds `brave` rather than being silently lost.
 
 A theme of your own is a JSON file under `~/.bravebot/themes/`, named for the theme: `nord.json` is
-the theme `nord`. Each key is one role, and any you leave out inherits from `brave`:
+the theme `nord`. `brave.json` and `system.json` are refused, both names reaching the built-in theme,
+so a file taking either would load and then be unreachable. Each key is one role, and any you leave out
+inherits from `brave`:
 
 ```json
 {
