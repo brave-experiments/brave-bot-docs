@@ -13,7 +13,7 @@ merely carried.
 | Tool | Routing | Content | Asks you? |
 |---|---|---|---|
 | [`read_file`](#read_file) | `path`, `path_ref` | — | only to trust a quarantined file |
-| [`list_files`](#list_files) | `directory`, `pattern` | — | no |
+| [`list_files`](#list_files) | `directory`, `pattern`, `depth` | — | no |
 | [`search`](#search) | `directory`, `include` | `pattern` | no |
 | [`write_file`](#write_file) | `path`, `path_ref` | `contents`, `contents_ref` | **yes, every time** |
 | [`edit_file`](#edit_file) | `path`, `path_ref` | `old_text`, `new_text` | **yes, every time** |
@@ -54,12 +54,20 @@ are offered the chance to vouch for that one file at the moment it matters — s
 
 ## `list_files`
 
-Lists files under a directory, recursively.
+Lists files under a directory.
 
 | Parameter | |
 |---|---|
 | `directory` | workspace-relative; `.` for the root |
 | `pattern` | optional glob: `*`, `?` and `**` are supported, brace groups are not |
+| `depth` | optional; how many directory levels below `directory` to walk, `1` being that directory and no further |
+
+Without a depth the walk reaches every file underneath, which in a real repository is thousands of
+paths — paid for in the planner's context, again on every round that resends it, and again in each
+delegate handed the same question. A **bounded** listing names the directories it did not descend
+into alongside the files, so what comes back describes the shape of the tree rather than only the
+part of it that was read. The pattern does not hide them: it says which files are wanted, and a
+directory is where the answer might be rather than an answer.
 
 A filename is content, so a listing of a directory nobody vouched for is quarantined — and it returns
 **one reference per entry**, not one for the listing. That is what lets the planner read a file,
