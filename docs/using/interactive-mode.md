@@ -272,6 +272,57 @@ See [Slash commands](../reference/commands.md) and [Adding context](context.md).
 Ctrl-O opens the scroller over the transcript, and Ctrl-T toggles the audit trail. See
 [Reading the transcript](transcript.md) and [The audit trail](../security/audit-trail.md).
 
+## Watching a delegate
+
+A [delegate's](../how-it-works.md#delegates) work is discarded by design: the planner is told a
+sentence, and the reading, the commands and the narration behind it end with the run. Drawn nowhere,
+that would leave you with one line about work you cannot see, done in a directory you own.
+
+Each one gets a **block of its own**, where the call that started it happened, holding the last three
+things it did and a count of the rest. The turn's own lines stay clear of it, and which block a line
+goes in is what the driver said rather than what the line says — several runs report at once, so
+where a line arrived says nothing about whose it is. A delegate that has finished collapses to the
+sentence the turn was told and the report it answered with; one that could not finish answered
+nothing, so its block carries the sentence alone. A report the planner was not allowed to read is
+drawn in the [marked block](transcript.md) every quarantined result uses, so you can see which of
+the two it was.
+
+**Ctrl-L opens the whole of it.** Where the session has spawned more than one delegate, a list is
+the way in — a panel over the transcript, a row each with the kind, how it is going, what it was
+asked and how much it has done. Where it has spawned one, that delegate's own lines open directly.
+Where it has spawned none the key does nothing, since a mode over an empty screen puts you somewhere
+with nothing to read and something to get out of. The row beneath the box names the key, and how
+many there are, for as long as the session has any.
+
+| Key | What it does |
+|---|---|
+| Ctrl-L | open the delegates, and close the mode from either level |
+| Enter | open the row under the cursor |
+| Up / Down | move through the list |
+| n / p | in a delegate, step to the next or previous one without going back to the list |
+| q, Escape | back to the list from a delegate, then out |
+| Ctrl-C | close the mode, leaving the turn in flight running |
+
+**The session is the first row of the list**, and choosing it closes the mode and puts the turn's
+view back where you left it. Every other destination the mode can reach is a row, so the way back is
+one too. Coming back to the list from a delegate puts the cursor on that delegate rather than on the
+session, because a press of Enter should not turn into an exit.
+
+The mode takes every key, so nothing you type reaches a box you cannot see, and there is no way to
+talk to a delegate: it was given one task, has nobody to ask, and takes no line typed mid-turn. What
+is on the screen only moves when you ask — a delegate finishing leaves the view on it, and a
+delegate starting does not take the screen from an older one you are reading.
+
+A delegate keeps more of its work than its block draws, and drops its oldest once it has made several
+hundred calls, so arriving late at a very long run means reading from wherever that bound has reached.
+
+**None of this reaches a model and none of it is written down.** The planner that asked is told the
+report and nothing else, no delegate is part of the record a session is resumed from, and `/clear`
+forgets them — so a resumed session has the reports and none of the work behind them. A screen is
+not a context: you own the directory and may see what your agent did in it, and what must not happen
+is those lines reaching a planner by any route, of which a record read back into a later turn would
+be one.
+
 ## Long turns
 
 **An interactive turn has no round limit.** You can see what it is doing and a stop reaches it

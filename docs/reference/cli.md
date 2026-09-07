@@ -72,6 +72,7 @@ Without a channel, `stable` is what importing means. `--forget` removes what was
 | Ctrl-V | Paste, including screenshots |
 | Ctrl-T | Toggle the audit trail |
 | Ctrl-O | Open the scroller over the transcript |
+| Ctrl-L | Watch what a delegate is doing, once the session has spawned one |
 | Up / Down | Walk back through sent prompts |
 | Ctrl-R | Search every prompt you have sent |
 | Wheel, PageUp / PageDown | Scroll the transcript |
