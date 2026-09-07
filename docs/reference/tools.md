@@ -20,7 +20,7 @@ merely carried.
 | [`run`](#run) | `program`, `args` | stdin | **yes, unless vouched for** |
 | [`read_output`](#read_output) | `ref` | — | **yes** |
 | [`spawn_processor`](#spawn_processor) | `about` | `reads`, `instruction` | no |
-| [`spawn_agent`](#spawn_agent) | `kind` | `task` | not the call — but its writes and runs do |
+| [`spawn_agent`](#spawn_agent) | `kind` | `task`, `each` | not the call — but its writes and runs do |
 | [`load_skill`](#load_skill) | `name` | — | no |
 | [`ask_user`](#ask_user) | the questions | — | it *is* the question |
 | [`todo_write`](#todo_write) | — | `todos` | no |
@@ -249,6 +249,7 @@ work it describes rather than leaving that to be worked out from the words.
 |---|---|
 | `kind` | `reader`, `checker` or `worker` |
 | `task` | the whole of what the delegate is told |
+| `each` | optional; starts one delegate per entry, each told `task` followed by its own entry |
 
 | Kind | Holds | For |
 |---|---|---|
@@ -260,6 +261,14 @@ A delegate holds its kind's capabilities **narrowed by its parent's**, so delega
 authority and never creates it, and a kind asking for more gets a delegate without it. What it is told
 about itself is a constant its kind chose: the planner supplies the task and nothing else, so there is
 no sentence it can write that changes what a delegate *is* rather than what it is doing.
+
+**`each` fans one task out**, so the shared half is written once and only the differing part — one
+path per entry, say — is repeated. Every delegate it starts is one like any other: it is approved on
+its own, takes its own number, and holds its own copy of what you vouched for, so a fan-out is
+several runs rather than one run several times. A call naming more than eight, or naming none, is
+refused and starts nothing. The ceiling is not a limit on authority — the same runs were always
+available one call at a time — but a field that turns one sentence into an unbounded number of runs
+is worth a bound.
 
 The delegate cannot see the conversation the task came from, so a task that leaves something out is a
 delegate that never learns it — and it cannot come back for more, since there is no channel to ask
