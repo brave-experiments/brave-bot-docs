@@ -8,8 +8,8 @@
 # (agents/skills/update-docs) to fold it in. The skill rewrites the sha below; nothing
 # else should.
 #
-# feat(tui): put the session in the delegate list, so there is a row back
+# updated changelog for version 0.3.0
 # 2026-09-06
-# https://github.com/brave-experiments/brave-bot/commit/a8c251d42a322505d43a7fcb279765d95971b990
+# https://github.com/brave-experiments/brave-bot/commit/48927d4c0d7d65a6a85d4dfb6cc80be8e71a0673
 
-a8c251d42a322505d43a7fcb279765d95971b990
+48927d4c0d7d65a6a85d4dfb6cc80be8e71a0673
