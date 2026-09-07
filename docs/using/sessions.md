@@ -179,6 +179,49 @@ reference names; the reference counter, since a slot name handed out twice would
 context's integrity, since nothing here has un-read what the conversation read. The cut never lands
 inside a round, so a call is never separated from its results.
 
+## A session that leaves nothing behind
+
+```sh
+bravebot --incognito
+```
+
+An incognito session runs like any other and adds nothing to `~/.bravebot`. No prompt reaches the
+history, no session record and no title are written, no audit trail is kept, and a model, theme or
+effort level chosen inside it applies for that session without being recorded. The sessions
+directory is not created either: an empty one still says that a session ran, in this project, at
+this time, which is most of what the record was for. Nothing is written, so nothing is resumable —
+an incognito session does not appear in the picker, including to itself.
+
+A history and records that were already there are left exactly as they were, rather than trimmed
+or rewritten in passing, and an ordinary session from before stays resumable. It simply stops
+being updated for as long as the incognito one runs.
+
+**Reading is untouched.** The settings, the model and theme you chose, your standing instructions,
+your skills and your imported credentials are all read as usual, so the session is the one you
+configured rather than a fresh install. This is the division a browser's private window makes: the
+promise is about what survives, not about what the session may know.
+
+The flag may go anywhere in the command line and combines with `-p`, `--resume`, `--mode` and a
+bare invocation alike. It cannot be turned off once the session has started.
+
+### What it does not cover
+
+Three things still reach the filesystem, each because not doing them would mean not doing the work:
+
+- **Your project.** `write_file` and `edit_file` go on editing it. Those edits are the work rather
+  than a trace of it.
+- **Programs you run.** A program reaches the filesystem with the access your own shell would give
+  it, and may write whatever it likes. What confines one is
+  [confinement](../security/security.md#confinement), which is a different question.
+- **The editor hand-off.** Composing in `$EDITOR` writes a scratch file, because there is no way to
+  hand an editor a buffer instead of a path. It goes to the system temporary directory rather than
+  `~/.bravebot`, is readable by nobody else, and does not outlive the edit.
+
+[`import-leo-creds`](../customize/premium.md) is refused rather than quietly skipped, since an
+import is a write by definition: a credential that did not outlive the session would not be an
+import. `--forget` still works, because removing a stored secret leaves less behind rather than
+more.
+
 ## When it cannot be written down
 
 A missing home directory, a full disk, a corrupt record, a stored time in the future: everything here

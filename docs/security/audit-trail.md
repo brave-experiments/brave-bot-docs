@@ -17,6 +17,10 @@ would not answer "why did it not do the thing I asked", which is most of what an
 | a one-shot run | `--trace`, which puts it on stderr |
 | after the fact | `~/.bravebot/sessions/<directory>/<id>.audit.jsonl` |
 
+An [incognito session](../using/sessions.md#a-session-that-leaves-nothing-behind) shows its gate
+decisions on screen as always and writes no file. The trail holds no content, but it does hold gate
+names and paths, which is a record of a session having happened and what it touched.
+
 ```sh
 bravebot "what does this do?" --file src/main.rs --trace
 ```

@@ -43,10 +43,14 @@ Anything that is not a recognised flag or subcommand is treated as the task prom
 | `-p`, `--print` | non-interactive; reads piped stdin as quarantined context |
 | `--mode <turn\|manifest>` | how a one-shot is run; `turn` (the default) decides step by step, `manifest` plans the whole run first |
 | `--trace` | print the audit trail to stderr |
+| `--incognito` | write nothing to `~/.bravebot`: no history, no session record, no preference |
 | `-h`, `--help` | show the help |
 | `-V`, `--version` | show the version |
 
 `-p` may lead, as it does for other agents: `bravebot -p "task"`.
+
+`--incognito` may lead too, and combines with everything else here — see
+[an incognito session](../using/sessions.md#a-session-that-leaves-nothing-behind).
 
 ## `import-leo-creds`
 
