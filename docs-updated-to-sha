@@ -8,8 +8,8 @@
 # (agents/skills/update-docs) to fold it in. The skill rewrites the sha below; nothing
 # else should.
 #
-# fix(bedrock): name a profile that is not configured rather than signing in to it
+# feat(tui): put the session in the delegate list, so there is a row back
 # 2026-09-06
-# https://github.com/brave-experiments/brave-bot/commit/d700e50482241e37c16a48ca4aaf2bb5e29aff64
+# https://github.com/brave-experiments/brave-bot/commit/a8c251d42a322505d43a7fcb279765d95971b990
 
-d700e50482241e37c16a48ca4aaf2bb5e29aff64
+a8c251d42a322505d43a7fcb279765d95971b990
