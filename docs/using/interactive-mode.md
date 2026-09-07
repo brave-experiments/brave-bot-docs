@@ -80,11 +80,18 @@ what they mean everywhere else while it is up. It folds into as many columns as 
 no row runs past the edge. It is the one place the keys are written down, which is what stops it
 advertising a binding that has since changed.
 
-The row beneath the box carries what the session is doing — the trail, the confinement, and how full
-the context is — and then `? for shortcuts`. It names no binding of its own. The two used to share
-one line, and the line was wider than the terminal, so the end of it was cut: everything you could
-look up was taking room from the figures you had no other way to see. A binding cut off is one you
-learn once, and a context reading cut off is gone.
+The row beneath the box carries what the session is doing — how full the context is, the trail, and
+the key that opens the delegates once the session has spawned any — and then `? for shortcuts`. It
+names no other binding of its own. The two used to share one line, and the line was wider than the
+terminal, so the end of it was cut: everything you could look up was taking room from the figures you
+had no other way to see. A binding cut off is one you learn once, and a context reading cut off is
+gone.
+
+The trail key is named only **once a turn has left a trail to look at**, since a trail is recorded
+when the turn it belongs to ends and before then the key would change nothing on the screen. The
+confinement is not on the row at all: it is settled before the session opens and cannot change while
+it runs, so reporting it on every frame spends room on a constant. It is stated once at startup, and
+[`/status`](../reference/commands.md#status) answers for it whenever you ask.
 
 ## Stopping and leaving
 
