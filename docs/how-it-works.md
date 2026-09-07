@@ -108,6 +108,19 @@ a second planner with a context of its own and a narrower set of capabilities.
 A planner that runs the build reads the whole log. A planner that asks a delegate to run the build is
 told what failed. The work happens either way and only one of them spends the conversation on it.
 
+**Delegates run alongside the turn and alongside each other.** Starting one hands the planner its
+round straight back and the work goes on behind it, so a turn that asked three questions waits on
+the slowest rather than on the sum. Nothing is shared between two of them: each holds its own
+conversation, its own quarantine and its own copy of what you have vouched for, so no delegate can
+see another's work any more than it can see the turn's. What they do share is you — one question is
+put at a time, so a delegate wanting a write approved while you are reading another delegate's diff
+waits for you to finish reading it.
+
+A turn does not answer while something it started is still working. If it would otherwise finish
+first, the reports are waited for and put in front of it, and it answers again knowing what came
+back — because a person told the turn is over reasonably believes nothing of theirs is still being
+read or written.
+
 None of this is about trusting a second model more than the first. A delegate holds capabilities and
 holds no untrusted content — what it may not read is quarantined and it is handed a reference, exactly
 as its parent would be — so there is no point in the run where untrusted bytes and a capability are in

@@ -240,6 +240,11 @@ See [How Brave Bot works](../how-it-works.md#processors).
 Hands a sub-task to a [delegate](../how-it-works.md#delegates) — a second planner with a narrower set
 of capabilities — and gets back one report.
 
+The call answers as soon as the delegate has been approved, so the planner has its round back while
+the work goes on behind it, and what the delegate says arrives on its own later. Several delegates
+can be going at once, each numbered in the order the turn started them, and every report says whose
+work it describes rather than leaving that to be worked out from the words.
+
 | Parameter | |
 |---|---|
 | `kind` | `reader`, `checker` or `worker` |
@@ -272,8 +277,8 @@ of its own to you — what it could not settle goes in the report, and the plann
 
 :::note
 The confirmation for a write shows the path and the diff, as it always does, but it does not say that
-a delegate rather than the turn is asking. Where a turn spawns delegates one after another, reading
-only the prompt means approving a change whose reason is a task you did not read.
+a delegate rather than the turn is asking. With several running, reading only the prompt means
+approving a change whose reason is one of the tasks you did not read.
 :::
 
 ## `load_skill`

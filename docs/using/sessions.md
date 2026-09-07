@@ -104,6 +104,11 @@ drawn from inside a tool call is taken off the tool figure rather than counted i
 remainder means something. `/status` reports the session total and each part that actually happened,
 leaving out a part that did not rather than showing it as zero.
 
+What a [delegate](../how-it-works.md#delegates) spends is counted in the turn's tokens, because the
+turn asked for it and you are paying for it. Its seconds are not: several delegates and the turn
+spend the same seconds at once, so adding them would report a turn as having taken longer than it
+did.
+
 A turn that failed is recorded like any other, being the one most worth reading afterwards, and a
 `/compact` asked for mid-turn is charged to the turn it interrupted, as its tokens are. A record
 written before any of this was kept reads as an empty breakdown, which is not the same as a session
