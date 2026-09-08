@@ -1,7 +1,7 @@
 ---
 sidebar_position: 2
 title: Slash commands
-description: The eleven commands the interface acts on itself, and the rules every one of them shares.
+description: The twelve commands the interface acts on itself, and the rules every one of them shares.
 ---
 
 # Slash commands
@@ -20,6 +20,7 @@ A line beginning with `/` is acted on by the interface itself, in place of being
 | `/rename` | `<name>` | Call this conversation something else |
 | `/compact` | | Summarise the conversation so far, keeping the recent part |
 | `/clear` | | Start a new session here, keeping this one resumable |
+| `/export` | `[path]` | Write the transcript out as a markdown file |
 | `/exit` | | Leave |
 
 Typing `/` offers the list, and Tab completes.
@@ -187,6 +188,20 @@ archive that the transcript still reads and the session record still stores. See
 Begins a new session in this directory and keeps the current one resumable. Because it is a new
 session it asks the trust question again, restores no standing permissions, and closes any directory
 `/add-dir` had opened.
+
+## `/export [path]`
+
+Writes the transcript out as a markdown file under the working directory — at the path you name, or
+at `bravebot-export-<id>.md`. The conversation belongs to the person who had it, and without this the
+only way to get one out is to read the session record's JSON out of the state directory by hand.
+
+The path is typed on the same line as the command, so it gets the confinement any other path from
+that line would get: `..`, an absolute path and a drive prefix are refused, and containment is then
+tested against the real location of the deepest directory that exists, so a path leading out of the
+tree through a symlink is refused as well. Missing parent directories are created.
+
+**Anything already at the path is refused rather than replaced**, a symlink whose target is missing
+included. The file is written readable by you alone, as the record it came from is.
 
 ## The rules every command shares
 
