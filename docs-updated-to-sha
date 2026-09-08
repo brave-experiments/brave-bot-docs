@@ -8,8 +8,8 @@
 # (agents/skills/update-docs) to fold it in. The skill rewrites the sha below; nothing
 # else should.
 #
-# feat(turn): ask in one round, and read the whole file
+# feat(preamble): say where the planner is working, rather than let it find out
 # 2026-09-08
-# https://github.com/brave-experiments/brave-bot/commit/16705068b70f6996d6041a9f18babad746245142
+# https://github.com/brave-experiments/brave-bot/commit/56e62076307759c73421aa587a038221f80a7806
 
-16705068b70f6996d6041a9f18babad746245142
+56e62076307759c73421aa587a038221f80a7806

@@ -1,0 +1,13 @@
+# brave-bot commits reviewed by the update-docs skill and deliberately left for a
+# later run, with why. The baseline in docs-updated-to-sha cannot hold these: it
+# says everything before it was folded in, and the next span begins after it, so a
+# commit skipped mid-span would never be offered again.
+#
+# `docs-ref.py changes` replays these ahead of the new span. Drop one with
+# `docs-ref.py resolve <sha>` once its behaviour is documented.
+
+6e6c71a82234d0324b3a73b108e906ed3a1eadfe only 56e6207 was requested this run; models filter unreviewed
+ac0a5d01f26334ce5d83de467c30136b898a2836 only 56e6207 was requested this run; regex search unreviewed
+0747ad646aca9a72d725d613f4013aecf45ffd89 only 56e6207 was requested this run; npm publish workflow unreviewed
+d7d2af9b57ae0cd3bca435db4598f499b099a5e5 only 56e6207 was requested this run; quarantine message unreviewed
+4f59a55b474e87901f0b8acc44be48a2c78b9670 only 56e6207 was requested this run; exec test unreviewed
