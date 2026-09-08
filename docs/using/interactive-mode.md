@@ -89,6 +89,19 @@ terminal, so the end of it was cut: everything you could look up was taking room
 had no other way to see. A binding cut off is one you learn once, and a context reading cut off is
 gone.
 
+**The context reading says which of three things the session knows.** A session that has measured a
+request says how full the context is, as a percentage of the budget it would be compacted at. One
+whose conversation has been shortened underneath that figure says it was *compacted* rather than
+giving a percentage, since the number it held describes an exchange that is no longer the one on
+screen. A session that has measured nothing says nothing. A resumed session opens with what the last
+request of the session it read came to, so the figure is there before this one has sent anything.
+
+**A percentage against a budget nobody advertised is marked as approximate**, and the mark is the
+difference between two readings of a hundred per cent that want opposite things. Against a window the
+endpoint stated, it means shorten the conversation. Against the
+[built-in default](../customize/configuration.md#context-budget), it may only mean that default is
+too small for the model in force, and the answer is to set the budget rather than to compact.
+
 The trail key is named only **once a turn has left a trail to look at**, since a trail is recorded
 when the turn it belongs to ends and before then the key would change nothing on the screen. The
 confinement is not on the row at all: it is settled before the session opens and cannot change while

@@ -685,6 +685,10 @@ An advertised figure is believed even where it is small, and never raised. A bud
 sense falls back to the default rather than disabling compaction, so a misconfiguration cannot
 quietly turn the mechanism off.
 
+While the default is standing in, the reading under the input box is
+[marked as approximate](../using/interactive-mode.md#looking-up-the-keys), because a conversation
+that reads as full against a guess may only mean the guess is too small.
+
 The window is looked up whenever a model is in force, not only when you pick one in the picker, so a
 session starting on a model you chose earlier asks again. If that lookup fails the default stays in
 place and nothing is said.
