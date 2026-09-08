@@ -80,19 +80,33 @@ The glob is literal and the matcher does not backtrack. A truncated listing says
 
 ## `search`
 
-Finds a **literal substring** in workspace files, and returns matching lines.
+Finds lines matching a **regular expression** in workspace files.
 
 | Parameter | |
 |---|---|
-| `pattern` | literal text; **not** a regular expression. May be a list, in which case a line matches if it holds any of them |
+| `pattern` | a regular expression. May be a list, in which case a line matches if it matches any of them |
 | `directory` | workspace-relative, defaults to `.` |
 | `include` | optional glob limiting which files are searched: `*`, `?`, `**` and brace groups like `**/*.{cc,h,mm}` |
 | `case_sensitive` | defaults to true |
 
-There is no regular expression here. A list of patterns is alternation, not a pattern language: every
-entry is matched with a substring test, so the work is the sum of the patterns and never a power of
-the input. Brace groups in `include` are expanded before the walk. Case is asked for rather than
-inferred, and a line is reported as written rather than as it was folded to match.
+Supported: literals, `.`, `*`, `+`, `?`, `|`, `(...)`, `[...]` with ranges and negation, `\d`, `\w`,
+`\s` and their negations, `^`, `$`, `\b`, `\B`, and a backslash before a metacharacter to match it
+literally.
+
+Two things are absent. **Counted repetition** (`a{2,9}`) is not supported and `{` is an ordinary
+character. **Backreferences** are not supported. Captures are never extracted, since a search reports
+the whole line.
+
+The engine does not backtrack, so a pattern like `(a+)+$` that is exponential elsewhere costs nothing
+unusual here: matching is the line's length times the pattern's size, whatever the pattern. That bound
+is why the two missing constructs are missing. Counted repetition nested twice multiplies the states a
+short pattern expands to, and backreferences cannot be matched without backtracking.
+
+A list of patterns is alternation, one more expression to try per line, so the work is the sum of the
+patterns rather than a power of anything. A pattern that is too long or nested too deeply is refused.
+Brace groups in `include` are expanded before the walk. Case is folded by the engine rather than by
+lowercasing the pattern, which would turn `\D`, `\W` and `\S` into the classes they negate, and a line
+is reported as written rather than as it was folded to match.
 
 **Version control, build output, caches and vendored dependencies are not walked**, by name and
 without reading anything to decide it. The project's own `.gitignore` is not consulted either: it
@@ -102,9 +116,8 @@ search can hide them from review.
 A result touching several files is trusted only if **every one of them** is. A truncated search tells
 the planner it is incomplete. A search that found nothing says which kind of nothing it is: no
 matching lines in the files it read, or an `include` that selected no files at all. Those are
-opposite facts, and drawn identically the planner reads one as the other. A pattern written as a
-regular expression, or a glob leaning on syntax the matcher does not have, is named for the same
-reason.
+opposite facts, and drawn identically the planner reads one as the other. A glob leaning on syntax the
+matcher does not have is named for the same reason.
 
 ## `write_file`
 
