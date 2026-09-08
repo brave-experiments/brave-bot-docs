@@ -14,7 +14,7 @@ merely carried.
 |---|---|---|---|
 | [`read_file`](#read_file) | `path`, `path_ref` | — | only to trust a quarantined file |
 | [`list_files`](#list_files) | `directory`, `pattern`, `depth` | — | no |
-| [`search`](#search) | `directory`, `include` | `pattern` | no |
+| [`search`](#search) | `pattern`, `directory`, `include` | — | no |
 | [`write_file`](#write_file) | `path`, `path_ref` | `contents`, `contents_ref` | **yes, every time** |
 | [`edit_file`](#edit_file) | `path`, `path_ref` | `old_text`, `new_text` | **yes, every time** |
 | [`run`](#run) | `command`, compiled to a plan | stdin | **yes, unless vouched for** |
@@ -83,13 +83,31 @@ Finds a **literal substring** in workspace files, and returns matching lines.
 
 | Parameter | |
 |---|---|
-| `pattern` | literal text; **not** a regular expression |
+| `pattern` | literal text; **not** a regular expression. May be a list, in which case a line matches if it holds any of them |
 | `directory` | workspace-relative, defaults to `.` |
-| `include` | optional glob limiting which files are searched |
+| `include` | optional glob limiting which files are searched: `*`, `?`, `**` and brace groups like `**/*.{cc,h,mm}` |
+| `case_sensitive` | defaults to true |
+
+A list of patterns is alternation rather than a pattern language — every entry is still matched with
+a substring test, so the work is the sum of the patterns and never a power of the input, which is why
+there is no regular expression here. Brace groups in `include` are expanded before the walk for the
+same reason. Case is asked for rather than inferred: nothing about a pattern widens it, and a line is
+reported as written rather than as it was folded to match.
+
+**Version control, build output, caches and vendored dependencies are not walked**, by name and
+without reading anything to decide it. A tree that mirrors what it depends on holds far more of that
+than of its own code, so a search for a common word would otherwise spend its whole budget inside a
+dependency mirror. The project's own `.gitignore` is deliberately not consulted: it would decide what
+to walk from a file in the tree being walked, and a tree that can hide files from a search can hide
+them from review.
 
 A result touching several files is trusted only if **every one of them** is. A truncated search tells
-the planner it is incomplete, and a search that found nothing for a pattern written as a regular
-expression says so, rather than letting the planner conclude the text is absent.
+the planner it is incomplete, and one that found nothing says which kind of nothing it is: no
+matching lines in the files it read, or an `include` that selected no files at all. Those are
+opposite facts — the first is evidence about the tree, the second says nothing whatever about it —
+and drawn identically the planner reads one as the other and answers the question wrong. A pattern
+written as a regular expression, or a glob leaning on syntax the matcher does not have, is named for
+the same reason.
 
 ## `write_file`
 
