@@ -7,7 +7,7 @@ description: Every command, flag and key bravebot takes.
 # CLI reference
 
 ```
-bravebot 0.1.0: a general-purpose agent resistant to prompt injection
+bravebot 0.4.0: a general-purpose agent resistant to prompt injection
 
 Usage:
   bravebot                               Start an interactive session
@@ -118,7 +118,7 @@ See [Slash commands](commands.md).
 ## The version string
 
 ```
-bravebot 0.1.0 (f2a6e1a, modified)
+bravebot 0.4.0 (f2a6e1a, modified)
 ```
 
 The commit is what the binary was compiled from, and `modified` means the tree had uncommitted changes

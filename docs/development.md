@@ -94,7 +94,7 @@ Every session record carries the build that produced it, and `bravebot --version
 string:
 
 ```
-bravebot 0.1.0 (f2a6e1a, modified)
+bravebot 0.4.0 (f2a6e1a, modified)
 ```
 
 Both matter when reading a transcript back: a session that behaved oddly is usually being read against
