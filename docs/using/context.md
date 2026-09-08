@@ -58,9 +58,17 @@ Ctrl-V pastes. More than a couple of lines folds to a marker:
 [Pasted text #2 +40 lines]
 ```
 
-The words around it are left alone and the text is put back before the turn is built, so what gets
-sent is what the prompt says. Deleting the marker drops the words. A short paste lands whole, a
-paste into a command line is never folded, and a paste ending in a newline does not send.
+The words around it are left alone, and the words themselves are put back where the line leaves the
+box — so the request, the transcript and your prompt history all hold the paste rather than the
+marker. Deleting the marker drops the words. A short paste lands whole, a paste into a command line
+is never folded, and a paste ending in a newline does not send.
+
+**The marker goes no further than the box.** It is a handle on text that only the session holding it
+can put back: in the transcript it would have the conversation claim something the planner was never
+given, and in the history it would come back in a later session naming nothing, sending the
+placeholder in place of everything you pasted with nothing on the screen to say so. A prompt that
+comes back for editing after a stop does come back behind its marker, since that is where a stack
+trace is worth folding away.
 
 ### Pictures
 
@@ -77,6 +85,10 @@ terminal and reads the clipboard itself. On macOS that goes through `osascript`;
 - The picture is inlined into the request, never linked, so no other machine fetches it.
 - The marker is written where the caret is, and the picture goes wherever that text goes. Deleting
   the marker unsends it.
+- **A prompt recalled from your history carries no picture and names none.** No durable text stands
+  for a screenshot, and the words around it are what you meant, so the marker is simply not what gets
+  remembered. What this turn sends is untouched: the picture still travels with the prompt that named
+  it, and the transcript still shows the line as it was on your screen.
 - A picture is refused in shell mode rather than written into the command.
 - Anything over 10 MB is refused, and says so with its size.
 - A pasted picture is kept with the session record and comes back on resume, because it is part of
@@ -103,6 +115,11 @@ What happens depends on the type:
 | anything else | its path is written into the line, as dropping a file always did |
 
 Extensions are recognised whatever their case. Dropping a directory attaches nothing.
+
+**A prompt recalled from your history names the file rather than the marker.** Nothing staged beside
+a line outlives the session that staged it, so a name is what is left when the staging is gone — and
+it is enough, since the planner reads it and goes to the file through the same gate it reads any
+other file through.
 
 Terminals deliver a drop as text, so it has to be told from typing: a line is a drop only when every
 word of it is a path that exists. A plain, quoted, backslash-escaped or `file://` path counts,
