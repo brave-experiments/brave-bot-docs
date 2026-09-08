@@ -20,6 +20,12 @@ Each session is two files, named after a version 4 UUID:
 The name is random rather than counted or clocked, so two sessions cannot collide however many are
 running, and it is opaque because the name gets printed on a screen and pasted into a command.
 
+**Both are private to you.** On Unix, session directories are created mode 0700 and records, trails
+and the temporary files beside them are written mode 0600, with anything already there tightened on
+write. A record holds the whole conversation — your prompts, the model's replies, the file snippets
+the planner was shown, and the standing permissions you granted — and at the usual process umask that
+would land world-readable on a shared host.
+
 ## Picking one back up
 
 ```sh
