@@ -229,7 +229,9 @@ def changes(args) -> int:
     span = f'{ref_sha}..{head_sha}'
 
     if ref_sha == head_sha:
-        print(f'Up to date at {ref_sha[:9]}. Nothing to fold in.')
+        print(f'Up to date at {ref_sha[:9]}. Nothing new to fold in.')
+        print()
+        _print_deferred(repo)
         return 0
 
     paths = [] if args.all else _DOC_PATHS
