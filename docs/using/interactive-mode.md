@@ -82,8 +82,8 @@ no row runs past the edge. It is the one place the keys are written down, which 
 advertising a binding that has since changed.
 
 The row beneath the box carries what the session is doing — the mode in force where it is not simply
-asking, how full the context is, the trail, and the key that opens the delegates once the session has
-spawned any — and then `? for shortcuts`. It
+asking, how full the context is, the trail, and the key that opens the delegates and the commands
+once the session has anything to open — and then `? for shortcuts`. It
 names no other binding of its own. The two used to share one line, and the line was wider than the
 terminal, so the end of it was cut: everything you could look up was taking room from the figures you
 had no other way to see. A binding cut off is one you learn once, and a context reading cut off is
@@ -302,7 +302,7 @@ See [Slash commands](../reference/commands.md) and [Adding context](context.md).
 Ctrl-O opens the scroller over the transcript, and Ctrl-T toggles the audit trail. See
 [Reading the transcript](transcript.md) and [The audit trail](../security/audit-trail.md).
 
-## Watching a delegate
+## Watching a delegate, and reading what a command printed
 
 A [delegate's](../how-it-works.md#delegates) work is discarded by design: the planner is told a
 sentence, and the reading, the commands and the narration behind it end with the run. Drawn nowhere,
@@ -317,21 +317,36 @@ nothing, so its block carries the sentence alone. A report the planner was not a
 drawn in the [marked block](transcript.md) every quarantined result uses, so you can see which of
 the two it was.
 
-**Ctrl-L opens the whole of it.** Where the session has spawned more than one delegate, a list is
-the way in — a panel over the transcript, a row each with the kind, how it is going, what it was
-asked and how much it has done. Where it has spawned one, that delegate's own lines open directly.
-Where it has spawned none the key does nothing, since a mode over an empty screen puts you somewhere
-with nothing to read and something to get out of. The row beneath the box names the key, and how
-many there are, for as long as the session has any.
+**What a command printed has the same shape of problem.** The transcript has room for the first lines
+and a count, and "12 lines, quarantined" does not tell you what your agent just ran in a directory
+you own. So it gets the same answer rather than a second key to learn.
+
+**Ctrl-L opens the whole of it.** Where there is more than one row, a list is the way in — a panel
+over the transcript, a row each. Where there is one, its own lines open directly. Where there is
+nothing the key does nothing, since a mode over an empty screen puts you somewhere with nothing to
+read and something to get out of. The row beneath the box names the key and how many rows there are,
+counting the delegates and the commands together, for as long as the session has any.
 
 | Key | What it does |
 |---|---|
-| Ctrl-L | open the delegates, and close the mode from either level |
+| Ctrl-L | open the list, and close the mode from either level |
 | Enter | open the row under the cursor |
 | Up / Down | move through the list |
 | n / p | in a delegate, step to the next or previous one without going back to the list |
 | q, Escape | back to the list from a delegate, then out |
 | Ctrl-C | close the mode, leaving the turn in flight running |
+
+**Every command the turn ran is a row**, after the delegates and in the order they ran, so a row's
+place does not move under you while you are stepping through it. Opening one draws what the command
+printed, as far back as is kept, and says so rather than dropping quietly where more was printed than
+was kept. Where the planner was kept from the output, every row of it carries the margin every
+quarantined block carries — and the row is there whether or not the planner read what it printed, and
+says which, that being the one thing about the bytes you cannot work out from them.
+
+The header and the footer name which kind of thing you are looking at: a delegate by its kind and its
+number, a command by the line that ran. One list holds both and the keys that move through it do not
+ask what a row is, so without that, stepping from a delegate onto a command reads as the same view
+showing different lines.
 
 **The session is the first row of the list**, and choosing it closes the mode and puts the turn's
 view back where you left it. Every other destination the mode can reach is a row, so the way back is
@@ -348,10 +363,10 @@ hundred calls, so arriving late at a very long run means reading from wherever t
 
 **None of this reaches a model and none of it is written down.** The planner that asked is told the
 report and nothing else, no delegate is part of the record a session is resumed from, and `/clear`
-forgets them — so a resumed session has the reports and none of the work behind them. A screen is
-not a context: you own the directory and may see what your agent did in it, and what must not happen
-is those lines reaching a planner by any route, of which a record read back into a later turn would
-be one.
+forgets them and what the commands printed alike — so a resumed session has the reports and none of
+the work behind them. A screen is not a context: you own the directory and may see what your agent
+did in it, and what must not happen is those lines reaching a planner by any route, of which a record
+read back into a later turn would be one.
 
 ## Long turns
 
