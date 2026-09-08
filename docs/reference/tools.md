@@ -17,7 +17,7 @@ merely carried.
 | [`search`](#search) | `directory`, `include` | `pattern` | no |
 | [`write_file`](#write_file) | `path`, `path_ref` | `contents`, `contents_ref` | **yes, every time** |
 | [`edit_file`](#edit_file) | `path`, `path_ref` | `old_text`, `new_text` | **yes, every time** |
-| [`run`](#run) | `program`, `args` | stdin | **yes, unless vouched for** |
+| [`run`](#run) | `command`, compiled to a plan | stdin | **yes, unless vouched for** |
 | [`read_output`](#read_output) | `ref` | — | **yes** |
 | [`spawn_processor`](#spawn_processor) | `about` | `reads`, `instruction` | no |
 | [`spawn_agent`](#spawn_agent) | `kind` | `task`, `each` | not the call — but its writes and runs do |
@@ -30,7 +30,9 @@ A thirteenth, [`schedule_next`](#schedule_next), is offered to a turn inside a s
 
 An unknown tool is reported to the planner rather than ignored.
 
-There is **no shell tool**, and there never will be. See [Shell mode](../using/shell-mode.md).
+There is **no shell tool**, and there never will be: nothing the planner writes is handed to an
+interpreter. [`run`](#run) takes a command line, and bravebot compiles it itself. See
+[Shell mode](../using/shell-mode.md).
 
 ---
 
@@ -128,44 +130,132 @@ the route is `spawn_processor` plus `write_file`.
 
 ## `run`
 
-Runs a program. **You approve the exact argv before anything runs.**
+Runs a command line. **You approve the compiled plan before anything runs.**
 
-```json
-{"pipeline": [
-  {"program": "git", "args": ["log", "--oneline", "-50"]},
-  {"program": "sed", "args": ["-n", "1,10p"]}
-]}
+| Parameter | |
+|---|---|
+| `command` | one command line; a newline is refused, since this is a line and not a script |
+
+```
+git log --oneline -50 | head -20
 ```
 
-Each stage's output feeds the next. **There is no shell**: no pipes, no redirection, no `&&`, no
-`$(...)`. A `;` or `|` inside an argument is part of that argument and nothing splits it. Narrowing
-output is a stage, not a pipe character.
+The line is **compiled, never interpreted**. No shell sees it at any point: bravebot's own grammar is
+the only thing that reads it, and what comes out is an ordered plan — each step a resolved binary and
+a literal argument vector, together with every file the line would write — which is what then runs. A
+`;` or `|` inside quotes is part of an argument and stays part of it, because the only thing that
+ever split the line was the compiler and it has already finished.
 
-A name is looked up on `PATH`; a path is taken relative to the workspace. `args` is what comes *after*
-the program — there is no `argv[0]` to repeat.
+A name is looked up on `PATH`; a path is taken relative to the workspace.
 
-**The planner is not shown the output.** It comes back as a reference, like a file it may not read,
-and can be passed to `spawn_processor` or written to a file with `write_file`.
+### What the grammar takes
+
+| | |
+|---|---|
+| pipelines and sequencing | <code>\|</code>, `&&`, <code>\|\|</code>, `;`, and `( … )` to group |
+| redirection | `>`, `>>`, `<`, `2>`, `2>>`, `2>&1`, `&>`, each naming one literal file |
+| patterns | `*`, `?`, `[…]`, `**` |
+| brace expansion | `{a,b}`, `{1..9}` |
+| home | a leading `~` |
+| per-command environment | `NAME=literal cmd` |
+
+Everything else is refused, as an error naming the part of the line that caused it, and **a refusal
+runs nothing** — there is no falling back to a shell and no running the prefix that did compile.
+
+| Refused | Why |
+|---|---|
+| `$(…)`, backticks | a command whose text is computed is a destination nobody saw |
+| `$VAR`, `${…}` | the value is not in the line, so the plan is not in the line |
+| `$((…))` | arithmetic is a language, and a language needs an interpreter |
+| `<(…)`, `>(…)` | the same, plus a file descriptor nobody named |
+| `&` | backgrounding is a parameter of a call, not a token in a line |
+| `<<`, `<<<` | a here-document is content wearing the shape of syntax |
+| `eval`, `source`, `.`, `exec`, `trap` | they put an interpreter back in the plan |
+| `if`, `while`, `for`, `case`, `function` | control flow is a program |
+| `!` | history expansion is text you typed reaching a line the planner wrote |
+
+Quoted, every one of them is an ordinary argument: `'$HOME'` is six characters that reach the program
+as one word.
+
+### Your answer binds to the plan, not to the line
+
+The prompt draws the plan: each step as the line wrote it, the binary that will actually run
+underneath, the directory it runs in, and **every file the line would create or replace**, listed
+rather than left to be worked out from the steps above. The line the planner wrote is shown above it
+and marked as context — comparing the two is what would catch a compiler that read the line wrong —
+but it is not what you are agreeing to.
+
+So two lines that compile alike are one thing to agree to, and one approval cannot be reused for the
+same steps joined differently, for the same steps writing somewhere else, or for the same steps in
+another directory.
+
+**Every branch is endorsed before anything runs.** `a && b` may run `b`, `a || b` may run `b`, and
+`a ; b` will, so all of them are in the plan and all of them are approved up front. Nothing is put to
+you part-way through a running line, where you could not tell what state the first half had left
+behind.
+
+### Patterns become the files they match
+
+Expansion happens against the tree at approval time, so what you read at the prompt is the file list
+rather than the pattern. A pattern matching nothing is an error rather than an argument passed
+through unchanged, which is what a shell does and is never what anybody writing one meant. `**` steps
+over the directories a listing steps over, so it does not descend into `.git` or `node_modules`.
+
+It is bounded in both directions: a word standing for more than 100 arguments is refused with the
+count, and the walk gives up after 4,096 directories. An approval prompt nobody reads grants
+everything and asks nothing.
+
+### A redirection is a write
+
+`> out.txt` is a file this line creates or truncates. It appears in the plan's write set, it is shown
+at the prompt, and it takes every rule a write takes — the permission rules, the trust map's answer
+for that path, and the confinement that keeps a write inside the workspace. `>>` is a write, `<` is a
+read, and `2>&1` renames a stream and touches no file.
+
+A target that does not compile to exactly one literal path is refused, a pattern included, even where
+it matches one file today: a destination worked out from what is on disk moves when the tree does,
+and the plan would stop saying where the bytes go.
+
+**A line that writes is put to you every time**, whatever you have vouched for. Vouching is keyed on
+a program and its arguments, and a destination is neither, so a remembered command cannot pick one up
+unseen.
+
+### Something that wants a terminal is refused before it starts
+
+`git rebase -i`, `git add -i`, an editor, a pager without `--no-pager`: refused when the line is
+compiled, with the thing to do instead. The list is a convenience rather than a guarantee — something
+interactive that is not on it reaches [the time limit](#a-line-has-five-minutes) and comes back with
+what it printed, which is the same outcome by a slower road.
+
+Standard input is empty, so a step that reads it gets nothing rather than the terminal.
+
+### The output
 
 | | Label |
 |---|---|
-| program and arguments | `(T,pub)` — a person approves the exact argv |
+| the plan — programs, arguments, and the files it writes | `(T,pub)` — a person approves the compiled plan |
 | standard input | may be untrusted; a person approves when it is private |
 | standard output and error | `(U,priv)` — quarantined |
-| …for a command a person vouched for | `(T,priv)` |
+| …for a line every step of which a person vouched for | `(T,priv)` |
 
-Stdin is content: the planner names a quarantined reference and the policy layer supplies the bytes,
-so `sed` and `awk` work on a file nobody vouched for without the planner or the driver ever reading
-it. A stage that reads stdin and was given none receives nothing, never the terminal.
+**Output nobody vouched for is not shown to the planner.** It comes back as a reference, like a file
+it may not read, and can be passed to `spawn_processor` or written to a file with `write_file`.
+
+Output the planner **may** read comes back as text, capped at 16 KiB. Past the cap the head and the
+tail are kept and the middle dropped, with a line in between saying how much went: a build log's
+verdict is at the end and its first error near the beginning, so keeping only the front answers
+neither question. The cap is on what enters the conversation rather than on what the command printed,
+and the whole of it stays available as a reference. Output the planner may not read is not capped at
+all, since none of it enters the conversation.
 
 ### What a program is handed
 
-A stage gets the environment bravebot is running in, **less the credentials bravebot authenticates to
-its own backend with** — `SERVICES_KEY_AICHAT` and `BRAVE_SERVICES_KEY_ID`. Every stage, not only the
+A step gets the environment bravebot is running in, **less the credentials bravebot authenticates to
+its own backend with** — `SERVICES_KEY_AICHAT` and `BRAVE_SERVICES_KEY_ID`. Every step, not only the
 first, and removed rather than blanked, so a program that tells an unset variable from an empty one
 sees what a machine that never held the credential sees.
 
-You approve the argv, the resolved binary and the directory. The environment is not among those, so a
+You approve the plan, the resolved binaries and the directory. The environment is not among those, so a
 credential travelling alongside them would be handed over without your ever having seen it, and "run
 `git log`" would be approved as an inspection of the repository.
 
@@ -186,13 +276,13 @@ is established about what the program then does, and the label on its output is 
 A line you typed yourself in [shell mode](../using/shell-mode.md) is not this and keeps your whole
 environment, since it is meant to behave as your own terminal does.
 
-### A pipeline has five minutes
+### A line has five minutes
 
-Every pipeline is given 300 seconds. When that runs out the stages are killed, and **what they
-printed before that comes back exactly as it would from a pipeline that ended on its own**, under
-the same label — reaching the limit ends a run rather than failing it. So a program that never
-exits, like a server told to serve a page, still gives you everything it printed. How long the run
-took comes back with the output, which is how you tell the two apart.
+Every line is given 300 seconds. When that runs out the steps are killed, and **what they printed
+before that comes back exactly as it would from a line that ended on its own**, under the same
+label — reaching the limit ends a run rather than failing it. So a program that never exits, like a
+server told to serve a page, still gives you everything it printed. How long the run took comes back
+with the output, which is how you tell the two apart.
 
 Finishing inside the limit says nothing about what a program did, and being cut short neither
 raises nor lowers the label on its output.

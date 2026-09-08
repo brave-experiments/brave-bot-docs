@@ -98,8 +98,11 @@ prompt.
 exact arguments: `git log` says nothing about `git log --all`. And a run with *private* input asks
 every time, whatever is vouched for.
 
-**It refuses to use a pipe or a redirect.** The planner has no shell, by design. It composes argv
-stages instead. To use a real shell, type `!` yourself. See
+**A command line was refused rather than run.** Pipes, `&&`, redirection, globs and braces are all
+fine; `$(...)`, `$VAR`, `$((...))`, `&`, here-documents and control flow are refused, because what
+they stand for is not in the line and so could not be shown to you at the prompt. The refusal names
+the part of the line that caused it, and quoting turns any of them into an ordinary argument. To use
+a real shell, type `!` yourself. See [`run`](reference/tools.md#run) and
 [Shell mode](using/shell-mode.md).
 
 ## Long sessions

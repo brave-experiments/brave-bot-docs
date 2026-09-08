@@ -148,9 +148,10 @@ This split is why the built-in tools are native rather than MCP calls: an opaque
 distinction between the part that decides where something lands and the part that is carried, and
 these tools depend on it.
 
-It is also why the planner never gets a command line. `run` takes a pipeline of argv stages, so
-`; rm -rf /` inside an argument is one argument and stays one — nothing splits it, because nothing
-is passed to a shell.
+It is also why the planner's command line is compiled rather than interpreted. `run` reads the line
+into the programs, arguments and destinations it names — a plan you endorse — and nothing is ever
+passed to a shell, so `; rm -rf /` inside quotes is one argument and stays one. The only thing that
+ever split the line was the compiler, and it had already finished.
 
 ## Gates
 

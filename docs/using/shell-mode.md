@@ -45,8 +45,14 @@ the planner proposed, never text read from a file, never anything a processor pr
 reconstructed from a transcript.
 
 **The planner gets no shell tool, ever.** Not behind a capability, not behind an approval prompt, not
-via MCP. If it could ask for one, everything above is void. What it gets instead is
-[`run`](../reference/tools.md#run), which takes a pipeline of argv stages and never a command string.
+via MCP. If it could ask for one, everything above is void.
+
+What it gets instead is [`run`](../reference/tools.md#run), which takes a command line and
+**compiles** it: bravebot's own grammar reads the line into the programs, arguments and destinations
+it names, refuses anything it cannot fully work out, and runs the result. That is shell syntax
+without a shell — no line the planner writes is ever handed to an interpreter, which is the half of
+this that carries the guarantee. Here, by contrast, `$SHELL` really does read the line, because you
+typed it.
 
 ## The cost, stated plainly
 

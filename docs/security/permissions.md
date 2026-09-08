@@ -18,7 +18,7 @@ Not a summary of it:
 | a write | the path and the body |
 | an overwrite | what it replaces |
 | an edit | the diff |
-| a run | the argv, the resolved binary and the directory |
+| a run | the compiled plan: every step, the binary each resolved to, the directory, and every file the line would write |
 | reading a command's output | the bytes, and the command that printed them |
 | trusting a file | the path and its first lines |
 
@@ -71,12 +71,19 @@ is trusted: you said so.
 
 An entry is keyed by **resolved path and exact arguments**. `git log` says nothing about `git push`,
 and nothing about `git log --all`. `$PATH` and aliases decide what a name means, so an assertion never
-follows a name onto a different binary. In a pipeline, *every* stage must be vouched for or the whole
-output is untrusted.
+follows a name onto a different binary. In a line of several steps, *every* step must be vouched for
+or the whole output is untrusted.
 
-Every run asks unless every stage was vouched for. There is no read-only category: `foo --bar` might
-write to disk and nothing here can tell, and a stage declaring itself harmless only helps if the
+Every run asks unless every step was vouched for. There is no read-only category: `foo --bar` might
+write to disk and nothing here can tell, and a step declaring itself harmless only helps if the
 declaration is honest. An unprompted write is worse than an unwanted prompt.
+
+**A line that writes asks every time**, whatever you have vouched for. Vouching is keyed on a program
+and its arguments, and a redirection's destination is neither, so `grep -rn thing src/` running
+unasked must not let `grep -rn thing src/ > notes.txt` run unasked too. Your answer is bound to the
+whole compiled plan rather than to the text of the line, so it cannot be reused for the same steps
+joined differently, writing somewhere else, or run in another directory. See
+[`run`](../reference/tools.md#run).
 
 **Private input asks every time**, whatever is vouched for, and `a` is not offered for those runs at
 all. Untrusted input is fine, since carrying bytes decides nothing — but private input hands your data

@@ -30,8 +30,9 @@ bravebot
   [Tools](reference/tools.md).
 - **Write and edit code.** Every write and every edit is approved by you first, as a body or as a
   diff. See [Approvals and permissions](security/permissions.md).
-- **Run programs.** `run` takes an argv pipeline rather than a command line, so nothing is ever
-  handed to a shell on the model's behalf. See [the `run` tool](reference/tools.md#run).
+- **Run programs.** `run` takes a command line and compiles it into the programs, arguments and
+  destinations it names, so nothing is ever handed to a shell on the model's behalf. See
+  [the `run` tool](reference/tools.md#run).
 - **Run your own shell commands.** Type `!` on an empty prompt and the line goes to `$SHELL`, with
   globs and redirection intact, and its output reaches the model in full so you can follow it with
   "fix the first failure". See [Shell mode](using/shell-mode.md).
@@ -51,7 +52,7 @@ bravebot
 | **Labels, not vibes** | Every value carries a label on two axes: trusted or untrusted, public or private. Labels only ever degrade, and no code path can hand a value a better one than its inputs had. |
 | **Quarantine, not warnings** | Untrusted content is never placed in a message to the model. The planner gets a reference — origin, line count, byte count, label — and acts on content it cannot read. |
 | **Approval bound to what you saw** | An approval is single-use and bound to the exact value it was given for. Approving a write is not approving a run, and no approval survives into a later session unless it was explicitly a standing one. |
-| **No shell for the planner** | The model never gets a shell tool. Not behind a capability, not behind a prompt. It composes argv stages instead. |
+| **No shell for the planner** | The model never gets a shell tool. Not behind a capability, not behind a prompt. It writes a command line, and bravebot compiles it rather than interpreting it. |
 | **Specified clause by clause** | Behaviour is written down as numbered clauses, each naming the tests that pin it, and the code is reviewed against them. |
 
 ## Start here

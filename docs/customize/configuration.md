@@ -406,7 +406,7 @@ A rule is `Tool` or `Tool(specifier)`, and names one of three **families**:
 
 These are categories rather than tool names, as they are in Claude Code, so there is no rule spelled
 `Write` or `Glob`. `Bash` names no shell — there is none — and its specifier is matched against one
-pipeline stage's program and arguments.
+step's program and arguments.
 
 **`deny`, then `ask`, then `allow`, and the first match decides.** Specificity does not enter into
 it: a broad deny beats a narrow allow, and a matching `ask` rule prompts even where a more specific
@@ -448,10 +448,15 @@ A trailing ` *` also matches the bare command, but only when it is the rule's on
 space before it is part of the rule. A trailing `:*` is the same rule as a trailing ` *`, and a colon
 anywhere else is an ordinary character.
 
-**Every stage of a pipeline is judged on its own.** Restricting any one stage restricts the pipeline;
-granting it needs every stage granted, because one stage no rule covers is a program nobody has
-answered for, and what it prints is what the next stage reads. An argument is never re-split, so a
-denied program cannot be smuggled inside one.
+**Every step of a command line is judged on its own**, as its program and arguments joined by single
+spaces — the shape a rule is written in. Restricting any one step restricts the whole line; granting
+the line needs every step granted, because one step no rule covers is a program nobody has answered
+for, and what it prints is what the next step reads. An argument is never re-split, so a denied
+program cannot be smuggled inside one.
+
+A `Read` or `Write` rule reaches a line too: a redirection like `> notes.txt` is matched as a path,
+exactly as `write_file`'s destination is, and a `<` is matched as a read. A rule about a path is a
+statement about the path, so it does not depend on which tool got there.
 
 `additionalDirectories` opens directories by the same route [`/add-dir`](../reference/commands.md)
 takes, and they are trusted for the session on the same terms. A relative name means a path under the

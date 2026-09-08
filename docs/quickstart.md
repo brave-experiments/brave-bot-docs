@@ -96,8 +96,8 @@ carries on and can try something else. Ctrl-C refuses and stops.
 > run the tests
 ```
 
-A `run` prompt shows the exact argv, the resolved binary and the directory, and says that the
-command is not sandboxed:
+A `run` prompt shows the compiled plan — every step, the binary each resolved to, the directory, and
+every file the line would write — and says that the command is not sandboxed:
 
 ```
   y run it    a always    n don't    ctrl-c stop the turn
