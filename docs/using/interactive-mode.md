@@ -316,6 +316,14 @@ was kept. Where the planner was kept from the output, every row of it carries th
 quarantined block carries. The row is there whether or not the planner read what it printed, and
 says which, that being the one thing about the bytes you cannot work out from them.
 
+**A command's row says how the run ended**, with the same three marks a delegate's row carries: one
+for a run whose every step exited zero, one for a run a step failed, and the mark of work still going
+for a run stopped at [the five-minute limit](../reference/tools.md#a-line-has-five-minutes). Opening
+the row says it in words beside the command, naming the step that failed and its code. A stopped run
+keeps the working mark because that is what it was doing: a server told to serve a page prints as it
+goes and never exits, so a cross beside it would say something about the program that is not true.
+The verdict comes from the exit codes and the clock, never from a line the program printed.
+
 The header and the footer name which kind of thing you are looking at: a delegate by its kind and its
 number, a command by the line that ran.
 
