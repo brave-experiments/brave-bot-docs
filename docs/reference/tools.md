@@ -256,6 +256,13 @@ Standard input is empty, so a step that reads it gets nothing rather than the te
 it may not read, and can be passed to `spawn_processor` or written to a file with `write_file`. It is
 not capped, since none of it enters the conversation.
 
+**Every result says how the run ended**, in front of what the program printed: that every step
+exited zero, which step did not and with what code, or that the line outstayed
+[its five minutes](#a-line-has-five-minutes) and was stopped. It is said for quarantined output too,
+where the planner holds a reference it may not read. The verdict is read off the processes and the
+clock, never out of a byte the program printed, so it is structure exactly as a line count is and
+puts nothing in the planner's context that a program chose.
+
 Output the planner **may** read comes back as text, capped at 16 KiB. Past the cap the head and the
 tail are kept and the middle dropped, with a line in between saying how much went. The cap is on what
 enters the conversation rather than on what the command printed, and the whole of it stays available
@@ -291,8 +298,8 @@ environment, since it is meant to behave as your own terminal does.
 Every line is given 300 seconds. When that runs out the steps are killed, and **what they printed
 before that comes back exactly as it would from a line that ended on its own**, under the same
 label. Reaching the limit ends a run rather than failing it, so a program that never exits, like a
-server told to serve a page, still gives you everything it printed. How long the run took comes back
-with the output, which is how you tell the two apart.
+server told to serve a page, still gives you everything it printed. The result says it was stopped,
+which is how you tell the two apart.
 
 Being cut short neither raises nor lowers the label on the output. Finishing inside the limit says
 nothing about what a program did.
