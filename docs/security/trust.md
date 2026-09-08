@@ -15,6 +15,13 @@ At startup you are asked whether you trust the working directory.
 
 That record is the **trust map**, and it is the thing every read and every write consults.
 
+A session started with `--dangerously-skip-permissions` is the one exception: the question is not put
+at all, and the map is the one a yes would have written. That mode already approves vouching for
+every unvouched file the planner reads, so the tree becomes trusted a file at a time either way, and
+a modal box is a strange thing to put in front of somebody who asked to be asked about nothing. A
+resume still takes the map from its own record even there. See
+[modes](permissions.md#answering-in-advance-modes).
+
 ## Nothing is trusted until it is granted
 
 An empty map trusts no path. Trust is granted by a person, and never inferred from silence, from a

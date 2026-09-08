@@ -103,6 +103,83 @@ exception is bravebot's **own** credentials, which are withheld from every progr
 approve an argv, never an environment, so a credential travelling alongside one would be handed over
 without your having seen it. See [`run`](../reference/tools.md#what-a-program-is-handed).
 
+## Answering in advance: modes
+
+**Shift-Tab** walks the session through four modes, and the one in force is drawn under the input
+box. A mode is a standing answer to the questions above, given once instead of one at a time.
+
+| Mode | What it answers |
+|---|---|
+| **asking** | nothing — every write, run, command output and unvouched file is put to you |
+| **accepting edits** | the write prompt, and no other |
+| **plan mode** | it refuses a write rather than asking about one |
+| **bypassing** | every permission question, including the two that decide trust |
+
+**Asking is where a session opens**, and it is what holds when nobody has chosen. The key comes round
+to the first again, so no mode is one you cannot press your way out of, and it works while a turn
+runs: the turn in flight keeps the mode it began with, so a diff already on your screen does not have
+the question withdrawn from under you.
+
+**Accepting edits stops at writes on purpose.** A write lands in a tree you can read afterwards and
+`git diff` shows you all of it; a program runs with everything your own shell has, leaves no diff,
+and what it prints is what the next round reads. A mode named for edits that also stopped asking
+about programs would be granting the larger thing quietly. It does accept a write to any path the
+workspace reaches, since the prompt was the only thing that would have shown you the path — a rule in
+the settings file is what narrows that.
+
+**Plan mode refuses a write rather than asking**, whatever you would have answered, and the planner
+is told so and why, so a run of refusals reads as a constraint to work inside rather than as a series
+of mistakes. Commands are still asked about, because research is most of what planning is. It
+constrains the write tools rather than making the turn incapable of changing anything: a command you
+approve may write whatever it likes.
+
+### Bypassing
+
+```sh
+bravebot --dangerously-skip-permissions
+```
+
+The flag is the only way to reach that mode: without it the key walks the other three however many
+times you press it. It may go anywhere in the command line and composes with `-p`, `--resume`,
+`--continue`, `--mode` and `--incognito` alike — and a one-shot run has no key to press, so the flag
+is the whole of what can say.
+
+It answers the two questions that decide trust as well as the others, and those are the ones that
+cost the most. Vouching is what decides whether a file's contents are shown to the planner or held
+behind a reference, so in this mode every file the planner asks to read is shown to it, and a file
+holding instructions rather than data is read as instructions. The [startup trust
+question](trust.md) is not put either: the session starts with the rule a yes would have written,
+since the tree becomes trusted a file at a time in any case.
+
+What stays is the structural guarantee, that untrusted content cannot *decide* what happens. What
+goes is the narrower protection of not showing the planner bytes nobody vouched for. **This is a mode
+for a container with no network and nothing in it worth losing**, which is what its spelling is
+for.
+
+A run approved this way vouches for no program. The list of commands you said to stop asking about is
+written into the session record and outlives the mode, so a record claiming you approved programs you
+were never shown would be a standing permission nobody granted.
+
+### Two things no mode answers
+
+**A `deny` rule holds in every mode**, including the one that asks about nothing. It refuses before
+there is a prompt, so there is nothing for a mode to answer. A flag that quietly undid a rule you
+wrote down would take protection away at the moment you were relying on a mode to save keystrokes.
+
+**A question the planner posed reaches you in every mode**, and so does a line you type unprompted.
+Neither asks for consent: the first asks for information, and the second is you speaking. An answer
+invented on your behalf is reported to the planner as your own words.
+
+### A mode belongs to the sitting it was chosen in
+
+It is not written into the session record. A resumed session opens by asking, whatever the session
+that wrote the record was doing when it ended — coming back tomorrow into a session that had stopped
+asking about writes, having chosen nothing today, is the wrong direction for this to be wrong in.
+`--resume` with the flag opens in bypass, because the flag was given again.
+
+A [delegate](../reference/tools.md#spawn_agent) inherits the mode of the turn that spawned it, since
+a delegate is that turn's work done somewhere else.
+
 ## Rules you write down in advance
 
 The `permissions` block of `~/.bravebot/settings.json` holds three lists — `deny`, `ask` and `allow` —
@@ -185,4 +262,7 @@ the session, question by question.
 ## Where nobody can be asked
 
 A one-shot run refuses effects rather than applying them unseen, and declines every question rather
-than inventing an answer. See [Non-interactive use](../using/headless.md).
+than inventing an answer. `--dangerously-skip-permissions` is the one thing that lifts the first
+half, because a flag somebody typed is an instruction rather than a guess; it does not lift the
+second, since the planner's questions are not permissions. See
+[Non-interactive use](../using/headless.md).

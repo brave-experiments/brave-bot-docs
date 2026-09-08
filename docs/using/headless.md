@@ -24,7 +24,17 @@ The alternative to a person is not a default — it is a guess made in their nam
 that a reply came from a person, so inventing one would be worse than not asking at all.
 
 So a one-shot run is for reading, explaining and summarising. If you want it to change something, run
-it interactively.
+it interactively — or say so on the command line:
+
+```sh
+bravebot --dangerously-skip-permissions -p "fix the failing test"
+```
+
+That flag is the one thing that lifts the first half, because a flag you typed is an instruction
+rather than a guess made in your name. It does not lift the second: the planner's questions are
+declined in that mode too, since they are not permissions. It is a mode for a container with no
+network and nothing in it worth losing — see
+[modes](../security/permissions.md#answering-in-advance-modes).
 
 ## Piped input is untrusted and private, always
 

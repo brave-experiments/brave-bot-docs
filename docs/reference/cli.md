@@ -44,6 +44,7 @@ Anything that is not a recognised flag or subcommand is treated as the task prom
 | `--mode <turn\|manifest>` | how a one-shot is run; `turn` (the default) decides step by step, `manifest` plans the whole run first |
 | `--trace` | print the audit trail to stderr |
 | `--incognito` | write nothing to `~/.bravebot`: no history, no session record, no preference |
+| `--dangerously-skip-permissions` | bypass every permission check; recommended only for a sandbox with no internet access |
 | `-h`, `--help` | show the help |
 | `-V`, `--version` | show the version |
 
@@ -51,6 +52,11 @@ Anything that is not a recognised flag or subcommand is treated as the task prom
 
 `--incognito` may lead too, and combines with everything else here — see
 [an incognito session](../using/sessions.md#a-session-that-leaves-nothing-behind).
+
+`--dangerously-skip-permissions` may go anywhere in the line and combines with everything else too.
+It is the only way to reach the mode that answers every permission question, including the ones that
+decide trust, and the only way a run nobody is watching may write — see
+[modes](../security/permissions.md#answering-in-advance-modes) for what it costs.
 
 ## `import-leo-creds`
 
@@ -70,6 +76,7 @@ Without a channel, `stable` is what importing means. `--forget` removes what was
 | Ctrl-G | Compose in `$VISUAL` or `$EDITOR` |
 | Ctrl-S | Stash the line, or bring back the stashed one |
 | Ctrl-V | Paste, including screenshots |
+| Shift-Tab | Choose how much the session asks before it acts |
 | Ctrl-T | Toggle the audit trail |
 | Ctrl-O | Open the scroller over the transcript |
 | Ctrl-L | Watch what a delegate is doing, once the session has spawned one |

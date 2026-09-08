@@ -26,6 +26,7 @@ growing further. It keeps growing while a turn runs.
 | Up / Down | walk back through prompts you have sent |
 | Ctrl-R | search every prompt you have sent |
 | Tab | complete a slash command or an `@path` |
+| Shift-Tab | choose how much the session asks before it acts |
 | `?` | on an empty line, list every key |
 
 Enter on an empty line does nothing. Shift-Enter needs a terminal that reports the modifier
@@ -80,8 +81,9 @@ what they mean everywhere else while it is up. It folds into as many columns as 
 no row runs past the edge. It is the one place the keys are written down, which is what stops it
 advertising a binding that has since changed.
 
-The row beneath the box carries what the session is doing — how full the context is, the trail, and
-the key that opens the delegates once the session has spawned any — and then `? for shortcuts`. It
+The row beneath the box carries what the session is doing — the mode in force where it is not simply
+asking, how full the context is, the trail, and the key that opens the delegates once the session has
+spawned any — and then `? for shortcuts`. It
 names no other binding of its own. The two used to share one line, and the line was wider than the
 terminal, so the end of it was cut: everything you could look up was taking room from the figures you
 had no other way to see. A binding cut off is one you learn once, and a context reading cut off is
@@ -92,6 +94,26 @@ when the turn it belongs to ends and before then the key would change nothing on
 confinement is not on the row at all: it is settled before the session opens and cannot change while
 it runs, so reporting it on every frame spends room on a constant. It is stated once at startup, and
 [`/status`](../reference/commands.md#status) answers for it whenever you ask.
+
+## Choosing how much the session asks
+
+**Shift-Tab** cycles the session through asking about everything, accepting edits, plan mode, and —
+only where the command line asked for it — bypassing every check. It types nothing, is read before
+Tab so it never completes a half-typed line, and works while a turn runs, which is when it is wanted
+most: a turn in flight keeps the mode it began with, so what you press describes the next one.
+
+Both spellings of the chord are answered, since which one arrives is the terminal's choice rather
+than yours.
+
+The mode leads the row beneath the box and is the only part of it drawn in a colour, because it is
+the one thing there that changes what your next keystroke does. Asking takes no room at all: what is
+drawn is a mode somebody chose, and a marker on every session is one people stop reading. When the
+terminal is too narrow, the parts are given up whole and in order — the way to the bindings, then the
+trail key, then the figures — and the mode is the last to go. A part that is simply absent reads as a
+line with no room; half a word under the box reads as a rendering fault.
+
+See [modes](../security/permissions.md#answering-in-advance-modes) for what each one answers and what
+choosing one costs.
 
 ## Stopping and leaving
 
@@ -118,8 +140,9 @@ is an order to keep.
 ## Sending while a turn runs
 
 Typing, editing, pasting, dropping a file, putting a line away, walking back through earlier prompts,
-scrolling the transcript, toggling the audit trail and asking what the keys are all do exactly what
-they do at rest. **The only thing a running turn refuses is sending.**
+scrolling the transcript, toggling the audit trail, choosing how much the session asks and asking
+what the keys are all do exactly what they do at rest. **The only thing a running turn refuses is
+sending.**
 
 Two things follow from that rather than contradict it. Nothing is offered to **complete**, because
 what appears beneath the box is machinery for finishing a line that is about to be sent — where the
