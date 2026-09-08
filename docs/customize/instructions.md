@@ -22,13 +22,41 @@ Commit subjects are imperative; the body explains why, never what.
 |---|---|
 | `~/.bravebot/AGENTS.md` | every project |
 | `~/.bravebot/skills/<name>/SKILL.md` | every project |
-| `<workspace>/AGENTS.md` | this project |
+| `<workspace>/AGENTS.md`, else `CLAUDE.md`, else `.claude/CLAUDE.md` | this project |
 | `<workspace>/.bravebot/skills/<name>/SKILL.md` | this project |
 
-And no others. There is **no search of parent directories** and no nested `AGENTS.md` — a rule that
-walked upwards would pick up instructions from whatever happened to be above a project on this
+And no others. There is **no search of parent directories** and no nested instructions file — a rule
+that walked upwards would pick up instructions from whatever happened to be above a project on this
 machine, which is a different set of instructions on the next machine. A file at any other path is an
-ordinary file, read only when something asks for it by name.
+ordinary file, read only when something asks for it by name, or when the source points at it.
+
+**The project's file is looked for under three names, and the first that exists is the one.** Not all
+three: a repository holding two of them holds one set of instructions under two names, and reading
+both would say everything twice in a system prompt that goes out afresh every request. More than one
+name is read because more than one is in use, and a project that wrote its conventions down should
+not have them ignored over the spelling.
+
+### A file that only names another is followed
+
+Repositories supporting several agents often keep one real document and point the other names at it.
+An `AGENTS.md` holding nothing but
+
+```markdown
+Refer to canonical agent instructions in `.claude/CLAUDE.md`.
+```
+
+is followed to the file it names, which is what reaches the planner. Otherwise the agent is handed
+the pointer, reads it, and spends a whole round trip learning what it was about to be given anyway.
+
+**Length is the whole test**, and it is what keeps this safe: anything past 500 bytes is a document
+that happens to cite other files, so it is read as itself and its citations are left alone. Following
+the first name in a real conventions file would swap your instructions for whatever they mentioned in
+passing.
+
+Once, not twice — what the named file names in turn is not followed. The pointer is opened by the
+same route as any other path, so [confinement](../security/security.md#confinement) and the trust map
+decide whether it may be read at all, and a pointer naming something outside the workspace is refused
+there.
 
 The two roots are spelled differently on purpose. Your own directory is already `.bravebot`, so its
 skills sit directly beneath it; a project keeps its own out of the way in a dotted directory, rather
