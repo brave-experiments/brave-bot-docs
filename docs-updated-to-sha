@@ -8,8 +8,8 @@
 # (agents/skills/update-docs) to fold it in. The skill rewrites the sha below; nothing
 # else should.
 #
-# updated changelog for version 0.3.0
-# 2026-09-06
-# https://github.com/brave-experiments/brave-bot/commit/48927d4c0d7d65a6a85d4dfb6cc80be8e71a0673
+# fix(pasting): settle a marker before it is remembered
+# 2026-09-08
+# https://github.com/brave-experiments/brave-bot/commit/1f7331c376345ddd98535c3d9077749ecfddb407
 
-48927d4c0d7d65a6a85d4dfb6cc80be8e71a0673
+1f7331c376345ddd98535c3d9077749ecfddb407
