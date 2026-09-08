@@ -32,7 +32,7 @@ configuration OK
   endpoint  https://ai-chat.bsg.brave.com/v1/chat/completions
   premium   https://ai-chat-premium.bsg.brave.com/v1/chat/completions
   key id    …
-  model     automatic (default)
+  model     automatic-brave-bot (default)
   key       … (never transmitted)
 
 confinement …

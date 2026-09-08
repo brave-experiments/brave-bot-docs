@@ -19,7 +19,7 @@ configuration OK
   endpoint  https://ai-chat.bsg.brave.com/v1/chat/completions
   premium   https://ai-chat-premium.bsg.brave.com/v1/chat/completions
   key id    …
-  model     automatic (default)
+  model     automatic-brave-bot (default)
   key       … (never transmitted)
   settings  no settings.json
 
@@ -71,8 +71,8 @@ home, or the name is empty, everything kept there is absent.
 :::note
 Nothing recalled from `~/.bravebot` is fed straight to a turn. A recalled prompt is placed in the
 input box, where you read it and press Enter. That keystroke is what makes it trusted, exactly as
-typing it would have. A model name the server does not recognise is reset to `automatic` rather than
-obeyed.
+typing it would have. A model name the server does not recognise is reset to the automatic entry
+rather than obeyed.
 :::
 
 ## Choosing a model
@@ -95,9 +95,22 @@ says so, and there is nothing to select while it does.
 Rows are **grouped under the service that answers them**, one heading per service, and the heading of
 the section you are scrolling through is held on the top line.
 
-`automatic` lets the server triage per request, and is what an unrecognised name is reset to. The
-model requested is not necessarily the model used: some entries are weighted ensembles that resolve
-per request, and `automatic` itself picks per request.
+`automatic-brave-bot` lets the server triage per request, and is what an unrecognised name is reset
+to. It is always offered, so it is the one choice that cannot fail to work. The model requested is not
+necessarily the model used: some entries are weighted ensembles that resolve per request, and the
+automatic entry itself picks per request.
+
+**The roster is curated for Brave Bot.** Requests to Brave's endpoint carry a header naming this
+product, and the endpoint answers with the models chosen for it rather than the full Leo list. Leo's
+roster is chosen for a chat assistant and a good fraction of it cannot call tools at all, which would
+make an agent that can read and write nothing. A gateway is sent no such header, since what a
+third-party service gets is the shape it documents.
+
+If you wrote `automatic` anywhere, it still works. That is Leo's triage entry and names a different
+routing policy, so it is rewritten to `automatic-brave-bot` before a request carries it, whether it
+came from a settings file, an exported variable or a choice recorded by an older version. The
+rewrite is one-way: `automatic` cannot be requested, and Leo's routing is not something the picker
+offers.
 
 The list is drawn for a person, and the names in it never reach a model. What you picked becomes the
 `model` routing field of later requests.
@@ -373,7 +386,7 @@ written for another tool puts here. Each resolves to something reachable: the mo
 named for that tier, and otherwise that tier's name on the Brave roster. A tier word is never sent as
 written, because a service has never heard of it. Any other name is used exactly as you wrote it.
 Bedrock refuses a model it does not recognise, and the aichat endpoint silently resets one to
-`automatic`, which is the key appearing to work while changing nothing.
+`automatic-brave-bot`, which is the key appearing to work while changing nothing.
 
 ### `run.scrubEnv`
 
@@ -530,8 +543,8 @@ credentials sign the request, and because Brave serves part of its own roster th
 Every configured tier is marked free: premium means a Leo subscription, and reaching a model through
 your own account does not involve one.
 
-There is no `automatic` among them. There it means "let the server choose", which Bedrock does not
-offer. A request names one model and gets it or an error.
+There is no automatic entry among them. On the Brave roster it means "let the server choose", which
+Bedrock does not offer. A request names one model and gets it or an error.
 
 If one service cannot say what it offers, the models known from your configuration alone are still
 offered; a choice is refused only when nothing is left to choose. That is the position somebody
@@ -671,8 +684,8 @@ a summary, in the request only.
 that figure is the budget for whichever model you chose. You do not normally set this at all.
 
 A budget you set by hand outranks the advertised one. The built-in default of 24,000 prompt tokens
-only stands in for two cases: `automatic`, whose model is resolved per request so no single window
-describes it, and a model that advertises nothing.
+only stands in for two cases: the automatic entry, whose model is resolved per request so no single
+window describes it, and a model that advertises nothing.
 
 An advertised figure is believed even where it is small, and never raised. A budget that makes no
 sense falls back to the default rather than disabling compaction, so a misconfiguration cannot

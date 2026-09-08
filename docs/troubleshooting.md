@@ -109,7 +109,7 @@ shell, type `!` yourself. See [`run`](reference/tools.md#run) and
 
 **The conversation was summarised unexpectedly.** It passed the context budget, which is the window
 your model advertises. Override it with `BRAVEBOT_CONTEXT_BUDGET`, which outranks the advertised
-figure. A model that advertises nothing, and `automatic`, fall back to 24,000 prompt tokens.
+figure. A model that advertises nothing, and the automatic entry, fall back to 24,000 prompt tokens.
 
 **It stopped calling tools and just answered.** A bounded turn reached its round limit: the planner
 is told it has no tools left, so it answers with what it has. Ask again with a narrower task. An
