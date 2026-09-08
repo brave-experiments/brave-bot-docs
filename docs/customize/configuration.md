@@ -1,7 +1,7 @@
 ---
 sidebar_position: 3
 title: Configuration
-description: What is baked into the binary, what lives in ~/.bravebot, and the environment variables that override either.
+description: What is baked into the binary, what lives in ~/.bravebot and beside your work, and the environment variables that override either.
 ---
 
 # Configuration
@@ -38,6 +38,10 @@ configured shows a second `offers` block with its region, profile and tiers (see
 whether a credential was found for it. The `settings` line names which keys your settings file set,
 and never their values. A file that sets no variables says so rather than being reported as an absent
 file.
+
+The `layer` lines name the [settings files](#settingsjson) in force, weakest first, and an `override`
+line names a key more than one of them set beside the file that won it. Paths and names only: a value
+from a settings file is never printed, because on some machines that value is a credential.
 
 ## `~/.bravebot`
 
@@ -272,6 +276,32 @@ Long-lived configuration can go in a file instead of your shell profile:
 }
 ```
 
+**Three files are read, the closest to your work last:**
+
+| File | What it is for |
+|---|---|
+| `~/.bravebot/settings.json` | you, in every directory |
+| `.bravebot/settings.json` | the directory you started bravebot in |
+| `.bravebot/settings.local.json` | that directory, on this machine only |
+
+A later file overrides an earlier one **a name at a time** rather than wholesale, so a file that sets
+one thing leaves everything else in force:
+
+| What | How the files combine |
+|---|---|
+| `env`, `provider` | per name one level down; the value under a name is replaced whole |
+| `run.scrubEnv`, every list under `permissions` | every file's entries are kept |
+| `model`, anything else | the closest file that set it wins |
+
+The lists are the exception because an entry in one only ever takes something away: a name under
+`scrubEnv` withholds a variable from a program, and a rule under `permissions` refuses something that
+was otherwise allowed. Overriding them would let a file closer to your work hand back what a broader
+one withheld, and a permission removed by a file you never opened is the outcome worth ruling out.
+
+**The project files are read from the directory you started bravebot in, and from no directory above
+it.** Searching upward would make what configures a session depend on which directory you happened to
+change into, and the file it found could sit above the thing you are working on.
+
 These keys are read, and anything else in the file is ignored rather than refused:
 
 | Key | What it holds |
@@ -286,21 +316,35 @@ In `env`, only string values: a number or a boolean is skipped rather than coerc
 `"true"`. Every name in the block is read rather than a chosen subset.
 
 **The file is the same shape as Claude Code's `~/.claude/settings.json`**, so a block that configures
-one largely configures the other unedited. Where a variable names **your** deployment the spelling is
-kept, which is why the Bedrock tiers below are `ANTHROPIC_DEFAULT_*_MODEL`. The switch that decides
-which backend bravebot itself uses is `BRAVEBOT_USE_BEDROCK`.
+one largely configures the other unedited. The three files resolve in the same order Claude Code's do,
+down to the name `settings.local.json`, so knowing where to put a value for one tool is knowing it for
+the other. Where a variable names **your** deployment the spelling is kept, which is why the Bedrock
+tiers below are `ANTHROPIC_DEFAULT_*_MODEL`. The switch that decides which backend bravebot itself
+uses is `BRAVEBOT_USE_BEDROCK`.
 
 :::caution
 `BRAVEBOT_USE_BEDROCK` was called `CLAUDE_CODE_USE_BEDROCK`. The old name now **reads as unset**, so a
 file or a profile still setting it falls back to the Brave backend without an error. Rename it.
 :::
 
-**The environment wins over the file.** A variable exported in your shell overrides the same name here.
+**The environment wins over all three files.** A variable exported in your shell overrides the same
+name here.
 
 Two limits fail silently by design. A file over 64 KB is refused rather than parsed, and **every
 failure is treated as absence** (no file, a syntax error, an unparseable value), because the built-in
 configuration still describes a working backend. Nothing refuses to start over this. `bravebot doctor`
 is where a file nobody can parse shows up.
+
+Each of the three files fails on its own. One that is missing, oversized or unparseable leaves the
+others in force, so a mistake in a checkout cannot decide that your own file no longer applies.
+
+:::caution
+**A `.bravebot/settings.json` arrives with a checkout.** A repository you have just cloned can name
+the host every request goes to and the credential profile that signs it, and nothing on the screen
+says so. What limits the damage is the rule below: a settings file names destinations and grants no
+capability, so the worst it does is send a request somewhere useless or somewhere watching. Read a
+project's settings file before working in it, and `bravebot doctor` names the files in force.
+:::
 
 :::note
 **What this file names is destinations, not capabilities.** A region, a credential profile, a model:
