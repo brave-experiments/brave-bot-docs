@@ -107,6 +107,17 @@ Brave does not use your data and does not store it. Prompts and used file conten
 endpoint to produce a reply and are discarded once it has been produced. Nothing is retained and
 nothing is used for training.
 
+:::caution[Six lines about your machine go out with every request]
+The system prompt states your working directory, whether it is a git repository, the platform, the OS
+version, the shell and today's date. The working directory is an absolute path, so on most machines it
+contains your username, and the OS version names your kernel build. There is no setting that withholds
+them.
+
+Nothing else about the machine is added: no environment variables beyond `$SHELL`, no hostname, no
+username on its own, no file contents, no directory listing. See
+[Where you are working](../customize/instructions.md#where-you-are-working) for why each is there.
+:::
+
 Local state is stored in `~/.bravebot` on your own machine: session records, prompt history and the
 model you chose. Session records hold what the planner was allowed to hold. **Nothing untrusted is
 ever written down**, by construction rather than by filtering, and quarantined content is not written
