@@ -209,13 +209,13 @@ def _print_deferred(repo: Path) -> None:
     entries = read_deferred()
     if not entries:
         return
-    print(f'Deferred by earlier runs — these are behind the baseline and will not appear')
+    print(f'Deferred by earlier runs. These are behind the baseline and will not appear')
     print(f'below. Decide each one again:')
     for sha, reason in entries:
         try:
             _, date, subject = _describe(repo, sha)
         except Problem:
-            print(f'  {sha[:9]}  (not in this checkout — fetch, or resolve it)  {reason}')
+            print(f'  {sha[:9]}  (not in this checkout: fetch, or resolve it)  {reason}')
             continue
         print(f'  {sha[:9]}  {date}  {subject}')
         print(f'             deferred because: {reason}')

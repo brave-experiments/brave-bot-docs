@@ -1,9 +1,9 @@
 # What a terminal coding agent's documentation is expected to cover
 
 A checklist of topics, not a table of contents. It exists because the gate in
-[SKILL.md](SKILL.md) is good at judging a commit on its own terms and bad at noticing that a
-whole subject never arrived. A change can fail the gate honestly, five times running, and leave
-a feature undocumented — nothing in a per-commit decision asks "is there a topic missing here".
+[SKILL.md](SKILL.md) judges a commit on its own terms and cannot notice that a whole subject
+never arrived. A change can fail the gate honestly five times running and leave a feature
+undocumented, because no per-commit decision asks "is there a topic missing here".
 
 Use it two ways:
 
@@ -13,9 +13,8 @@ Use it two ways:
   A row with nothing behind it is either a gap or a feature this tool does not have. Both are
   worth knowing; only the first is worth fixing.
 
-The rows are drawn from what comparable tools document. They are **not** a claim that bravebot
-has the feature — plenty of them it does not, and inventing a page for one would be worse than
-the gap.
+The rows are drawn from what comparable tools document. They are not a claim that bravebot has
+the feature. Inventing a page for a feature that does not exist is worse than the gap.
 
 ## Configuration is the row that gets missed
 
@@ -26,14 +25,14 @@ right up until you notice nobody can use the feature without knowing its name.
 - the settings file: where it lives, what shape it is, which block is read
 - what wins when a value is set in more than one place
 - every key that selects a backend, a model, a region, or a credential
-- what a settings file is *not* trusted for — permissions, paths, capabilities
+- what a settings file is not trusted for: permissions, paths, capabilities
 - how a misconfiguration reports itself, and where
 - what a diagnostic command prints, and what it withholds
 
 **A key name is documentation, not an implementation detail.** If the specs do not carry it, read
 the source for the spelling and write it down. `SKILL.md`'s ban on reconstructing behaviour from
-source is about *inventing a story* — a flag's exact name is the opposite of invented, and a
-configuration page missing its key names is not usable at all.
+source is about inventing a story. A flag's exact name is the opposite of invented, and a
+configuration page missing its key names is not usable.
 
 ## The rest of the list
 
