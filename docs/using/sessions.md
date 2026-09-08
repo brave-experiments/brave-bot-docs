@@ -32,6 +32,24 @@ bravebot -c                # the same
 
 The list is sorted on what each record says it was last written, not by id.
 
+### Trying a second approach
+
+```sh
+bravebot --fork <id>
+bravebot -f <id>
+```
+
+Forking copies a session into a new one with an id of its own and opens that, so a second approach
+starts from the prefix that was worth keeping rather than from nothing — and the session you forked
+is left exactly as it was. The conversation, the spend history and the audit trail all come with the
+copy, since the gates that decided the shared prefix decided the fork's history too; the start time
+is reset and the title is marked.
+
+A [manifest run](#a-manifest-run-is-recorded-but-cannot-be-continued) is refused, for the reason it
+cannot be resumed: there is no conversation inside one to carry on from. An
+[incognito](#a-session-that-leaves-nothing-behind) session writes no copy, so forking in one opens
+the conversation and records nothing.
+
 `--continue` takes the session the picker would offer first and picks it up exactly as naming its id
 would, because "carry on with what I was just doing" is the question people actually have most of the
 time and answering it with an id means finding the line that printed one — in a terminal that is often

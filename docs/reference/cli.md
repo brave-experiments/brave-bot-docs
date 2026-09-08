@@ -15,6 +15,7 @@ Usage:
   cat file | bravebot -p "<task>"        ...with piped input, never trusted
   bravebot --resume [id]                 Pick up a session in this directory
   bravebot --continue                    Pick up the most recent session in this directory
+  bravebot --fork <id>                   Fork a session and start exploring a different path
   bravebot doctor                        Check configuration and confinement
   bravebot import-leo-creds [channel]    Import a Leo Premium subscription
 ```
@@ -28,6 +29,7 @@ Usage:
 | `bravebot --resume`, `-r` | choose a session in this directory to pick up |
 | `bravebot --resume <id>` | resume that session by id |
 | `bravebot --continue`, `-c` | pick up the most recent session in this directory |
+| `bravebot --fork <id>`, `-f` | copy a session into one of its own and open that, to try a second approach |
 | `bravebot doctor` | report configuration and confinement, changing nothing |
 | `bravebot import-leo-creds [channel]` | import a Leo Premium subscription |
 | `bravebot --version`, `-V` | print the build |
