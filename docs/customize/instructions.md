@@ -85,6 +85,42 @@ Sources are resolved afresh every turn, so editing `AGENTS.md` mid-session takes
 thing you send. A source that is not there is not an error. No `AGENTS.md`, no skills directory, no
 user directory at all: each is the ordinary case and offers nothing.
 
+## Where you are working
+
+The system prompt also states six facts about your machine, so the planner does not have to run a
+command to learn them:
+
+| Line | Value |
+|---|---|
+| Working directory | The absolute path of the workspace root |
+| Is a git repository | Whether this tree or a directory above it holds a `.git` |
+| Platform | `macos`, `linux`, or whatever this build runs on |
+| OS version | The kernel release string, as `uname` reports it. Unix only |
+| Shell | `$SHELL`, or `/bin/sh` when that is unset or empty |
+| Today's date | The current UTC date, as `YYYY-MM-DD` |
+
+:::caution[These six lines are sent to the model with every request]
+The working directory is an absolute path, so on most machines it contains your username. The kernel
+release string names your OS build. Both are part of every request this session sends, including the
+first one, and there is no setting that withholds them.
+
+Nothing else about your machine is added. No environment variables beyond `$SHELL`, no hostname, no
+username on its own, no file contents, no directory listing.
+:::
+
+They are labelled as facts about the machine rather than as instructions, and nothing is asked of the
+planner on their account.
+
+The date is stated because a model's sense of it comes from its training and is wrong by however long
+ago that was. The rest is stated because discovering any of it otherwise costs a `run`, and a run
+costs two approvals rather than one: you approve the command, then its output comes back quarantined
+and the planner has to ask to be shown it. A planner that does not know its own working directory
+reaches for `pwd` and spends that whole exchange on a value already on your screen at every run
+prompt.
+
+This block is composed afresh every turn like the sources are, so [`/cd`](../reference/commands.md)
+is followed and the next turn states where the session went.
+
 ## Trust
 
 `~/.bravebot` is trusted **by provenance**: it is your own directory, on the same footing as the
@@ -110,3 +146,9 @@ had written it.
 
 The notice is said when it is learned, before the first request goes out, rather than when the turn
 ends. A turn that fails or is cancelled has already told you what it was working without.
+
+The six [environment lines](#where-you-are-working) do not go through this gate, and cannot be
+refused by it. There is no file behind any of them: the working directory is where you pointed the
+session, and the rest comes from the kernel and this process's own environment, which is the same
+provenance a command you typed rests on. Nothing read out of the workspace may join that block, which
+is the whole reason it can skip the gate.
