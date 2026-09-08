@@ -17,8 +17,7 @@ That record is the **trust map**, and it is the thing every read and every write
 
 A session started with `--dangerously-skip-permissions` is the one exception: the question is not put
 at all, and the map is the one a yes would have written. That mode already approves vouching for
-every unvouched file the planner reads, so the tree becomes trusted a file at a time either way, and
-a modal box is a strange thing to put in front of somebody who asked to be asked about nothing. A
+every unvouched file the planner reads, so the tree becomes trusted a file at a time either way. A
 resume still takes the map from its own record even there. See
 [modes](permissions.md#answering-in-advance-modes).
 
@@ -26,7 +25,7 @@ resume still takes the map from its own record even there. See
 
 An empty map trusts no path. Trust is granted by a person, and never inferred from silence, from a
 path's shape, or from anything a model or a file said. That is what makes declining at startup mean
-something — a default of trusted would make the answer decorative.
+something.
 
 ## How a path is matched
 
@@ -44,9 +43,9 @@ directory afterwards is therefore read as trusted, whoever put it there.
 
 Relative and absolute rules are separate namespaces. A rule under the working directory decides
 nothing about a directory opened by absolute path, and the reverse. The working directory's own rule
-is the *empty* prefix, since every path in the project is named relative to it — match absolute paths
-against that same map and answering yes at startup would silently vouch for every directory opened
-later.
+is the *empty* prefix, since every path in the project is named relative to it. Matching absolute
+paths against that same map would mean answering yes at startup silently vouched for every directory
+opened later.
 
 ## What a write does
 
@@ -77,7 +76,7 @@ siblings, and marking the parent would turn a single fetched page into a project
 
 ## Every way a rule gets written
 
-Each grants exactly one thing, and grants it because a person made a gesture — never because anything
+Each grants exactly one thing, and grants it because a person made a gesture, never because anything
 inspected content.
 
 | Gesture | What it grants |
@@ -113,11 +112,9 @@ asked whether to trust it:
 ╰───────────────────────────────────────────────────────────╯
 ```
 
-Yes writes exactly the rule `@` would have written. It is asked once per path per turn, and only where
-the read is quarantined. Declining leaves the file as it was and the turn carries on with a reference.
-
-This is the map's own decision offered where it matters, not a second route to trusting content, so a
-yes stays consistent for every later read.
+Yes writes exactly the rule `@` would have written, so it stays consistent for every later read. It is
+asked once per path per turn, and only where the read is quarantined. Declining leaves the file as it
+was and the turn carries on with a reference.
 
 ### `/add-dir`
 
@@ -127,7 +124,7 @@ yes stays consistent for every later read.
 
 records an absolute rule that does two things together: the directory becomes reachable, since an
 absolute path is otherwise refused whatever the map says, and it is recorded as trusted. Either half
-alone is no use — one leaves a rule about files nothing can open, the other a directory that prompts
+alone is no use. One leaves a rule about files nothing can open, the other a directory that prompts
 on every edit.
 
 It lasts the session, `--resume` carries both halves, and `/clear` closes it. A directory already
@@ -149,21 +146,15 @@ it always said about the same files: one inside the new working directory become
 one outside becomes absolute. That grants nothing and withdraws nothing, which is what makes it
 something bravebot can do without asking you.
 
-The alternative would be worse in both directions. A relative rule means a path under the working
-directory, so leaving the rules alone would point every one of them at a file you never decided
-anything about: the yes you gave for one project would vouch for another, and every no you gave inside
-the old one would be forgotten.
-
-Anything overlapping the new working directory closes — the directory you left, and any `/add-dir`
-directory holding it or sitting inside it. That is not tidiness. A file reachable both relatively and
-by absolute path has a rule in each namespace, and the two are kept apart precisely so that one file
-has one answer.
+Anything overlapping the new working directory closes: the directory you left, and any `/add-dir`
+directory holding it or sitting inside it. A file reachable both relatively and by absolute path has a
+rule in each namespace, and the two are kept apart precisely so that one file has one answer.
 
 ## Reach stays confined
 
 No rule extends reach. Reading, writing, editing, listing and searching are confined to the working
 directory and to whatever has been opened beside it. `..` and absolute paths outside those are refused
-rather than resolved — in an added directory exactly as in the project — and a symlink leaving one is
+rather than resolved, in an added directory exactly as in the project, and a symlink leaving one is
 refused. A relative path always means the project, so no file has two spellings.
 
 ## How long an answer lasts
@@ -172,7 +163,7 @@ refused. A relative path always means the project, so no file has two spellings.
 session in that directory answered. `/clear` begins a session and therefore asks.
 
 `--resume` does not ask: it restores the map from the record of the session you chose, because the
-answer honoured is the one that session's own user gave — and it carries the rules that session's
+answer honoured is the one that session's own user gave. It also carries the rules that session's
 writes recorded, which is what stops a resumed turn reading back a file an earlier turn of the same
 session poisoned.
 
@@ -200,9 +191,8 @@ Both of these are deliberate.
 
 - **A fresh session forgets what an earlier one poisoned.** The rule that untrusted data marks its
   destination untrusted holds within a session and across a resume of it. Across a fresh start it
-  cannot, because the map it was recorded in is gone. The alternative is a per-directory map, which is
-  a directory that trusts itself. If a file holds content you do not trust, say no to the directory —
-  or do not leave it there.
+  cannot, because the map it was recorded in is gone. If a file holds content you do not trust, say no
+  to the directory, or do not leave it there.
 
 - **A file another process drops into a trusted directory is trusted.** A rule is about the path, so
   `npm install`, `git pull`, an editor, a background daemon, or a program the agent was allowed to run

@@ -8,8 +8,8 @@ description: What Brave Bot defends against, what it does not, and what leaves t
 
 ## What this defends against
 
-**Indirect prompt injection.** Text that arrives from somewhere nobody vouched for — a web page, a
-dependency's README, a build log, a program's output, a file in an untrusted directory — never reaches
+**Indirect prompt injection.** Text that arrives from somewhere nobody vouched for (a web page, a
+dependency's README, a build log, a program's output, a file in an untrusted directory) never reaches
 the model deciding what to do next, and never reaches a decision in the Rust code either.
 
 This is structural rather than instructional. The model is not asked to be careful with such content,
@@ -20,7 +20,7 @@ will read it as one.
 The four things that would break it, and are therefore what a code review looks for:
 
 1. **A branch on untrusted bytes.** The driver may carry untrusted content and hand it to an effect. It
-   may not branch on it — no `if`, `match`, comparison or early return whose condition derives from
+   may not branch on it: no `if`, `match`, comparison or early return whose condition derives from
    untrusted bytes. A "careful refusal" computed from attacker-controlled text is still a decision an
    attacker took.
 2. **The same branch, moved into the kernel.** Relocating a decision is not removing it, and "it is
@@ -55,11 +55,12 @@ be found.
 **Splitting a processor's answer.** A processor returns one piece of text holding two things: a remark
 for the person watching, and the document to be written. It marks where the document begins, and the
 policy layer searches for that mark to find where to cut. The mark is not a boundary and cannot be
-forged, because there is nothing to forge — the processor writes the whole answer and may put the mark
-wherever it likes; the first one counts. An attacker who owns the file gains: the ability to make the
-write be refused, the ability to shift where the cut lands within content that was already theirs, and
-the ability to put words in a remark that reaches your screen and stops there. What they cannot do is
-choose *which* file is written, which stays the planner's choice plus your approval from a diff.
+forged, because there is nothing to forge. The processor writes the whole answer and may put the mark
+wherever it likes, and the first one counts. An attacker who owns the file gains: the ability to make
+the write be refused, the ability to shift where the cut lands within content that was already
+theirs, and the ability to put words in a remark that reaches your screen and stops there. What they
+cannot do is choose *which* file is written, which stays the planner's choice plus your approval from
+a diff.
 
 **A trailing newline.** Before a file is written back, the code checks whether the file being replaced
 ended in a newline, so the new one can end the same way.
@@ -75,7 +76,7 @@ second path.
 - **Only `http` and `https` ever reach the network.** Any other scheme is refused before a connection
   is attempted, rather than handed to a library to interpret.
 - **A body is capped, and a truncated one says so.** A body that stops partway is a failure rather than
-  a short success. This is resource hygiene, not content inspection — the bytes are never parsed to
+  a short success. This is resource hygiene, not content inspection. The bytes are never parsed to
   decide anything.
 - **Each phase is bounded separately.** Connecting, starting to reply and continuing to reply are timed
   apart, so a slow answer is not confused with a dead connection.
@@ -96,10 +97,9 @@ rather than running unconfined. A profile starts denying everything and grants a
 a policy that would confine nothing is rejected rather than applied. The network is denied unless it
 was asked for.
 
-What confinement is *not* for is the rest of the system. A processor is a model call made by our own
-code, and a program you asked for runs with the access your own shell would give it. Confining our own
-code would fence in the trusted half and leave the untrusted half free — everywhere else, the boundary
-is the capability set and the label on a value.
+Confinement does not cover the rest of the system. A processor is a model call made by our own code,
+and a program you asked for runs with the access your own shell would give it. Everywhere else, the
+boundary is the capability set and the label on a value.
 
 ## Data collection, usage, and retention
 
@@ -108,7 +108,7 @@ endpoint to produce a reply and are discarded once it has been produced. Nothing
 nothing is used for training.
 
 Local state is stored in `~/.bravebot` on your own machine: session records, prompt history and the
-model you chose. Session records hold what the planner was allowed to hold — **nothing untrusted is
+model you chose. Session records hold what the planner was allowed to hold. **Nothing untrusted is
 ever written down**, by construction rather than by filtering, and quarantined content is not written
 at all. A pasted picture is written, because it was part of your own message. Deleting the session
 removes it.

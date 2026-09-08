@@ -28,34 +28,33 @@ Typing `/` offers the list, and Tab completes.
 
 ## `/status`
 
-Everything the session knows about itself:
+Reports everything the session knows about itself:
 
 - the working directory, and anything opened with `/add-dir`;
-- the model in force, and whether it was chosen or defaulted — with the model that actually answered
-  shown beside it where the server substituted a different one;
+- the model in force, and whether it was chosen or defaulted. Where the server substituted a
+  different one, the model that actually answered is shown beside it;
 - the [effort level](#effort-level), and whether this model reads one;
 - which deployment the endpoint names, and **which tier the last turn ran on**, rather than which
   tier the build was compiled to reach;
 - the confinement available here;
-- turns and tokens spent, and **where the time went** — how much was spent waiting on the model,
+- turns and tokens spent, and **where the time went**: how much was spent waiting on the model,
   running tools, and waiting for you to answer a prompt;
 - **every trust rule in force**, listed in full, each marked trusted or untrusted;
 - **every command you vouched for**, which now run unasked and whose output is read as trusted;
 - what a [`/loop`](#loop-interval-prompt) is repeating and when the next tick is due, where one is
-  running — what happens next without anybody typing anything being the one thing about a session that
-  cannot be read off the transcript.
+  running.
 
-The last two are the point. Every other prompt in a session announces itself by appearing; a vouched
-command is the one that stops appearing, so without this there would be nothing to tell you it now
-runs unasked.
+The last three are the ones nothing else on your screen tells you. A vouched command is the one that
+stops appearing, and what happens next without anybody typing anything cannot be read off the
+transcript.
 
-`/status` deliberately leaves out the endpoint host and the key id, though `bravebot doctor` prints
-both. A status panel is the thing people paste into an issue or a screenshot.
+The endpoint host and the key id are left out, though `bravebot doctor` prints both. A status panel
+is the thing people paste into an issue or a screenshot.
 
 ## `/model`
 
 Opens a picker on the model in use. The list comes from the endpoint rather than a set compiled in, so
-it is whatever the backend offers today, and the choice is written to `~/.bravebot` — it outlives the
+it is whatever the backend offers today. The choice is written to `~/.bravebot`, so it outlives the
 session and applies in every directory.
 
 Typing narrows the list rather than walking it, and rows are grouped under the service that answers
@@ -63,10 +62,12 @@ them. See [Configuration](../customize/configuration.md#choosing-a-model).
 
 ## `/theme [name]`
 
-Opens a picker on the palette in force. Up and Down move the cursor, and the theme under it is put in
-force while it is selected, so you are comparing themes against your own transcript rather than
-against a sample. Enter keeps the one on the cursor and Escape restores the one that was in force when
-the picker opened. With a name, `/theme nord` applies it without opening the panel.
+Opens a picker on the palette in force. With a name, `/theme nord` applies it without opening the
+panel.
+
+Up and Down move the cursor, and the theme under it is put in force while it is selected, so you are
+comparing themes against your own transcript rather than against a sample. Enter keeps the one on the
+cursor and Escape restores the one that was in force when the picker opened.
 
 The choice is written to `~/.bravebot`, so it outlives the session and applies in every directory.
 Themes of your own are JSON files under `~/.bravebot/themes/`, and nothing in a workspace is read. See
@@ -75,7 +76,7 @@ Themes of your own are JSON files under `~/.bravebot/themes/`, and nothing in a 
 
 ## `/effort [level]`
 
-Opens a picker of the five levels — `low`, `medium`, `high`, `xhigh` and `max` — above a row for
+Opens a picker of the five levels (`low`, `medium`, `high`, `xhigh` and `max`) above a row for
 asking for no level at all, so a first pick is not permanent. With a word, `/effort high` takes it
 directly, and a word that names no level changes nothing and says so rather than reaching a request
 field.
@@ -101,7 +102,7 @@ taken against where the session is now, so `..` and a name inside the project bo
 directory is trusted for the session on the same terms `/add-dir` grants.
 
 The directory you left closes, and so does anything `/add-dir` had opened that holds the new working
-directory or sits inside it — each said out loud as it happens, with the line that opens it again.
+directory or sits inside it. Each is said out loud as it happens, with the line that opens it again.
 Nothing may overlap the working directory, because a file reachable both relatively and by absolute
 path would have a rule in each namespace and so two answers.
 
@@ -120,25 +121,25 @@ Sends one prompt again and again until you stop it.
 /loop watch the build              # now, and each turn says when the next is due
 ```
 
+The first tick goes at once, so you can see it happen while you are still watching. The gap is
+measured from the end of a tick rather than its start, so `every 5m` means five minutes between runs.
+A due tick waits for an idle session and never interrupts, and a prompt you type in the middle of a
+loop is not a tick of it.
+
 An interval is read off the front of the argument, or off an `every` clause at the end, in that order
 and nowhere else. A leading token counts only when it is a number and one of `s`, `m`, `h` or `d`, and
-a trailing clause only when a time expression is the whole of what follows `every` — which is what
+a trailing clause only when a time expression is the whole of what follows `every`. That is what
 keeps `/loop check every PR` a sentence rather than one with its last two words taken off. Given no
 interval, each turn says when the next tick is due.
 
 **The line a loop repeats is the one you typed.** It is settled the moment you press Enter and sent
 unchanged for the life of the loop: nothing a turn reads, writes or returns can add to it, edit it or
-replace it. A schedule a turn could write its next prompt into would be a turn rewriting its own
-instructions, and the point of a loop is that it asks the same question again.
+replace it. A turn that could write its own next prompt would be rewriting its own instructions, and
+the point of a loop is that it asks the same question again.
 
 **A tick is a prompt, never a command.** `/loop 5m /status` sends the seven characters `/status` to
 the planner every five minutes; it does not run the status command. A command is dispatched from a key
 press, and a timer is not one.
-
-The first tick goes at once, so you can see it happen while you are still watching and decide whether
-it was the right thing to ask for. The gap is measured from the end of a tick rather than its start,
-so `every 5m` means five minutes between runs. A due tick waits for an idle session and never
-interrupts, and a prompt you type in the middle of a loop is not a tick of it.
 
 | The wait | Shortest | Longest |
 |---|---|---|
@@ -151,9 +152,9 @@ more tightly than yours because a turn that wants longer than an hour can say so
 somebody reads it. Where you gave an interval, no turn can change it; a self-paced tick that says
 nothing is woken once more twenty minutes later, and a second silence ends the loop.
 
-Each tick is announced with its number, and with how many in a row have reported finding nothing —
-which is the difference between a loop that is working and a loop with nothing to do. Four things end
-one, and each says so:
+Each tick is announced with its number, and with how many in a row have reported finding nothing.
+That count is the difference between a loop that is working and a loop with nothing to do. Four
+things end one, and each says so:
 
 | What | When |
 |---|---|
@@ -163,7 +164,7 @@ one, and each says so:
 | age | seven days after it started |
 
 **A loop is never written down.** It is not in the session record, so `--resume` restores none and it
-does not outlive the process — a schedule that survived the session that set it would start sending
+does not outlive the process. A schedule that survived the session that set it would start sending
 prompts at somebody who opened a conversation only to read it.
 
 :::caution
@@ -174,8 +175,8 @@ hundred and fifty turns nobody read.
 
 ## `/rename <name>`
 
-Renaming rewrites the session record immediately, and the chosen name survives the next turn. An empty
-name is refused.
+Rewrites the session record immediately, and the chosen name survives the next turn. An empty name is
+refused.
 
 ## `/compact`
 
@@ -192,9 +193,9 @@ session it asks the trust question again, restores no standing permissions, and 
 
 ## `/export [path]`
 
-Writes the transcript out as a markdown file under the working directory — at the path you name, or
-at `bravebot-export-<id>.md`. The conversation belongs to the person who had it, and without this the
-only way to get one out is to read the session record's JSON out of the state directory by hand.
+Writes the transcript out as a markdown file under the working directory, at the path you name or at
+`bravebot-export-<id>.md`. Without this the only way to get a conversation out is to read the session
+record's JSON out of the state directory by hand.
 
 The path is typed on the same line as the command, so it gets the confinement any other path from
 that line would get: `..`, an absolute path and a drive prefix are refused, and containment is then
@@ -213,19 +214,17 @@ commands you vouched for and the transcript go back with it; the turn's audit li
 since they decided about a turn that is no longer in the conversation. Rewinding past a session's
 first turn removes its record rather than leaving one with nothing in it.
 
-A turn that went wrong is the case with no clean recovery otherwise: `git checkout` takes your own
-uncommitted work with it, and `/clear` throws away the context that was worth keeping. Disk and
-conversation move together because either alone leaves the transcript describing a tree that is not
-there.
+Disk and conversation move together because either alone leaves the transcript describing a tree that
+is not there.
 
 **A rewind names any file it could not put back**, and the rest of the rewind still happens. What one
 turn keeps for this is bounded, so a very large file may be remembered as a path whose contents were
-not held — that path is reported as one that did not go back rather than treated as a file that was
+not held. That path is reported as one that did not go back rather than treated as a file that was
 never there.
 
 **One turn is as far as it goes**, and the window closes as soon as the next turn begins. Anything
-else that changes the session outside a turn closes it too — `/clear`, `/compact`, `/rename`,
-`/add-dir`, `/cd`, and a shell-mode command — after which `/undo` says there is nothing left to undo
+else that changes the session outside a turn closes it too: `/clear`, `/compact`, `/rename`,
+`/add-dir`, `/cd`, and a shell-mode command. After that `/undo` says there is nothing left to undo
 rather than rewinding to a snapshot describing a different session.
 
 :::caution
@@ -243,7 +242,7 @@ else: never a line the planner produced, never text read out of a file, never an
 returned, never a line reconstructed from a transcript. A model that writes `/clear` has written four
 characters, and they reach your screen as four characters.
 
-Every command here decides something a turn is not allowed to decide on its own — which directories are
+Every command here decides something a turn is not allowed to decide on its own: which directories are
 reachable, what the conversation consists of, which model thinks. The endorsement is the keystroke, so
 the keystroke is the only thing that may produce one.
 
@@ -261,14 +260,15 @@ by putting a file somewhere.
 
 ## Skills are not slash commands
 
-Other agents let you type a skill's name after a slash. This one does not: a skill is advertised to
-the planner by name and description, and its body is fetched by the planner asking for it. Nothing in
-the input box knows skills exist, so `/commit-style` is a prompt like any other sentence. See
+`/commit-style` is a prompt like any other sentence, even where a skill of that name exists. Other
+agents let you type a skill's name after a slash. This one does not: a skill is advertised to the
+planner by name and description, and its body is fetched by the planner asking for it. Nothing in the
+input box knows skills exist. See
 [Skills](../customize/skills.md#skills-are-not-slash-commands).
 
 ## Not a command, but typed in the same place
 
 | | |
 |---|---|
-| `@<path>` | include a workspace file as trusted context — [Adding context](../using/context.md) |
-| `!<line>` | run a line in your own shell — [Shell mode](../using/shell-mode.md) |
+| `@<path>` | include a workspace file as trusted context. [Adding context](../using/context.md) |
+| `!<line>` | run a line in your own shell. [Shell mode](../using/shell-mode.md) |

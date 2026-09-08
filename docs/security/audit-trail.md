@@ -6,7 +6,7 @@ description: What is recorded about every decision the system makes, and how to 
 
 # The audit trail
 
-Every gate decision is recorded — allowed **or** refused. A trail that logged only what happened
+Every gate decision is recorded, allowed **or** refused. A trail that logged only what happened
 would not answer "why did it not do the thing I asked", which is most of what anyone asks it.
 
 ## Reading it
@@ -88,4 +88,4 @@ jq -r 'select(.gate == "present")' ~/.bravebot/sessions/*/…​.audit.jsonl
 
 The labels are spelled out in words rather than abbreviated, because a file read months later has no
 legend beside it, and each event keeps the time it happened. The compact form suits a terminal, where
-the reader has the legend in front of them; a file has a different reader.
+the reader has the legend in front of them.

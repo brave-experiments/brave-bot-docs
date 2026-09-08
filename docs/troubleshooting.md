@@ -22,36 +22,36 @@ vouched-for command.
 
 ## Configuration
 
-**`configuration error: …`** — the build is missing a required variable, or one in your environment is
+**`configuration error: …`**. The build is missing a required variable, or one in your environment is
 wrong. The environment wins over what is baked in, so an exported `BRAVE_AI_CHAT_ENDPOINT` left over
 from debugging will override a working release binary. See
 [Configuration](customize/configuration.md#environment-variables).
 
-**401 from the endpoint** — the services key is issued for exactly one environment. Used against
-another it returns 401: the signature is well formed, the credential is simply not accepted there. For
+**401 from the endpoint.** The services key is issued for exactly one environment, and used against
+another it returns 401: the signature is well formed, the credential is not accepted there. For
 a source build, check that `BRAVEBOT_ENV`, the key and the hosts all agree.
 
-**A Leo Premium credential returns 401** — a credential only verifies against the deployment that
+**A Leo Premium credential returns 401.** A credential only verifies against the deployment that
 issued it. Import from the Brave channel matching the environment the binary is configured for. See
 [Leo Premium](customize/premium.md#requirements-and-limits).
 
 ## The interface
 
-**Shift-Enter sends instead of starting a new line.** Most terminals send the same byte for Enter
-whichever modifier is held. Use **Ctrl-J**, which always works, or use a terminal that reports the
-modifier (Ghostty, Kitty, WezTerm) or configure yours to send a newline.
+**Shift-Enter sends instead of starting a new line.** Use **Ctrl-J**, which always works, or use a
+terminal that reports the modifier (Ghostty, Kitty, WezTerm) or configure yours to send a newline.
+Most terminals send the same byte for Enter whichever modifier is held.
 
-**Command-V pastes nothing when I copied a picture.** Command-V never reaches the process: the byte
-stream over a pty has no encoding for that modifier, so the terminal writes the clipboard's *text*
-instead. **Ctrl-V** is the key for a picture. On Linux it needs `wl-paste` or `xclip` installed.
+**Command-V pastes nothing when I copied a picture.** Use **Ctrl-V** for a picture. On Linux it needs
+`wl-paste` or `xclip` installed. Command-V never reaches the process: the byte stream over a pty has
+no encoding for that modifier, so the terminal writes the clipboard's *text* instead.
 
 **Dragging a file typed a path instead of attaching it.** A line is treated as a drop only when every
 word of it is a path that exists. One word of prose, a path naming nothing, an unterminated quote or
 more than one line makes it a paste. Also: dropping a *directory* attaches nothing, and a file type
 that is neither text, an image nor a PDF has its path written into the line.
 
-**Escape does not end the session.** By design — Escape only ever stops. **Ctrl-C** on an empty box
-leaves. See [Interactive mode](using/interactive-mode.md#stopping-and-leaving).
+**Escape does not end the session.** Use **Ctrl-C** on an empty box to leave. Escape only ever stops.
+See [Interactive mode](using/interactive-mode.md#stopping-and-leaving).
 
 **Ctrl-C did not stop anything.** It stops the *nearest* thing: with the scroller open, the first press
 closes the scroller and the next one reaches the turn. The screen says which.
@@ -64,7 +64,7 @@ not name does nothing at all. `?` says what it takes.
 
 ## Reading and writing
 
-**"the model cannot read this file"** — the file is not covered by any trust rule, so it was
+**"the model cannot read this file".** The file is not covered by any trust rule, so it was
 quarantined. Answer `y` at the prompt, name it with `@path`, drop it on the window, or trust the
 directory. See [Trusted directories](security/trust.md).
 
@@ -72,13 +72,13 @@ directory. See [Trusted directories](security/trust.md).
 because locating a passage to replace is a comparison and a comparison is a decision. For a
 quarantined file the route is a processor plus a write, which you approve from the diff.
 
-**`AGENTS.md was not loaded: this directory is not trusted`** — exactly what it says. A project's own
+**`AGENTS.md was not loaded: this directory is not trusted`**. Exactly what it says. A project's own
 instructions are read through the trust map, so they load when you vouched for the directory. Your own
 `~/.bravebot/AGENTS.md` is unaffected.
 
-**A skill is not being used.** Check that `SKILL.md` has both `name` and `description` in front matter
-— a file missing either is skipped. Then check the description: it is the only part the planner sees
-before loading, so it should say *when* to use the skill.
+**A skill is not being used.** Check that `SKILL.md` has both `name` and `description` in front
+matter, since a file missing either is skipped. Then check the description: it is the only part the
+planner sees before loading, so it should say *when* to use the skill.
 
 **`/commit-style` did not run my skill.** Skills are not slash commands here. Say what you want and
 the planner loads the skill when the description matches. See
@@ -98,11 +98,11 @@ prompt.
 exact arguments: `git log` says nothing about `git log --all`. And a run with *private* input asks
 every time, whatever is vouched for.
 
-**A command line was refused rather than run.** Pipes, `&&`, redirection, globs and braces are all
-fine; `$(...)`, `$VAR`, `$((...))`, `&`, here-documents and control flow are refused, because what
-they stand for is not in the line and so could not be shown to you at the prompt. The refusal names
-the part of the line that caused it, and quoting turns any of them into an ordinary argument. To use
-a real shell, type `!` yourself. See [`run`](reference/tools.md#run) and
+**A command line was refused rather than run.** `$(...)`, `$VAR`, `$((...))`, `&`, here-documents and
+control flow are refused, because what they stand for is not in the line and so could not be shown to
+you at the prompt. Pipes, `&&`, redirection, globs and braces are all fine. The refusal names the part
+of the line that caused it, and quoting turns any of them into an ordinary argument. To use a real
+shell, type `!` yourself. See [`run`](reference/tools.md#run) and
 [Shell mode](using/shell-mode.md).
 
 ## Long sessions
@@ -121,11 +121,11 @@ interactive turn carries no such limit, so this is a one-shot or manifest run, w
 **`--resume` cannot find my session.** Sessions belong to the directory they ran in. Resume from the
 same working directory, or pass the id printed when the session ended. A session that moved with
 [`/cd`](reference/commands.md#cd-path) is recorded where it moved to, and the line printed on the way
-out names that directory — resume it from there, or the same id in the directory you started in finds
-the session as it was before the move.
+out names that directory. Resume it from there, or use the same id in the directory you started in to
+find the session as it was before the move.
 
 **A resumed session asked a question I already answered.** Answers to the planner's own questions live
-only in the running session. Standing permissions — the trust map and vouched-for commands — do come
+only in the running session. Standing permissions (the trust map and vouched-for commands) do come
 back.
 
 **A resumed session says it was recorded by a different build.** It is telling you the transcript is
@@ -133,7 +133,8 @@ being read against code that has moved since.
 
 ## Still stuck
 
-The [mini-specs](https://github.com/brave-experiments/brave-bot/tree/main/docs/specs) state each
+Bugs and questions go to
+[the issue tracker](https://github.com/brave-experiments/brave-bot/issues). The
+[mini-specs](https://github.com/brave-experiments/brave-bot/tree/main/docs/specs) state each
 behaviour as a numbered clause and name the tests that pin it, so they are usually the fastest way to
-find out whether something is intended. Bugs and questions go to
-[the issue tracker](https://github.com/brave-experiments/brave-bot/issues).
+find out whether something is intended.

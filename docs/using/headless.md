@@ -18,33 +18,29 @@ A one-shot run has nobody to ask, and most of what makes it different follows fr
 ## Nothing is approved
 
 **Where nobody can be asked, nothing is approved.** Effects are refused rather than applied unseen,
-and the planner's own questions are declined rather than answered on your behalf.
-
-The alternative to a person is not a default — it is a guess made in their name. The planner is told
+and the planner's own questions are declined rather than answered on your behalf. The planner is told
 that a reply came from a person, so inventing one would be worse than not asking at all.
 
 So a one-shot run is for reading, explaining and summarising. If you want it to change something, run
-it interactively — or say so on the command line:
+it interactively, or say so on the command line:
 
 ```sh
 bravebot --dangerously-skip-permissions -p "fix the failing test"
 ```
 
-That flag is the one thing that lifts the first half, because a flag you typed is an instruction
-rather than a guess made in your name. It does not lift the second: the planner's questions are
-declined in that mode too, since they are not permissions. It is a mode for a container with no
-network and nothing in it worth losing — see
-[modes](../security/permissions.md#answering-in-advance-modes).
+That flag lifts the refusal of effects, because a flag you typed is an instruction rather than a guess
+made in your name. It does not lift the second half: the planner's questions are declined in that mode
+too, since they are not permissions. It is a mode for a container with no network and nothing in it
+worth losing. See [modes](../security/permissions.md#answering-in-advance-modes).
 
 ## Piped input is untrusted and private, always
 
-Nothing vouched for what a pipe carries. `gh pr diff` and `cat build-error.txt` both arrive the same
-way and neither passed through the trust map, and a pipe has no path for the trust map to have an
-opinion about. So piped bytes are quarantined, and the planner is given a reference rather than the
-bytes.
+Piped bytes are quarantined, and the planner is given a reference rather than the bytes. Nothing
+vouched for what a pipe carries: `gh pr diff` and `cat build-error.txt` both arrive the same way, and
+a pipe has no path for the trust map to have an opinion about.
 
-That is not a dead end: the planner can pass the reference to a processor, feed it to a program's
-stdin, or write it to a file — it simply cannot read it. See
+The planner can still pass the reference to a processor, feed it to a program's stdin, or write it to
+a file. It just cannot read it. See
 [How Brave Bot works](../how-it-works.md#quarantine-and-references).
 
 To give the agent something it can *read*, name a file instead:
@@ -80,18 +76,17 @@ bravebot "what does this do?" --file src/main.rs --trace 2> trail.txt
 bravebot --mode manifest "collect every TODO comment into notes/todos.md"
 ```
 
-The default, `--mode turn`, is what an unqualified `bravebot "task"` has always been: observe,
-decide, act, and decide again after each thing it reads. `--mode manifest` decides **everything
-first**. The planner emits a step list, that list is refused or frozen, and a driver walks it with
-no model anywhere in the control path.
+`--mode manifest` decides **everything first**. The planner emits a step list, that list is refused or
+frozen, and a driver walks it with no model anywhere in the control path. The default, `--mode turn`,
+is what an unqualified `bravebot "task"` has always been: observe, decide, act, and decide again after
+each thing it reads.
 
-This is not a stricter policy — the gates are the same ones. What changes is the scope of the
-precommitment, from one turn to a whole run.
+The gates are the same ones in both modes. What changes is the scope of the precommitment, from one
+turn to a whole run.
 
 A plan that fails validation **fails the run whole**: nothing is half adopted, no step is patched to
-make a plan usable, and nothing re-plans once a step has read something. Where every effect will
-land is fixed before the first byte is read, and the driver cannot insert, skip, reorder or invent a
-step.
+make a plan usable, and nothing re-plans once a step has read something. Where every effect will land
+is fixed before the first byte is read, and the driver cannot insert, skip, reorder or invent a step.
 
 ### What a plan cannot use
 
@@ -102,21 +97,21 @@ step.
 - **Piped stdin**, which is refused rather than dropped: a pipe is observed context, and this mode
   does not observe before it plans. Name a workspace file with `--file` instead.
 
-Everything a step produces is quarantined, whatever its label — there is no planner left to show it
+Everything a step produces is quarantined, whatever its label. There is no planner left to show it
 to. The ways out are a later processor, a write back into the workspace, and a release the plan
 named in advance.
 
 ### What comes back
 
-The goal in plain words, the proposed plan verbatim, the frozen steps, and what each one did — on
+The goal in plain words, the proposed plan verbatim, the frozen steps, and what each one did, on
 success **and on failure**, never behind a flag. A failed plan is printed on stderr even without
 `--trace`, and never shares stdout with the reply.
 
 ## A one-shot turn is bounded
 
-A one-shot run carries a limit of 200 rounds of tool calls, where an interactive turn carries none:
-nothing else would end an unattended loop. On the limiting round the planner is offered no tools and
-told it has none left, so it answers with what it has.
+A one-shot run carries a limit of 200 rounds of tool calls, where an interactive turn carries none.
+On the limiting round the planner is offered no tools and told it has none left, so it answers with
+what it has.
 
 ## Exit codes
 

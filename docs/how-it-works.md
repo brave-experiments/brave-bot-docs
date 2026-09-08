@@ -6,9 +6,9 @@ description: The planner, the driver, labels, quarantine and processors.
 
 # How Brave Bot works
 
-Everything in Brave Bot is predicated on one statement:
-
 > **Untrusted content never enters the driver's context or the planner's.**
+
+Everything else on this page follows from that rule.
 
 The **planner** is the model deciding what to do next. The **driver** is the Rust code around it.
 Both are held to the same rule, because moving a decision from one into the other does not remove
@@ -18,7 +18,7 @@ it.
 
 | | What it is | What it may do with untrusted content |
 |---|---|---|
-| **Planner** | the model | never sees it — it is handed a reference instead |
+| **Planner** | the model | never sees it: it is handed a reference instead |
 | **Driver** | the program | may **carry** it and hand it to an effect, never **read** it |
 | **Policy layer** | the gates inside the driver | the only code allowed to read untrusted bytes, and only at a gate |
 | **Processor** | an isolated model call with no tools | reads it, rewrites it, and can direct nothing |
@@ -38,14 +38,14 @@ are incomparable, so this is a lattice rather than a pair of booleans.
 A derived value is labelled by taint over its inputs: one untrusted input taints the result, one
 private input makes it private, the axes degrade independently and the order of the inputs does not
 matter. **Labels only ever degrade.** Nothing constructs a label better than its inputs had, in any
-crate — that is laundering, and if a value derived from untrusted input has to be trusted for
-something to work, the design is wrong rather than the label.
+crate. That is laundering. If a value derived from untrusted input has to be trusted for something to
+work, the design is wrong rather than the label.
 
-A *first* label is different from an upgrade. Model output is a function of the model's context, so
-when the context held only trusted input, what it produced is labelled accordingly. The same road
-labels a program's output, a line you ran yourself in shell mode, your own configuration and a
-picture you pasted. Each of those is a label a value receives for the first time, assigned from
-provenance the policy layer tracked — never a relabelling of something that already had one.
+A *first* label is not an upgrade. Model output is a function of the model's context, so when the
+context held only trusted input, what it produced is labelled accordingly. The same applies to a
+program's output, a line you ran yourself in shell mode, your own configuration and a picture you
+pasted. Each of those is a label a value receives for the first time, assigned from provenance the
+policy layer tracked, never a relabelling of something that already had one.
 
 ## Quarantine and references
 
@@ -68,8 +68,8 @@ What it cannot do is see the bytes, or take a decision from them.
 
 ## Processors
 
-Where content has to be *changed* rather than moved, it goes to a processor: an isolated model call
-with no tools, no memory and no conversation.
+Content that has to be *changed* rather than moved goes to a processor: an isolated model call with
+no tools, no memory and no conversation.
 
 | | |
 |---|---|
@@ -94,8 +94,9 @@ cannot be another processor's input.
 
 ## Delegates
 
-Where a sub-task would fill the conversation with reading, the planner can hand it to a **delegate**:
-a second planner with a context of its own and a narrower set of capabilities.
+The planner can hand a sub-task to a **delegate**: a second planner with a context of its own and a
+narrower set of capabilities. It is for a sub-task that would otherwise fill the conversation with
+reading.
 
 | | |
 |---|---|
@@ -106,32 +107,28 @@ a second planner with a context of its own and a narrower set of capabilities.
 | Writes | files, each shown to you first, and slots in a quarantine of its own |
 
 A planner that runs the build reads the whole log. A planner that asks a delegate to run the build is
-told what failed. The work happens either way and only one of them spends the conversation on it.
+told what failed. The work happens either way, and only the first spends the conversation on it.
 
 **Delegates run alongside the turn and alongside each other.** Starting one hands the planner its
 round straight back and the work goes on behind it, so a turn that asked three questions waits on
 the slowest rather than on the sum. Nothing is shared between two of them: each holds its own
 conversation, its own quarantine and its own copy of what you have vouched for, so no delegate can
-see another's work any more than it can see the turn's. What they do share is you — one question is
-put at a time, so a delegate wanting a write approved while you are reading another delegate's diff
-waits for you to finish reading it.
+see another's work any more than it can see the turn's. One question is put at a time, so a delegate
+wanting a write approved while you are reading another delegate's diff waits for you to finish.
 
 A turn does not answer while something it started is still working. If it would otherwise finish
 first, the reports are waited for and put in front of it, and it answers again knowing what came
-back — because a person told the turn is over reasonably believes nothing of theirs is still being
-read or written.
+back.
 
-None of this is about trusting a second model more than the first. A delegate holds capabilities and
-holds no untrusted content — what it may not read is quarantined and it is handed a reference, exactly
-as its parent would be — so there is no point in the run where untrusted bytes and a capability are in
-the same context. It is also why a run whose own context has already met something untrusted cannot
-delegate at all: the task it would compose is a function of those bytes.
+**A run whose own context has already met something untrusted cannot delegate at all**, because the
+task it would compose is a function of those bytes. A delegate is not trusted more than its parent.
+It holds capabilities and holds no untrusted content (what it may not read is quarantined and it is
+handed a reference, exactly as its parent would be), so there is no point in the run where untrusted
+bytes and a capability are in the same context.
 
 The report that comes back is labelled by the integrity of the delegate's own context and passes the
-same gate as any other result, so nothing is trusted on a delegate's say-so. Its gate decisions go into
-the same audit trail as the turn that spawned it, named so the two can be told apart — a nested run
-recording somewhere else would leave a hole in the record exactly over the part of the turn nobody
-watched.
+same gate as any other result, so nothing is trusted on a delegate's say-so. Its gate decisions go
+into the same audit trail as the turn that spawned it, named so the two can be told apart.
 
 See [`spawn_agent`](reference/tools.md#spawn_agent).
 
@@ -139,19 +136,16 @@ See [`spawn_agent`](reference/tools.md#spawn_agent).
 
 Every effect splits in two:
 
-- **Routing** — the part that decides where the effect lands: a path, a program name, its
+- **Routing**: the part that decides where the effect lands: a path, a program name, its
   arguments, a URL. Routing must be `(T,pub)`, and must be endorsed by a person.
-- **Content** — the part that is merely carried: a file body, a program's stdin, a request body.
+- **Content**: the part that is merely carried: a file body, a program's stdin, a request body.
   Content may be untrusted. It must not be private at the moment it is released.
 
-This split is why the built-in tools are native rather than MCP calls: an opaque call erases the
-distinction between the part that decides where something lands and the part that is carried, and
-these tools depend on it.
+The built-in tools are native rather than MCP calls, because an opaque call erases this split.
 
-It is also why the planner's command line is compiled rather than interpreted. `run` reads the line
-into the programs, arguments and destinations it names — a plan you endorse — and nothing is ever
-passed to a shell, so `; rm -rf /` inside quotes is one argument and stays one. The only thing that
-ever split the line was the compiler, and it had already finished.
+The planner's command line is compiled rather than interpreted. `run` reads the line into the
+programs, arguments and destinations it names, a plan you endorse, and nothing is ever passed to a
+shell, so `; rm -rf /` inside quotes is one argument and stays one.
 
 ## Gates
 
@@ -160,7 +154,7 @@ model, a file being written, a program being run, a request leaving the process.
 single question and **refuses rather than warns**, so there is no path to a consequence that does
 not go through one.
 
-Every gate decision is recorded, allowed or refused, and the record holds no content — only gate
+Every gate decision is recorded, allowed or refused, and the record holds no content: only gate
 names, capabilities, labels, paths and slot ids. That is why it can be shown on your screen and
 written to a file for a workspace nobody vouched for. See [The audit trail](security/audit-trail.md).
 
@@ -195,7 +189,7 @@ content. See [Trusted directories](security/trust.md).
 
 ## The limits of all this
 
-Three things are worth saying plainly, because they are deliberate rather than oversights:
+These three are deliberate rather than oversights:
 
 - **Trusting a directory trusts what lands in it.** A rule is about a path, not about the files that
   were there when the rule was made. `npm install`, `git pull`, your editor, or a program the agent
@@ -203,7 +197,7 @@ Three things are worth saying plainly, because they are deliberate rather than o
 - **A fresh session forgets what an earlier one poisoned.** The rule that untrusted data marks its
   destination untrusted holds within a session and across a resume of it, not across a fresh start.
 - **A vouched-for command's output is trusted because you said so.** Nothing establishes that
-  `git log` is free of influence — its output is whatever contributors wrote. It is trusted for the
+  `git log` is free of influence. Its output is whatever contributors wrote. It is trusted for the
   same reason a directory is: a person took responsibility.
 
 Every one of these is written down in the specs under "Known costs", because an unlisted exception

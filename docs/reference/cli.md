@@ -52,12 +52,12 @@ Anything that is not a recognised flag or subcommand is treated as the task prom
 
 `-p` may lead, as it does for other agents: `bravebot -p "task"`.
 
-`--incognito` may lead too, and combines with everything else here — see
+`--incognito` may lead too, and combines with everything else here. See
 [an incognito session](../using/sessions.md#a-session-that-leaves-nothing-behind).
 
 `--dangerously-skip-permissions` may go anywhere in the line and combines with everything else too.
 It is the only way to reach the mode that answers every permission question, including the ones that
-decide trust, and the only way a run nobody is watching may write — see
+decide trust, and the only way a run nobody is watching may write. See
 [modes](../security/permissions.md#answering-in-advance-modes) for what it costs.
 
 ## `import-leo-creds`
@@ -122,9 +122,10 @@ bravebot 0.4.0 (f2a6e1a, modified)
 ```
 
 The commit is what the binary was compiled from, and `modified` means the tree had uncommitted changes
-at that point. Every session record carries the same string, which matters when reading a transcript
-back: a session that behaved oddly is usually being read against code that has moved since. A build
-with no git available says `(no git)` rather than naming a commit it cannot see.
+at that point. A build with no git available says `(no git)` rather than naming a commit it cannot see.
+
+Every session record carries the same string. That matters when reading a transcript back: a session
+that behaved oddly is usually being read against code that has moved since.
 
 ## Exit codes
 

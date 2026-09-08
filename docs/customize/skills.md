@@ -26,13 +26,13 @@ missing either is skipped with a note saying so. Other keys are ignored, so a sk
 another agent works here. A file with no front matter is not a skill.
 
 A value may wrap over the lines indented beneath it, however the file spells the wrap: folded or
-literal with `>` or `|`, quoted and carried over, or plain text simply continued. A folded value is
+literal with `>` or `|`, quoted and carried over, or plain text continued. A folded value is
 joined with spaces; a literal one keeps the newlines it asked for.
 
 ## Only the name and description reach the prompt
 
-The body waits until the planner asks for it with `load_skill`. So a directory of long skills does
-not crowd out the task, and the **description is what the planner decides from** — write it to say
+The body waits until the planner asks for it with `load_skill`, so a directory of long skills does
+not crowd out the task. The **description is what the planner decides from**. Write it to say
 *when* to use the skill rather than what it contains:
 
 ```yaml
@@ -47,12 +47,12 @@ description: Notes about commits.
 
 ## Skills are not slash commands
 
-Other agents let you type a skill's name after a slash. This one does not.
+`/commit-style` is a prompt like any other sentence. Other agents let you type a skill's name after a
+slash. This one does not.
 
 A skill is advertised to the planner by name and description, and its body is fetched by the planner
-asking for it. Nothing in the input box knows skills exist, so `/commit-style` is a prompt like any
-other sentence. The two surfaces stay apart deliberately: a slash command is a thing *you* decide,
-and loading a skill is a thing the *planner* decides.
+asking for it. Nothing in the input box knows skills exist. The two surfaces stay apart deliberately:
+a slash command is a thing *you* decide, and loading a skill is a thing the *planner* decides.
 
 ## Loading
 
@@ -65,7 +65,7 @@ guessed at, because guessing would load instructions nobody asked for.
 
 | Source | Trusted because |
 |---|---|
-| `~/.bravebot/skills/<name>/SKILL.md` | it is your own directory — provenance, never the trust map |
+| `~/.bravebot/skills/<name>/SKILL.md` | it is your own directory: provenance, never the trust map |
 | `<workspace>/.bravebot/skills/<name>/SKILL.md` | you vouched for the directory |
 
 A workspace `.bravebot/skills` is checked for trust **before it is enumerated at all**, because a
@@ -74,11 +74,11 @@ is counted rather than named. See [Instructions](instructions.md#trust).
 
 A project skill replaces a global one of the same name.
 
-A few skills are written into bravebot itself rather than found on disk — the one that tells a
-[`/loop`](../reference/commands.md#loop-interval-prompt) tick how to pace itself is one. There is no
-file and no directory behind them, so they pass no trust gate and are offered in every session,
-including one in a directory nobody trusts. They are the least specific source, so a skill of your own
-with the same name shadows one.
+A few skills are written into bravebot itself rather than found on disk. They pass no trust gate and
+are offered in every session, including one in a directory nobody trusts, because there is no file and
+no directory behind them. They are the least specific source, so a skill of your own with the same
+name shadows one. The skill that tells a
+[`/loop`](../reference/commands.md#loop-interval-prompt) tick how to pace itself is one.
 
 :::caution
 A skill downloaded into `~/.bravebot/skills` is trusted exactly as far as a config file you pasted

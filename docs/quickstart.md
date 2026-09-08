@@ -6,11 +6,15 @@ description: Install Brave Bot, run your first task, and understand the question
 
 # Quickstart
 
-## Install
+Install Brave Bot with npm, then run `bravebot` in a project directory to start a session.
 
 ```sh
 npm install -g @brave/bravebot
+cd your-project
+bravebot
 ```
+
+## Install
 
 The install downloads the release binary for your platform and verifies its checksum. macOS, Linux
 and Windows are supported, on both x86_64 and arm64. To build from source instead, see
@@ -34,20 +38,13 @@ configuration OK
 confinement …
 ```
 
-## Start a session
-
-```sh
-cd your-project
-bravebot
-```
-
 ## The first question: do you trust this directory?
 
-Before anything else, Brave Bot asks whether you trust the working directory.
+Brave Bot asks whether you trust the working directory before anything else.
 
 - **Trust it** and ordinary work proceeds: files are read as trusted, and edits are not shown to
   you for every path in the tree.
-- **Decline** and nothing is trusted. The session still works — every write is simply shown to you
+- **Decline** and nothing is trusted. The session still works. Every write is shown to you
   first, and files are read into quarantine rather than into the model's context.
 
 The answer belongs to the session, not to the directory: every fresh session asks again, whatever
@@ -96,8 +93,8 @@ carries on and can try something else. Ctrl-C refuses and stops.
 > run the tests
 ```
 
-A `run` prompt shows the compiled plan — every step, the binary each resolved to, the directory, and
-every file the line would write — and says that the command is not sandboxed:
+A `run` prompt shows the compiled plan: every step, the binary each resolved to, the directory, and
+every file the line would write. It also says that the command is not sandboxed:
 
 ```
   y run it    a always    n don't    ctrl-c stop the turn
@@ -123,12 +120,12 @@ bravebot "explain this" --file notes.md     # with named context
 gh pr diff | bravebot -p "summarise this"   # with piped input
 ```
 
-A one-shot run has nobody to ask, so it refuses effects rather than applying them unseen. Piped
-input is untrusted and private, always. See [Non-interactive use](using/headless.md).
+A one-shot run refuses effects rather than applying them unseen, because there is nobody to ask.
+Piped input is untrusted and private, always. See [Non-interactive use](using/headless.md).
 
 ## Where to go next
 
-- [Interactive mode](using/interactive-mode.md) — the keys, the box, and what a running turn refuses.
-- [Adding context](using/context.md) — `@path`, `--file`, pasting and dropping files.
-- [Instructions](customize/instructions.md) and [Skills](customize/skills.md) — standing rules for a project.
-- [Slash commands](reference/commands.md) — `/status`, `/model`, `/add-dir`, `/compact`, `/clear`.
+- [Interactive mode](using/interactive-mode.md): the keys, the box, and what a running turn refuses.
+- [Adding context](using/context.md): `@path`, `--file`, pasting and dropping files.
+- [Instructions](customize/instructions.md) and [Skills](customize/skills.md): standing rules for a project.
+- [Slash commands](reference/commands.md): `/status`, `/model`, `/add-dir`, `/compact`, `/clear`.

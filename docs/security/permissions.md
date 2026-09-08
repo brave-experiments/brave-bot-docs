@@ -1,7 +1,7 @@
 ---
 sidebar_position: 2
 title: Approvals and permissions
-description: Every moment the system stops and asks you something, and exactly what your answer grants.
+description: Every prompt the system puts to you, and exactly what your answer grants.
 ---
 
 # Approvals and permissions
@@ -11,7 +11,7 @@ grants, and what it does not.
 
 ## A prompt shows what is at stake
 
-Not a summary of it:
+A prompt shows the thing itself, not a summary of it:
 
 | Prompt | What it shows |
 |---|---|
@@ -40,13 +40,13 @@ diff that cannot be computed says so rather than showing nothing.
 
 ## One answer is never taken for another
 
-An approved write does not approve a run. A write approval is not an answer to a question, and an
-answer to a question is not consent to a write. **Each endorsement is single-use and bound to the exact
-value it was given for.** These are separate grants that happen to use the same keyboard.
+**Each endorsement is single-use and bound to the exact value it was given for.** An approved write
+does not approve a run. A write approval is not an answer to a question, and an answer to a question
+is not consent to a write. These are separate grants that happen to use the same keyboard.
 
 ## Declining is not cancelling
 
-Saying no to a write does not stop the turn — the agent carries on and can try something else. That is
+Saying no to a write does not stop the turn. The agent carries on and can try something else. That is
 how you steer without starting over.
 
 **Ctrl-C refuses and stops.** Declining, and Ctrl-C, vouch for nothing.
@@ -65,7 +65,7 @@ The run prompt is the one place a standing permission is offered:
 2. **what it prints becomes trusted**, so the planner reads it instead of a reference.
 
 The second is a human assertion, not an inference. Nothing establishes that a vouched command is
-side-effect-free or that its output is free of influence, and nothing tries — `git log` prints commit
+side-effect-free or that its output is free of influence, and nothing tries. `git log` prints commit
 messages whoever contributed wrote. It is trusted for exactly the reason a directory in the trust map
 is trusted: you said so.
 
@@ -86,7 +86,7 @@ joined differently, writing somewhere else, or run in another directory. See
 [`run`](../reference/tools.md#run).
 
 **Private input asks every time**, whatever is vouched for, and `a` is not offered for those runs at
-all. Untrusted input is fine, since carrying bytes decides nothing — but private input hands your data
+all. Untrusted input is fine, since carrying bytes decides nothing. Private input hands your data
 to a program, and that releases it somewhere this policy stops governing. Vouching for what a file
 contains is not consenting to send it somewhere.
 
@@ -110,7 +110,7 @@ box. A mode is a standing answer to the questions above, given once instead of o
 
 | Mode | What it answers |
 |---|---|
-| **asking** | nothing — every write, run, command output and unvouched file is put to you |
+| **asking** | nothing: every write, run, command output and unvouched file is put to you |
 | **accepting edits** | the write prompt, and no other |
 | **plan mode** | it refuses a write rather than asking about one |
 | **bypassing** | every permission question, including the two that decide trust |
@@ -124,7 +124,7 @@ the question withdrawn from under you.
 `git diff` shows you all of it; a program runs with everything your own shell has, leaves no diff,
 and what it prints is what the next round reads. A mode named for edits that also stopped asking
 about programs would be granting the larger thing quietly. It does accept a write to any path the
-workspace reaches, since the prompt was the only thing that would have shown you the path — a rule in
+workspace reaches, since the prompt was the only thing that would have shown you the path. A rule in
 the settings file is what narrows that.
 
 **Plan mode refuses a write rather than asking**, whatever you would have answered, and the planner
@@ -141,7 +141,7 @@ bravebot --dangerously-skip-permissions
 
 The flag is the only way to reach that mode: without it the key walks the other three however many
 times you press it. It may go anywhere in the command line and composes with `-p`, `--resume`,
-`--continue`, `--mode` and `--incognito` alike — and a one-shot run has no key to press, so the flag
+`--continue`, `--mode` and `--incognito` alike. A one-shot run has no key to press, so the flag
 is the whole of what can say.
 
 It answers the two questions that decide trust as well as the others, and those are the ones that
@@ -172,17 +172,16 @@ invented on your behalf is reported to the planner as your own words.
 
 ### A mode belongs to the sitting it was chosen in
 
-It is not written into the session record. A resumed session opens by asking, whatever the session
-that wrote the record was doing when it ended — coming back tomorrow into a session that had stopped
-asking about writes, having chosen nothing today, is the wrong direction for this to be wrong in.
-`--resume` with the flag opens in bypass, because the flag was given again.
+A resumed session opens by asking, whatever the session that wrote the record was doing when it
+ended. The mode is not written into the session record. `--resume` with the flag opens in bypass,
+because the flag was given again.
 
 A [delegate](../reference/tools.md#spawn_agent) inherits the mode of the turn that spawned it, since
 a delegate is that turn's work done somewhere else.
 
 ## Rules you write down in advance
 
-The `permissions` block of `~/.bravebot/settings.json` holds three lists — `deny`, `ask` and `allow` —
+The `permissions` block of `~/.bravebot/settings.json` holds three lists (`deny`, `ask` and `allow`)
 saying which actions to refuse outright and which to stop and ask you about. They are the same three
 lists Claude Code keeps, with the same spellings, so a block copied out of `~/.claude/settings.json`
 governs bravebot unedited. See
@@ -192,7 +191,7 @@ governs bravebot unedited. See
 
 **A deny rule refuses before the file is opened or the program is looked for.** A denied file is not
 read, not enumerated, not searched and not written, and a `Read` deny rule also stops a write to the
-path it covers — a file whose contents are off limits is not protected if it can be overwritten.
+path it covers. A file whose contents are off limits is not protected if it can be overwritten.
 Naming the path through a reference reaches the same refusal, including on the one route allowed to
 read what nobody vouched for: a processor is handed no denied file either. The planner is told the
 rule refused and that retrying is not the answer.
@@ -202,7 +201,7 @@ saying yes at startup trusts the whole tree, and a rule is how one file is kept 
 without declining the rest of it.
 
 **An allow rule stops the asking and grants nothing else.** It does not make a command's output
-trusted — output carries what it would have carried. Pressing `a` grants those two together because
+trusted: output carries what it would have carried. Pressing `a` grants those two together because
 you are looking at one command and can answer for both; a pattern covers commands nobody has read, so
 it cannot carry the second claim. If a rule could trust output, one line in a settings file would turn
 fetched bytes into routing, which is the whole thing labels exist to prevent. Nor does an allow rule
@@ -248,8 +247,8 @@ that can tell you a command now runs unasked and that its output is being read a
 
 ## When the planner asks you something
 
-The `ask_user` tool puts up to four questions to you, one at a time, with options to choose from — and
-you can always answer in your own words, or skip.
+The `ask_user` tool puts up to four questions to you, one at a time, with options to choose from. You
+can always answer in your own words, or skip.
 
 An answer is trusted as a first label, and only for a trustworthy question. **Asking stops once the
 planner's context has met something untrusted**, because at that point the question itself could have

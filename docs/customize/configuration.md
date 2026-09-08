@@ -6,8 +6,8 @@ description: What is baked into the binary, what lives in ~/.bravebot, and the e
 
 # Configuration
 
-Configuration is built into the released binary, so a fresh install needs nothing set up. What it
-will actually use is reported by:
+A fresh install needs nothing set up. Configuration is built into the released binary. What it will
+actually use is reported by:
 
 ```sh
 bravebot doctor
@@ -27,18 +27,17 @@ confinement …
   mechanisms       …
 ```
 
-`doctor` changes nothing. It exists to answer "what will this actually use", so it reports a choice
-where one is in force rather than the default it overrode, and a configuration error makes it fail
-rather than pass with a warning. The signing key is named as never transmitted.
+`doctor` changes nothing. It reports a choice where one is in force rather than the default it
+overrode, and a configuration error makes it fail rather than pass with a warning. The signing key is
+named as never transmitted.
 
-It reports **every backend this build can reach**, not just one, so a machine with an AWS account
-configured shows a second `offers` block with its region, profile and tiers — see
-[Reaching Claude on AWS Bedrock](#reaching-claude-on-aws-bedrock) — and a configured
+It reports **every backend this build can reach**, not just one. A machine with an AWS account
+configured shows a second `offers` block with its region, profile and tiers (see
+[Reaching Claude on AWS Bedrock](#reaching-claude-on-aws-bedrock)), and a configured
 [gateway](#reaching-an-openai-compatible-gateway) shows a third, with its endpoint, its models, and
 whether a credential was found for it. The `settings` line names which keys your settings file set,
-and never their values: a settings file holds credentials on some machines, and a diagnostic that
-prints one is a diagnostic people paste into issues. A file that sets no variables says so rather
-than being reported as an absent file.
+and never their values. A file that sets no variables says so rather than being reported as an absent
+file.
 
 ## `~/.bravebot`
 
@@ -54,27 +53,23 @@ Everything that should outlive a session lives here:
 | `~/.bravebot/effort` | the effort level chosen with `/effort` |
 | `~/.bravebot/theme` | the theme chosen with `/theme` |
 | `~/.bravebot/themes/<name>.json` | themes you wrote yourself |
-| `~/.bravebot/settings.json` | long-lived settings — see [below](#settingsjson) |
+| `~/.bravebot/settings.json` | long-lived settings (see [below](#settingsjson)) |
 
-An imported Leo Premium subscription is kept here too, in a file only you can read — see
+An imported Leo Premium subscription is kept here too, in a file only you can read. See
 [Leo Premium](premium.md#where-they-are-kept).
 
-The directory rather than a per-project file, for the same reason in every case: a question worth
-asking again is usually worth asking in another checkout too, and neither which model to think with,
-nor how hard to think, nor which colours to draw in is a property of a checkout.
-
 Every operation here degrades to doing nothing. A missing home directory, a read-only disk or a
-corrupt file is not worth refusing to start over, because the session works without any of it.
+corrupt file does not stop a session starting.
+
+`~/.bravebot` is the directory the environment names, and there is no fallback. When there is no
+home, or the name is empty, everything kept there is absent.
 
 :::note
-What comes back from `~/.bravebot` is not fed straight to a turn. A recalled prompt is placed in the
-input box, where you read it and press Enter — that keystroke is what makes it trusted, exactly as
+Nothing recalled from `~/.bravebot` is fed straight to a turn. A recalled prompt is placed in the
+input box, where you read it and press Enter. That keystroke is what makes it trusted, exactly as
 typing it would have. A model name the server does not recognise is reset to `automatic` rather than
 obeyed.
 :::
-
-`~/.bravebot` is the directory the environment names, and there is no fallback. When there is no
-home, or the name is empty, everything kept there is simply absent.
 
 ## Choosing a model
 
@@ -94,19 +89,17 @@ narrows, and falls to the first match once that model no longer matches. A searc
 says so, and there is nothing to select while it does.
 
 Rows are **grouped under the service that answers them**, one heading per service, and the heading of
-the section you are scrolling through is held on the top line — a gateway's roster is longer than a
-screen, and a row that has lost its heading no longer says who bills for it.
+the section you are scrolling through is held on the top line.
 
-`automatic` lets the server triage per request, and is what an unrecognised name is reset to. Note
-that the model requested is not necessarily the model used: some entries are weighted ensembles that
-resolve per request, and `automatic` itself picks per request.
+`automatic` lets the server triage per request, and is what an unrecognised name is reset to. The
+model requested is not necessarily the model used: some entries are weighted ensembles that resolve
+per request, and `automatic` itself picks per request.
 
-The names never reach a model. They are drawn for a person, who picks one, and what they picked
-becomes the `model` field of later requests — a routing field, endorsed by a person choosing it off a
-list they read.
+The list is drawn for a person, and the names in it never reach a model. What you picked becomes the
+`model` routing field of later requests.
 
 With an AWS account or a gateway configured the picker offers those models alongside this list rather
-than instead of it, each under its own heading — see
+than instead of it, each under its own heading. See
 [Reaching Claude on AWS Bedrock](#reaching-claude-on-aws-bedrock) and
 [Reaching an OpenAI-compatible gateway](#reaching-an-openai-compatible-gateway).
 
@@ -116,31 +109,30 @@ than instead of it, each under its own heading — see
 /effort
 ```
 
-opens a picker of five levels, cheapest first — `low`, `medium`, `high`, `xhigh` and `max` — above a
+opens a picker of five levels, cheapest first (`low`, `medium`, `high`, `xhigh` and `max`), above a
 row for asking for no level at all. `/effort high` takes one without opening the panel. The choice is
 written to `~/.bravebot/effort`, so it outlives the session and applies in every directory, and
-`/status` reports it beside the model, since the two together are what a turn costs.
+`/status` reports it beside the model.
 
 **Nothing infers a level.** Until you choose one the request carries no such field at all and each
-service applies its own default, so the only thing that can spend this is you asking for it. Taking
-the row for no level removes the record rather than writing an empty one, which puts you back where
-you were before you ever chose, and a word bravebot does not define changes nothing and says so.
+service applies its own default. Taking the row for no level removes the record rather than writing an
+empty one, which puts you back where you were before you ever chose. A word bravebot does not define
+changes nothing and says so.
 
 **A level goes only where the roster says it is read.** Reasoning is two parameters rather than one on
 a gateway, so a model can reason and still not read a level sent this way. Where the listing describing
 your model says it reads none, no level is sent and `/status` says so. The choice is kept either way
-and applies again the moment you pick a model that reads one, so what a request carries does not depend
-on the order you typed two commands in. A model no listing described is not a model stated to read
-nothing: a name from your settings file, a roster reporting no parameters, and a listing that could not
-be fetched all leave the level to go out and be judged at the far end. A row that does advertise the
-parameter says it reads one without saying which words it accepts, so a model may reject or silently
-round a level it does not know.
+and applies again the moment you pick a model that reads one. A model no listing described is not a
+model stated to read nothing: a name from your settings file, a roster reporting no parameters, and a
+listing that could not be fetched all leave the level to go out and be judged at the far end. A row
+that does advertise the parameter says it reads one without saying which words it accepts, so a model
+may reject or silently round a level it does not know.
 
 :::caution
-**The Brave endpoint accepts the level and discards it.** Measured against it: a nonsense value is
-answered exactly as a real one is, and a model that reports a reasoning-token count reports the same
-count whatever level was asked for. So a level chosen against a Brave-served model is carried, sent and
-dropped, while the interface goes on reporting it as in force. Bedrock and gateways are unaffected.
+**The Brave endpoint accepts the level and discards it.** A nonsense value is answered exactly as a
+real one is, and a model that reports a reasoning-token count reports the same count whatever level
+was asked for. A level chosen against a Brave-served model is carried, sent and dropped, while the
+interface goes on reporting it as in force. Bedrock and gateways are unaffected.
 :::
 
 ## Choosing a theme
@@ -156,9 +148,8 @@ file, is no choice at all and falls back to `brave`. A choice saved under the ea
 still finds `brave` rather than being silently lost.
 
 A theme of your own is a JSON file under `~/.bravebot/themes/`, named for the theme: `nord.json` is
-the theme `nord`. `brave.json` and `system.json` are refused, both names reaching the built-in theme,
-so a file taking either would load and then be unreachable. Each key is one role, and any you leave out
-inherits from `brave`:
+the theme `nord`. `brave.json` and `system.json` are refused, both names reaching the built-in theme.
+Each key is one role, and any you leave out inherits from `brave`:
 
 ```json
 {
@@ -185,20 +176,16 @@ An ink may also be a **pair**, one colour for each terminal background:
 { "muted": { "dark": "#6c7086", "light": "#8c8fa1" } }
 ```
 
-The arm matching the background sensed at startup is the one used. Neither arm is a special kind of
-value, so a pair composes with `defs` and with `none` exactly as a lone value does. A pair missing an
-arm is refused and the file holding it is not a theme, because filling the missing one in would let a
-typo paint half a palette — and the wrong half is the one its author never sees.
-
-Write a pair where a scheme was published for a light terminal and a dark one: that is one theme you
-name, not two, and shipping it as two files leaves whoever installs it working out which their terminal
-wants. A theme that gives at least one pair says so under the picker's list.
+The arm matching the background sensed at startup is the one used. A pair composes with `defs` and
+with `none` exactly as a lone value does. A pair missing an arm is refused and the file holding it is
+not a theme, because filling the missing arm in would let a typo paint half a palette. Write a pair
+where a scheme was published for a light terminal and a dark one: that is one theme, not two. A theme
+that gives at least one pair says so under the picker's list.
 
 :::note
 Themes are read from `~/.bravebot/themes` and from nowhere else. A `.bravebot/themes` directory inside
-a project is **not** consulted, because a workspace is content: a repository you have just cloned must
-not be able to decide how your interface is painted, and colours are how you tell one thing on the
-screen from another.
+a project is **not** consulted. A repository you have just cloned must not be able to decide how your
+interface is painted.
 :::
 
 See [Reading the transcript](../using/transcript.md#themes) for what each role paints.
@@ -215,8 +202,7 @@ BRAVEBOT_LOCALE=fr bravebot       # this once
 export BRAVEBOT_LOCALE=fr         # from now on
 ```
 
-`BRAVEBOT_LOCALE` is there so one program can be in a language the rest of your shell is not — which
-is usually wanted the other way round, an English interface on an otherwise French machine.
+`BRAVEBOT_LOCALE` puts this one program in a language the rest of your shell is not.
 
 A request widens rather than failing: `fr-CA` and `fr-BE` are answered by the French catalog where
 they have none of their own, and a language nothing has shipped for reads in English. `LC_ALL=C` asks
@@ -226,27 +212,22 @@ for no translation at all. English and French are what ship today.
 
 - **The names of the slash commands**, so `/model` is `/model` everywhere.
 - **The letters a question is answered with**, `y` and `n`. These are both the key drawn and the key
-  matched, so a French reader is told to press `y` for *oui*. Changing that would mean changing what
-  the interface listens for, not just what it says.
-- **The audit trail.** It is a record rather than prose — fixed columns of gate and capability names
-  that are identifiers, read against the specs that use those same names.
-- **The words on the working indicator**, unless a language supplies its own list. They are chosen
-  for tone and variety rather than meaning, and translating one word for word keeps neither.
+  matched, so a French reader is told to press `y` for *oui*.
+- **The audit trail.** It is fixed columns of gate and capability names that are identifiers, read
+  against the specs that use those same names.
+- **The words on the working indicator**, unless a language supplies its own list.
 
-Digit grouping and currency forms are not localized either; a catalog says only what separates a
-whole number from its fraction. A partial imitation of the full rules reads worse than a plain
-number, because it is wrong only sometimes.
+Digit grouping and currency forms are not localized either. A catalog says only what separates a
+whole number from its fraction.
 
 **Nothing the model is sent changes with your language.** Tool descriptions, the preamble and the
 sentence a refused tool answers with all stay as they are, because the words in them are load-bearing
-on what the planner does. Translating them would make the agent *behave* differently in French, which
-is a change nobody would find by reading the French. So switching language changes what you read and
-never what the agent does.
+on what the planner does. Switching language changes what you read and never what the agent does.
 
 ## Environment variables
 
-The environment wins when set — over both the built-in values and
-[`settings.json`](#settingsjson) — which is how a released binary is pointed at a local backend
+The environment wins when set, over both the built-in values and
+[`settings.json`](#settingsjson). That is how a released binary is pointed at a local backend
 without rebuilding it.
 
 | Variable | What it sets |
@@ -258,9 +239,9 @@ without rebuilding it.
 | `BRAVE_AI_CHAT_DEFAULT_MODEL` | the model to request when nobody has chosen one |
 | `BRAVEBOT_CONTEXT_BUDGET` | the token budget before a conversation is compacted |
 | `BRAVEBOT_LOCALE` | the language the interface is read in |
-| `BRAVEBOT_SUBPROCESS_ENV_SCRUB` | `0` hands a program the agent runs bravebot's own credentials — [`run.scrubEnv`](#runscrubenv) |
+| `BRAVEBOT_SUBPROCESS_ENV_SCRUB` | `0` hands a program the agent runs bravebot's own credentials ([`run.scrubEnv`](#runscrubenv)) |
 
-Six more name an AWS account rather than this build — see
+Six more name an AWS account rather than this build. See
 [Reaching Claude on AWS Bedrock](#reaching-claude-on-aws-bedrock).
 
 To point a release build at a backend running locally:
@@ -272,9 +253,8 @@ BRAVE_AI_CHAT_ENDPOINT=http://127.0.0.1:8000 bravebot doctor
 `BRAVE_AI_CHAT_DEFAULT_MODEL` is a **default rather than the setting**: `/model` picks one per user
 and that choice wins, so this applies until somebody makes one.
 
-`BRAVEBOT_CONTEXT_BUDGET` is deliberately never baked into a binary. The others are credentials and
-hosts, which belong to the build; this is a knob one person turns while working, and a value someone
-exported to debug a session should not ship to everyone who uses their release.
+`BRAVEBOT_CONTEXT_BUDGET` is never baked into a binary. It is a knob one person turns while working,
+so it has to be set in the environment.
 
 ## `settings.json`
 
@@ -296,50 +276,42 @@ These keys are read, and anything else in the file is ignored rather than refuse
 
 | Key | What it holds |
 |---|---|
-| `model` | the model to request when nobody has chosen one — [below](#model) |
+| `model` | the model to request when nobody has chosen one ([below](#model)) |
 | `env` | variables, in Claude Code's own shape |
-| `permissions` | which actions to refuse, and which to ask about — [below](#permissions) |
-| `provider` | an OpenAI-compatible gateway to reach — [below](#reaching-an-openai-compatible-gateway) |
-| `run.scrubEnv` | further variables to keep from a program the agent runs — [below](#runscrubenv) |
+| `permissions` | which actions to refuse, and which to ask about ([below](#permissions)) |
+| `provider` | an OpenAI-compatible gateway to reach ([below](#reaching-an-openai-compatible-gateway)) |
+| `run.scrubEnv` | further variables to keep from a program the agent runs ([below](#runscrubenv)) |
 
-In `env`, only string values: `1` and `true` are not obviously `"1"` and `"true"` to whoever debugs
-this later, so a number or a boolean is skipped rather than coerced. Every name in the block is read
-rather than a chosen subset.
+In `env`, only string values: a number or a boolean is skipped rather than coerced, so write `"1"` and
+`"true"`. Every name in the block is read rather than a chosen subset.
 
 **The file is the same shape as Claude Code's `~/.claude/settings.json`**, so a block that configures
-one largely configures the other unedited. That is deliberate rather than incidental: a second
-spelling for the same handful of values would be another thing to learn in exchange for nothing.
-
-Where a variable names **your** deployment the spelling is kept, which is why the tiers below are
-`ANTHROPIC_DEFAULT_*_MODEL`. A switch that decides which backend bravebot itself uses belongs to
-bravebot, so that one is `BRAVEBOT_USE_BEDROCK`.
+one largely configures the other unedited. Where a variable names **your** deployment the spelling is
+kept, which is why the Bedrock tiers below are `ANTHROPIC_DEFAULT_*_MODEL`. The switch that decides
+which backend bravebot itself uses is `BRAVEBOT_USE_BEDROCK`.
 
 :::caution
 `BRAVEBOT_USE_BEDROCK` was called `CLAUDE_CODE_USE_BEDROCK`. The old name now **reads as unset**, so a
 file or a profile still setting it falls back to the Brave backend without an error. Rename it.
 :::
 
-**The environment wins over the file.** A variable exported in your shell overrides the same name here,
-which is what makes the file a place to keep a durable default rather than a thing to edit when you
-want a one-off.
+**The environment wins over the file.** A variable exported in your shell overrides the same name here.
 
-Two limits are worth knowing because they fail silently, by design. A file over 64 KB is refused
-rather than parsed, and **every failure is treated as absence** — no file, a syntax error, an
-unparseable value — because the built-in configuration still describes a working backend. Nothing
-refuses to start over this; `bravebot doctor` is where a file nobody can parse shows up, since the
-person who mistyped it is not necessarily the person watching a session begin.
+Two limits fail silently by design. A file over 64 KB is refused rather than parsed, and **every
+failure is treated as absence** (no file, a syntax error, an unparseable value), because the built-in
+configuration still describes a working backend. Nothing refuses to start over this. `bravebot doctor`
+is where a file nobody can parse shows up.
 
 :::note
 **What this file names is destinations, not capabilities.** A region, a credential profile, a model:
 nothing in `env` vouches for a path, decides whether an effect is allowed, or names a command to run.
 The file is the easiest thing on the machine to write to, so a capability grantable from here would be
-a capability granted by whatever last edited it. It does not become the process environment either — a
+a capability granted by whatever last edited it. It does not become the process environment either. A
 value is consulted where a variable would be, and reaches a subprocess only where that subprocess is
 the thing it configures.
 
-A [`permissions`](#permissions) block is the exception that proves the rule. It can refuse an action
-and it can answer a prompt, and it can do nothing else: no rule there makes a path reachable, and no
-rule makes a command's output trusted.
+A [`permissions`](#permissions) block can refuse an action and it can answer a prompt, and it can do
+nothing else: no rule there makes a path reachable, and no rule makes a command's output trusted.
 :::
 
 ### `model`
@@ -349,16 +321,15 @@ rule makes a command's output trusted.
 ```
 
 The model to request when nobody has chosen one. This is the one key in the file that **outranks the
-model baked into the binary**: every release bakes one in, so ranked with the rest of the file it
-would parse, be reported by `doctor`, and change nothing. An exported
-`BRAVE_AI_CHAT_DEFAULT_MODEL` still wins over it, and a choice recorded by `/model` wins over both.
+model baked into the binary**. An exported `BRAVE_AI_CHAT_DEFAULT_MODEL` still wins over it, and a
+choice recorded by `/model` wins over both.
 
 `opus`, `sonnet` and `haiku` name a **tier** rather than a model, since that is what a settings file
 written for another tool puts here. Each resolves to something reachable: the model your AWS account
 named for that tier, and otherwise that tier's name on the Brave roster. A tier word is never sent as
-written, because a service has never heard of it — Bedrock refuses a model it does not recognise, and
-the aichat endpoint silently resets one to `automatic`, which is the key appearing to work while
-changing nothing. Any other name is used exactly as you wrote it.
+written, because a service has never heard of it. Any other name is used exactly as you wrote it.
+Bedrock refuses a model it does not recognise, and the aichat endpoint silently resets one to
+`automatic`, which is the key appearing to work while changing nothing.
 
 ### `run.scrubEnv`
 
@@ -369,14 +340,13 @@ changing nothing. Any other name is used exactly as you wrote it.
 Variables to withhold from a program the agent runs, on top of bravebot's own credentials, which are
 withheld with no configuration at all. See [`run`](../reference/tools.md#what-a-program-is-handed).
 
-**Names only, and that is the whole reason this may live in a file.** A list of names can only ever
-take something away; a list of values here would put a credential in front of every command the agent
-starts, which is the larger claim the `env` block declines to make. The list is read when the process
-starts, so editing it describes your next session.
+**Names only.** A list of names can only ever take something away; a list of values here would put a
+credential in front of every command the agent starts. The list is read when the process starts, so
+editing it describes your next session.
 
 `BRAVEBOT_SUBPROCESS_ENV_SCRUB=0` turns the withholding off entirely. Only that exact spelling does
-it: somebody who writes `false`, `no` or `off` meant to switch something off, and a credential
-reaching every subprocess is not a thing to switch off by near-miss.
+it: `false`, `no` and `off` change nothing, because a credential reaching every subprocess is not a
+thing to switch off by near-miss.
 
 ### `permissions`
 
@@ -392,8 +362,8 @@ reaching every subprocess is not a thing to switch off by near-miss.
 ```
 
 The same three lists Claude Code keeps, with the same spellings, so a block copied out of
-`~/.claude/settings.json` works unedited. What a rule is allowed to decide — and the reason it may
-never trust a command's output — is on
+`~/.claude/settings.json` works unedited. What a rule is allowed to decide, and the reason it may
+never trust a command's output, is on
 [Approvals and permissions](../security/permissions.md#rules-you-write-down-in-advance).
 
 A rule is `Tool` or `Tool(specifier)`, and names one of three **families**:
@@ -405,13 +375,12 @@ A rule is `Tool` or `Tool(specifier)`, and names one of three **families**:
 | `Bash` | running a program |
 
 These are categories rather than tool names, as they are in Claude Code, so there is no rule spelled
-`Write` or `Glob`. `Bash` names no shell — there is none — and its specifier is matched against one
+`Write` or `Glob`. `Bash` names no shell (there is none), and its specifier is matched against one
 step's program and arguments.
 
 **`deny`, then `ask`, then `allow`, and the first match decides.** Specificity does not enter into
 it: a broad deny beats a narrow allow, and a matching `ask` rule prompts even where a more specific
-`allow` also matches. That is what makes a `deny` list readable as a flat statement about what will
-not happen.
+`allow` also matches.
 
 A **path** specifier is gitignore-shaped. `*` matches within one segment and `**` across them, and a
 trailing `/**` covers the directory it names as well as what is under it. Four anchors decide where a
@@ -428,12 +397,10 @@ So a single leading slash is **not** the filesystem root. A specifier with no sl
 and matches at any depth, which makes `Read(.env)` and `Read(**/.env)` one rule. Relative and
 absolute patterns are separate namespaces and neither reaches into the other.
 
-One further asymmetry, worth knowing before you write `allow`: **a one-segment relative pattern
-floats where it restricts and not where it grants.** `Edit(src/**)` in `deny` or `ask` covers a `src`
-directory at any depth, including a copy under `vendor`; the same pattern in `allow` covers only the
-`src` at the top. A rule that restricts should catch the copy you forgot about, and one that grants
-should cover what it says and no more. Anchor it as `Edit(/src/**)` to pin it to one place in either
-list.
+**A one-segment relative pattern floats where it restricts and not where it grants.** `Edit(src/**)`
+in `deny` or `ask` covers a `src` directory at any depth, including a copy under `vendor`; the same
+pattern in `allow` covers only the `src` at the top. Anchor it as `Edit(/src/**)` to pin it to one
+place in either list.
 
 A **command** specifier matches the whole line, with `*` standing in for any text:
 
@@ -449,14 +416,13 @@ space before it is part of the rule. A trailing `:*` is the same rule as a trail
 anywhere else is an ordinary character.
 
 **Every step of a command line is judged on its own**, as its program and arguments joined by single
-spaces — the shape a rule is written in. Restricting any one step restricts the whole line; granting
-the line needs every step granted, because one step no rule covers is a program nobody has answered
-for, and what it prints is what the next step reads. An argument is never re-split, so a denied
-program cannot be smuggled inside one.
+spaces, which is the shape a rule is written in. Restricting any one step restricts the whole line.
+Granting the line needs every step granted. An argument is never re-split, so a denied program cannot
+be smuggled inside one.
 
 A `Read` or `Write` rule reaches a line too: a redirection like `> notes.txt` is matched as a path,
-exactly as `write_file`'s destination is, and a `<` is matched as a read. A rule about a path is a
-statement about the path, so it does not depend on which tool got there.
+exactly as `write_file`'s destination is, and a `<` is matched as a read. A rule about a path holds
+whichever tool got there.
 
 `additionalDirectories` opens directories by the same route [`/add-dir`](../reference/commands.md)
 takes, and they are trusted for the session on the same terms. A relative name means a path under the
@@ -464,14 +430,12 @@ workspace.
 
 `defaultMode` is parsed so that a file carrying it is not rejected, and **acted on by nothing**: if
 you wrote `acceptEdits` you get the prompts you would have got without it. The modes it names do
-exist — Shift-Tab and `--dangerously-skip-permissions` are what choose one. See
+exist. Shift-Tab and `--dangerously-skip-permissions` are what choose one. See
 [modes](../security/permissions.md#answering-in-advance-modes).
 
 **An unreadable rule is dropped, named, and takes nothing with it.** A line that is not a rule, names
 no family, or has an anchor that cannot be resolved is reported by `doctor` and in the session where
-the file was read, and the rest of the file still applies. Refusing the whole file instead would mean
-a typo in an `allow` rule quietly removed a `deny` rule's protection — and a misspelled `deny` rule
-reads as protection that is not there, which is the one failure here worth interrupting somebody over.
+the file was read, and the rest of the file still applies.
 
 The rules are read **once per session**, so a file you edit while a session is open describes the next
 one. A session with no `permissions` block behaves exactly as one did before the block existed: every
@@ -479,18 +443,20 @@ gate asks what it asked before, and nothing is refused for being unmentioned.
 
 ## Reaching Claude on AWS Bedrock
 
-Three services can answer a request: the aichat endpoint Brave runs, Claude on AWS Bedrock through
-your own AWS account, and an [OpenAI-compatible gateway](#reaching-an-openai-compatible-gateway) you
-configured. Every build can reach Brave; the other two are what you configure.
+Set these variables to reach Claude through your own AWS account:
 
 | Variable | What it sets |
 |---|---|
 | `BRAVEBOT_USE_BEDROCK` | turns the backend on |
-| `AWS_REGION` | which region to reach Bedrock in — **required** once it is on |
+| `AWS_REGION` | which region to reach Bedrock in (**required** once it is on) |
 | `AWS_PROFILE` | which profile names the credentials to sign with (optional) |
 | `ANTHROPIC_DEFAULT_OPUS_MODEL` | the model the Opus tier names |
 | `ANTHROPIC_DEFAULT_SONNET_MODEL` | the model the Sonnet tier names |
 | `ANTHROPIC_DEFAULT_HAIKU_MODEL` | the model the Haiku tier names |
+
+Three services can answer a request: the aichat endpoint Brave runs, Claude on AWS Bedrock through
+your own AWS account, and an [OpenAI-compatible gateway](#reaching-an-openai-compatible-gateway) you
+configured. Every build can reach Brave; the other two are what you configure.
 
 Each tier takes either a model id or an inference-profile ARN. With `AWS_PROFILE` unset the AWS CLI
 resolves credentials as it would for any other command, which is what a machine on instance
@@ -498,33 +464,30 @@ credentials already relies on.
 
 **Claude models only, despite Bedrock hosting many others.** A request is sent as the Anthropic
 Messages API, which is the format Claude answers and other models on Bedrock do not. Nothing local
-checks the name you set — an ARN for Llama, Mistral, Titan or Nova is signed and sent like any other,
+checks the name you set. An ARN for Llama, Mistral, Titan or Nova is signed and sent like any other,
 and Bedrock rejects the request body. Point a tier at a non-Claude model and every request on it
 fails remotely.
 
 **A tier you do not name is left out rather than guessed at.** An ARN cannot be derived from a model
-name, so an invented entry would be a row in the picker that fails at the far end for a reason nothing
-local could explain. Set one tier and one tier is offered.
-
-### What it changes, and what it does not
+name. Set one tier and one tier is offered.
 
 **Configuring Bedrock takes nothing away from Brave.** Both rosters are offered together in `/model`,
 so this adds models rather than replacing them. It also does not move the default: what answers when
 nobody has chosen stays what it was.
 
 **The model names the service.** A request goes to whichever service offers the model it names, and
-nothing else participates — not which configuration is present, not which service answered last.
+nothing else participates: not which configuration is present, not which service answered last.
 Bedrock refuses a model it does not recognise rather than substituting one, and the aichat endpoint has
 never heard of an inference-profile ARN.
 
 Your tiers sit under a heading reading `Bedrock, your my-profile AWS profile`, or
 `Bedrock, your AWS account` with no profile set. The profile is named because it is what decides which
-credentials sign the request, and because Brave serves part of its own roster through Bedrock too — so
-that word alone would distinguish nothing. Every configured tier is marked free: premium means a Leo
-subscription, and reaching a model through your own account does not involve one.
+credentials sign the request, and because Brave serves part of its own roster through Bedrock too.
+Every configured tier is marked free: premium means a Leo subscription, and reaching a model through
+your own account does not involve one.
 
 There is no `automatic` among them. There it means "let the server choose", which Bedrock does not
-offer — a request names one model and gets it or an error.
+offer. A request names one model and gets it or an error.
 
 If one service cannot say what it offers, the models known from your configuration alone are still
 offered; a choice is refused only when nothing is left to choose. That is the position somebody
@@ -533,29 +496,30 @@ offline is most likely to be in.
 ### Signing in
 
 Where AWS has no usable session, the sign-in happens **before the turn starts**, and only for the
-service the next request will actually go to — a turn served entirely by Brave never stops to
-authenticate against AWS. The screen stays yours: the URL and code the AWS CLI prints appear line by
-line where you are already reading, because those lines *are* the flow rather than a report of it, and
-collected up and printed at the end they would arrive once the code had stopped working.
+service the next request will actually go to. A turn served entirely by Brave never stops to
+authenticate against AWS. The URL and code the AWS CLI prints appear line by line where you are
+already reading, because collected up and printed at the end they would arrive once the code had
+stopped working.
 
 Credentials are resolved by running the AWS CLI, which is the tool you already sign in with. It holds
-short-lived keys that expire during a session. `aws sso logout` clears them, and note it takes no
-option to narrow itself: it removes every cached token, so other tools sharing that cache need a fresh
+short-lived keys that expire during a session. `aws sso logout` clears them, and it takes no option to
+narrow itself: it removes every cached token, so other tools sharing that cache need a fresh
 `aws sso login` afterwards.
 
 ### The assumed context window
 
 Every configured tier is assumed to have a 131,072-token window. Nothing at AWS reports a context
-window, and an inference-profile ARN does not say which model it resolves to, so one figure stands in
-for all of them — deliberately a low one. Being wrong upward would not shorten a conversation late, it
-would stop shortening it at all: every round asks, no round qualifies, and the session runs to
-exhaustion looking like one with nothing to summarise. Set `BRAVEBOT_CONTEXT_BUDGET` if you know your
-model's real window and want to use it.
+window, and an inference-profile ARN does not say which model it resolves to, so one deliberately low
+figure stands in for all of them. Being wrong upward would stop the shortening of a conversation
+altogether: every round asks, no round qualifies, and the session runs to exhaustion. Set
+`BRAVEBOT_CONTEXT_BUDGET` if you know your model's real window and want to use it.
 
 ## Reaching an OpenAI-compatible gateway
 
 A `provider` block names a gateway, the models it offers and where its credential lives. The models
-it ends up with are offered in `/model` beside Brave's roster and any AWS tiers.
+it ends up with are offered in `/model` beside Brave's roster and any AWS tiers. It takes nothing away
+from those rosters and does not move the default: what answers when nobody has chosen stays what it
+was, and the conversation budget stays where it was too.
 
 ```json
 {
@@ -571,12 +535,6 @@ it ends up with are offered in `/model` beside Brave's roster and any AWS tiers.
 }
 ```
 
-**The block is opencode's, field for field**, so one copied out of `opencode.json` works unedited.
-Nothing is required that opencode does not require, no field is added to it however useful one would
-be, and a field bravebot does not know is read past rather than refused. That last part is what makes
-a copy work in either direction; the cost is that opencode's `cost`, `modality` and `package` fields
-do nothing here.
-
 | Where | Field | What it holds |
 |---|---|---|
 | the key under `provider` | | the gateway's id, which is also what a picker row names it by |
@@ -588,6 +546,10 @@ do nothing here.
 | a model | `limit.context` | that model's context window, in prompt tokens |
 | | `options` | anything extra to put in the request body |
 
+**The block is opencode's, field for field**, so one copied out of `opencode.json` works unedited.
+Nothing is required that opencode does not require, and a field bravebot does not know is read past
+rather than refused. opencode's `cost`, `modality` and `package` fields do nothing here.
+
 ### Where the requests go
 
 **A gateway bravebot already knows an endpoint for needs no `baseURL`.** `openrouter` is the name it
@@ -597,36 +559,33 @@ proxy or a private deployment.
 
 The names it knows are compiled in, and nothing is fetched to resolve one. This value is where a
 bearer credential gets sent, so a service that could decide it could redirect your token by answering
-a request. The table is short on purpose: the price of a gateway it has not heard of is one line of
-configuration.
+a request.
 
 ### The credential
 
 Name a variable in `env` and keep the token wherever you already keep secrets. `options.apiKey` is
-read too, because it is opencode's field, but a variable wins where both are present — a long-lived
+read too, because it is opencode's field, but a variable wins where both are present. A long-lived
 token in a settings file is a token in a file people paste into issues.
 
 It is read at the point a request needs it rather than once at startup, so exporting a new one takes
 effect in a session already open. A request that cannot be authenticated is refused with the remedy
-named rather than sent, since sent without one it would fail at the far end for a reason nothing local
-could explain. `bravebot doctor` says whether a credential was found, and never what it was.
+named rather than sent. `bravebot doctor` says whether a credential was found, and never what it was.
 
 ### Which models are offered
 
 **A block that lists `models` is taken at its word**, in the order you wrote them, and costs no round
-trip — which is what keeps a configured gateway working with no network, and is the way to pin a short
+trip. That is what keeps a configured gateway working with no network, and is the way to pin a short
 list out of a service offering hundreds.
 
 **A block that lists none has the gateway asked.** That is the ordinary case rather than a mistake:
 opencode resolves its roster from a registry it fetches, so the commonest block copied out of it names
 a credential and nothing else. What your credential may reach is asked for first, and the service's
 full catalogue answers only where a gateway does not offer the narrower question. Models that cannot
-call tools are left out, since a row that fails the moment you pick it is worth not drawing.
+call tools are left out.
 
-Nothing is capped — a cap would be bravebot deciding you may not choose a model your gateway serves —
-so ordering does that work instead: the model a session would use comes first and the rest are sorted
-by name. A listing that cannot be fetched contributes nothing and takes nothing away from the rest of
-the roster.
+Nothing is capped. Ordering does that work instead: the model a session would use comes first and the
+rest are sorted by name. A listing that cannot be fetched contributes nothing and takes nothing away
+from the rest of the roster.
 
 ### Naming one
 
@@ -637,37 +596,27 @@ to say which you mean:
 openrouter/z-ai/glm-4.6
 ```
 
-Split once, at the first slash, because the rest is the gateway's to spell and most of those names
-contain one. The id picks the service and only the remainder is sent, the id being bravebot's own
-filing that no gateway has heard of. A bare name your block lists still finds its gateway, so a choice
-already recorded by `/model` keeps working.
+The name is split once, at the first slash, because most gateway names contain one. The id picks the
+service and only the remainder is sent, the id being bravebot's own filing that no gateway has heard
+of. A bare name your block lists still finds its gateway, so a choice already recorded by `/model`
+keeps working.
 
 ### The context window
 
-`limit.context` is optional, since a window belongs to the model and the upstream serving it rather
-than to whoever writes the file. A model that states none is assumed to have 131,072 prompt tokens,
-the same deliberately low figure a Bedrock tier gets and for the same reason: a budget above the real
+`limit.context` is optional. A model that states none is assumed to have 131,072 prompt tokens, the
+same deliberately low figure a Bedrock tier gets and for the same reason: a budget above the real
 window does not compact a conversation late, it stops compacting it at all. A window a gateway reports
-is taken where the file stated none; a figure in the file outranks it, being one somebody pinned
-deliberately. Following opencode, `limit` needs `output` alongside `context` or it is not a `limit` and
-its figure is not read.
+is taken where the file stated none; a figure in the file outranks it. Following opencode, `limit`
+needs `output` alongside `context` or it is not a `limit` and its figure is not read.
 
 ### What a model's `options` can and cannot do
 
 Whatever you put there reaches the request body as it stands. Nothing parses it, knows what any of its
 fields mean, or validates them, so a misspelled routing field is a request the gateway rejects, or
-worse one it silently routes somewhere you did not intend. The alternative is a schema that goes stale
-whenever the gateway adds a field, which is what would make this support for one gateway rather than
-for gateways.
+worse one it silently routes somewhere you did not intend.
 
 It cannot replace what the turn itself built. The settings file names a destination, not what was
 asked.
-
-### What it changes, and what it does not
-
-**Configuring a gateway takes nothing away from the other rosters**, and does not move the default:
-what answers when nobody has chosen stays what it was, and the conversation budget stays where it was
-too.
 
 ## Context budget
 
@@ -693,8 +642,7 @@ The window is looked up whenever a model is in force, not only when you pick one
 session starting on a model you chose earlier asks again. If that lookup fails the default stays in
 place and nothing is said.
 
-Setting it by hand is still there for when you want a shorter conversation than your model would
-allow:
+Set it by hand when you want a shorter conversation than your model would allow:
 
 ```sh
 BRAVEBOT_CONTEXT_BUDGET=120000 bravebot

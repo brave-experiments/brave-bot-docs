@@ -35,34 +35,23 @@ works**, in every terminal and in shell mode too.
 
 ## Composing in your editor
 
-**Ctrl-G** opens your editor on what is already in the box, so it continues a prompt rather than
-starting it again, and what you save replaces the line. It does nothing while a turn runs: handing
-the terminal to an editor mid-turn would take the screen from the turn drawing on it.
+**Ctrl-G** opens your editor on what is already in the box, and what you save replaces the line. It
+is refused while a turn runs, because an editor needs the screen the turn is drawing on.
 
-Every path that does not end in a save ends in the line untouched. Quitting without saving leaves it
-exactly as it was, and so does an editor that failed or was killed — neither says anything about what
-you wanted, and the failure worth designing against is the one that blanks a paragraph you have just
-written. The newline an editor leaves at the end is dropped, one only. The file it opened holds your
-own words, is readable by nobody else, and does not outlive the edit.
+Every path that does not end in a save leaves the line untouched: quitting without saving, an editor
+that failed, an editor that was killed. One trailing newline is dropped, one only. The file holds
+your own words, is readable by nobody else, and does not outlive the edit.
 
 Which editor opens: `$VISUAL`, then `$EDITOR`, then the first of `vim`, `vi`, `emacs`, `nano` that is
-installed. An empty value is not an answer, since exporting a variable to nothing is how a profile
-takes one back. `nano` is the last resort because somebody with `vim` or `emacs` on their machine
-chose to install it and will not thank a guess for opening something else. An editor you named that
-will not start is reported as such and nothing else is tried: falling back past it would run an
-editor you did not ask for, and blame your configuration for it.
+installed. A variable exported as empty counts as unset. An editor you named that will not start is
+reported as such and nothing else is tried, so a fallback never runs an editor you did not ask for.
 
 An editor is started under the name it was asked for, rather than under the file a symbolic link
-behind that name points at. MacVim is why. It installs `vim`, `vi` and `gvim` as links to a single
-program that reads the name it was called by, staying in the terminal for the `vi` spellings and
-forking off a detached GUI window for the others; reached through the resolved path it is always the
-GUI one, so asking for `vim` opened a window, returned at once, and put the prompt back unedited with
-nothing saying why. The name is kept only while it still reaches the same program — a link that now
-points elsewhere is started by resolved path instead.
-
-That is the editor alone. Wherever a program is approved before it runs, the approval names the file
-that actually ran, because a name can be repointed afterwards. An editor is started rather than
-approved, and for it the name is part of what you asked for.
+behind that name points at. This matters for MacVim, which installs `vim`, `vi` and `gvim` as links
+to a single program that reads the name it was called by: reached through the resolved path it is
+always the detached GUI one, which returns at once and leaves the prompt unedited. The name is kept
+only while it still reaches the same program. A link that now points elsewhere is started by resolved
+path instead.
 
 A GUI editor that would otherwise return the moment its window opens is told to wait, but only where
 you wrote no arguments of your own.
@@ -76,18 +65,14 @@ lands in the box, so there is nothing to delete afterwards.
 Only on an empty line. A `?` part-way through a sentence is the punctuation you are asking a
 question with, and in shell mode it is a glob for your shell to expand.
 
-The list is not a completion — there is nothing in it to choose, so Tab and the arrows go on meaning
+The list is not a completion. There is nothing in it to choose, so Tab and the arrows go on meaning
 what they mean everywhere else while it is up. It folds into as many columns as the width holds, and
-no row runs past the edge. It is the one place the keys are written down, which is what stops it
-advertising a binding that has since changed.
+no row runs past the edge.
 
-The row beneath the box carries what the session is doing — the mode in force where it is not simply
+The row beneath the box carries what the session is doing (the mode in force where it is not just
 asking, how full the context is, the trail, and the key that opens the delegates and the commands
-once the session has anything to open — and then `? for shortcuts`. It
-names no other binding of its own. The two used to share one line, and the line was wider than the
-terminal, so the end of it was cut: everything you could look up was taking room from the figures you
-had no other way to see. A binding cut off is one you learn once, and a context reading cut off is
-gone.
+once the session has anything to open), and then `? for shortcuts`. It names no other binding of its
+own.
 
 **The context reading says which of three things the session knows.** A session that has measured a
 request says how full the context is, as a percentage of the budget it would be compacted at. One
@@ -96,34 +81,28 @@ giving a percentage, since the number it held describes an exchange that is no l
 screen. A session that has measured nothing says nothing. A resumed session opens with what the last
 request of the session it read came to, so the figure is there before this one has sent anything.
 
-**A percentage against a budget nobody advertised is marked as approximate**, and the mark is the
-difference between two readings of a hundred per cent that want opposite things. Against a window the
-endpoint stated, it means shorten the conversation. Against the
+**A percentage against a budget nobody advertised is marked as approximate.** Against a window the
+endpoint stated, a hundred per cent means shorten the conversation. Against the
 [built-in default](../customize/configuration.md#context-budget), it may only mean that default is
 too small for the model in force, and the answer is to set the budget rather than to compact.
 
 The trail key is named only **once a turn has left a trail to look at**, since a trail is recorded
-when the turn it belongs to ends and before then the key would change nothing on the screen. The
-confinement is not on the row at all: it is settled before the session opens and cannot change while
-it runs, so reporting it on every frame spends room on a constant. It is stated once at startup, and
+when the turn it belongs to ends. The confinement is not on the row at all: it is settled before the
+session opens and cannot change while it runs. It is stated once at startup, and
 [`/status`](../reference/commands.md#status) answers for it whenever you ask.
 
 ## Choosing how much the session asks
 
-**Shift-Tab** cycles the session through asking about everything, accepting edits, plan mode, and —
-only where the command line asked for it — bypassing every check. It types nothing, is read before
-Tab so it never completes a half-typed line, and works while a turn runs, which is when it is wanted
-most: a turn in flight keeps the mode it began with, so what you press describes the next one.
+**Shift-Tab** cycles the session through asking about everything, accepting edits, plan mode, and
+(only where the command line asked for it) bypassing every check. It types nothing, is read before
+Tab so it never completes a half-typed line, and works while a turn runs. A turn in flight keeps the
+mode it began with, so what you press describes the next one. Both spellings of the chord are
+answered, since which one arrives is the terminal's choice rather than yours.
 
-Both spellings of the chord are answered, since which one arrives is the terminal's choice rather
-than yours.
-
-The mode leads the row beneath the box and is the only part of it drawn in a colour, because it is
-the one thing there that changes what your next keystroke does. Asking takes no room at all: what is
-drawn is a mode somebody chose, and a marker on every session is one people stop reading. When the
-terminal is too narrow, the parts are given up whole and in order — the way to the bindings, then the
-trail key, then the figures — and the mode is the last to go. A part that is simply absent reads as a
-line with no room; half a word under the box reads as a rendering fault.
+The mode leads the row beneath the box and is the only part of it drawn in a colour. Asking about
+everything takes no room at all: what is drawn is a mode somebody chose. When the terminal is too
+narrow, the parts are given up whole and in order (the way to the bindings, then the trail key, then
+the figures), and the mode is the last to go.
 
 See [modes](../security/permissions.md#answering-in-advance-modes) for what each one answers and what
 choosing one costs.
@@ -142,7 +121,7 @@ Taking the line says so, on the row beneath the box, and names the key that ends
 offer lives for exactly one press.
 
 Stopping is silent. A reply still arriving stops arriving, the prompt that was sent comes back to
-the box for editing, and that is the whole of the answer — there is nothing to wait through. What
+the box for editing, and that is the whole of the answer. There is nothing to wait through. What
 still finishes is a tool call already running, because stopping one part way could leave a file half
 written.
 
@@ -152,22 +131,21 @@ is an order to keep.
 
 ## Sending while a turn runs
 
-Typing, editing, pasting, dropping a file, putting a line away, walking back through earlier prompts,
-scrolling the transcript, toggling the audit trail, choosing how much the session asks and asking
-what the keys are all do exactly what they do at rest. **The only thing a running turn refuses is
-sending.**
+**The only thing a running turn refuses is sending.** Typing, editing, pasting, dropping a file,
+putting a line away, walking back through earlier prompts, scrolling the transcript, toggling the
+audit trail, choosing how much the session asks and asking what the keys are all do exactly what
+they do at rest.
 
-Two things follow from that rather than contradict it. Nothing is offered to **complete**, because
-what appears beneath the box is machinery for finishing a line that is about to be sent — where the
-key list is documentation you asked for, and is drawn whether or not a turn is running. And **Ctrl-G**
-is refused, because handing the terminal to an editor would take the screen from the turn drawing on
-it.
+Two things follow from that. Nothing is offered to **complete**, because what appears beneath the box
+is machinery for finishing a line that is about to be sent; the key list is documentation you asked
+for, and is drawn whether or not a turn is running. And **Ctrl-G** is refused, because handing the
+terminal to an editor would take the screen from the turn drawing on it.
 
 Enter mid-turn takes the line out of the box and holds it. It is drawn under the box, marked, so you
 can see that what you sent went somewhere.
 
-**The turn in flight takes it.** A turn asks between rounds — after the round's tool calls have run,
-before the next request goes out — and everything waiting joins the conversation there, in the order
+**The turn in flight takes it.** A turn asks between rounds, after the round's tool calls have run
+and before the next request goes out. Everything waiting joins the conversation there, in the order
 you typed it. So "no, the other file" reaches the planner while the work it is about is still
 happening, instead of arriving after the thing it was meant to prevent. A prompt still waiting when
 the turn ends becomes a turn of its own.
@@ -179,17 +157,17 @@ in flight. Stopping part way is what Escape and Ctrl-C are for.
 **An interjection cannot change where effects may land.** Routing is settled by the prompt that began
 the turn and stays that way, so what you type mid-turn reaches the planner as words to read, and every
 effect it goes on to ask for is gated against the routing the turn started with. It is trusted, on the
-footing of the prompt that opened the turn and by the same act — a keystroke has no author but the
-person at the keyboard — and the audit trail records it as your own input, so a turn that changed
-course halfway through does not read as one that thought of it unprompted.
+footing of the prompt that opened the turn, since a keystroke has no author but the person at the
+keyboard. The audit trail records it as your own input, so a turn that changed course halfway through
+does not read as one that thought of it unprompted.
 
-**What it carries is text.** A running turn fixed the shape of its context before it read anything, so
-there is no trusted slot for a file to arrive in: markers resolve to words when the line is sent. A
-dropped file becomes its name, which the planner can go and read through the gate it reads anything
-else through, and a pasted picture says it cannot be shown. The box and the transcript keep the
-marker, because that is what you are looking at.
+**What it carries is text.** Markers resolve to words when the line is sent, because a running turn
+fixed the shape of its context before it read anything and has no trusted slot for a file to arrive
+in. A dropped file becomes its name, which the planner can go and read through the gate it reads
+anything else through, and a pasted picture says it cannot be shown. The box and the transcript keep
+the marker, because that is what you are looking at.
 
-A waiting prompt is not in the transcript — it moves there the moment the planner is given it, whether
+A waiting prompt is not in the transcript. It moves there the moment the planner is given it, whether
 that is inside the running turn or as a turn of its own. What it names is settled when it is queued, so
 a file you took off the line afterwards was never part of it.
 
@@ -200,16 +178,15 @@ and the rest go on waiting in order.
 
 **Up** puts everything waiting back into the box in one press, in the order you typed it, one to a
 line. Nothing is waiting afterwards, so the rows under the box that said so go with it. A half-typed
-line stays below them, where the caret is, and what each prompt named comes back staged with it — a
+line stays below them, where the caret is, and what each prompt named comes back staged with it. A
 marker in a recalled line stands for the same file or picture it stood for when it went.
 
 **Only what the planner has not been given.** A prompt the running turn has already taken is in the
-conversation, so it cannot come back: offering it to the box would leave you editing a line that had
-gone, and sending it again would say it twice. Where the turn has taken every waiting prompt, the
-press leaves the box exactly as it was.
+conversation, so it cannot come back. Where the turn has taken every waiting prompt, the press leaves
+the box exactly as it was.
 
-They stay in the prompt history — from your side they were sent, and taking them back does not
-unsay them.
+They stay in the prompt history. From your side they were sent, and taking them back does not unsay
+them.
 
 With nothing waiting the key is unchanged: it walks the history, and scrolls once there is nothing
 left to walk. Inside a paragraph it moves between rows first, and reaches the queue from the top
@@ -218,10 +195,7 @@ row the same way it reaches the history there.
 ## Searching the prompts you have sent
 
 **Ctrl-R** opens a search over every prompt in your history, drawn over the transcript in place of the
-box, newest at the bottom and seeded with whatever single line you had already typed. Up walks one
-prompt at a time, which is the right way in when the one you want is the last one and no way in at all
-when it is the hundredth — what you remember of an old prompt is a word out of the middle of it rather
-than how far back it was.
+box, newest at the bottom and seeded with whatever single line you had already typed.
 
 | Key | What it does |
 |---|---|
@@ -233,60 +207,52 @@ than how far back it was.
 
 Each row says how long ago that prompt was sent, and the one under the cursor is drawn in full beside
 the list with a word for the lines that did not fit. A terminal too narrow for two columns keeps the
-list, which is the half that answers the question, and a search matching nothing says so rather than
-showing an empty panel.
+list, and a search matching nothing says so rather than showing an empty panel.
 
 **Enter puts the prompt in the box rather than sending it.** A history file can be edited, on a shared
 machine by somebody else, so the keystroke that sends a stored line is your own, after you have read
-it — exactly as if you had typed it. The search answers while a turn is running, on the same footing
-as the scroller, since searching sends nothing.
+it. The search answers while a turn is running, on the same footing as the scroller, since searching
+sends nothing.
 
 ## Putting a line away
 
-A better thought arrives while a worse one is half written, most often during a turn, and the two
-ways out used to be sending the first or losing it. Escape is not a third — it discards, and there is
-nowhere to have got the words back from.
-
 **Ctrl-S** is read against the line rather than remembered. A line in the box is put away and the box
-emptied; an empty box is where a line you put away earlier comes back, with the caret at its end,
+emptied. An empty box is where a line you put away earlier comes back, with the caret at its end,
 where you carry on typing. There is one place to put a line, so a second one replaces the first, and
 a line that has come back is no longer there to come back again: the next press on the empty box it
 left has nothing to do, and says nothing.
 
-Nothing is sent, so a running turn refuses none of it — sending is the only thing a running turn
-refuses. What a line names is settled when it is sent rather than when it is put away, so a file
-attached to a stashed line is still staged, and is named again when the words holding it come back.
+Nothing is sent, so a running turn refuses none of it. What a line names is settled when it is sent
+rather than when it is put away, so a file attached to a stashed line is still staged, and is named
+again when the words holding it come back.
 
 **The words travel and the mode does not.** What is put away is what you typed, and `!` is a mode
 rather than a character, so it stays where you left it. A prompt comes back into an armed shell as
 the command you are writing now, and a command comes back onto an ordinary prompt as words.
 
-A line put away says so, on one row beneath the box — one row however long the line was — and names
+A line put away says so, on one row beneath the box (one row however long the line was), and names
 the key that returns it. Where the width will not hold both, the words stay and the reminder goes:
 which line is waiting is the part only that row can tell you, and the key is in the list `?` puts up
-as well. The row is the whole of what makes the key safe to press. A press that emptied the box and
-said nothing would be indistinguishable from one that threw a paragraph away, and the only way to
-find out which it had been would be to press again and hope.
+as well.
 
 The caret is not carried back. It belongs to an edit that has finished, and restoring it would put
 you back in the middle of a sentence you have not looked at since.
 
 :::note
 Ctrl-S is the byte a terminal traditionally freezes its output with. It reaches bravebot because the
-session turns that flow control off for as long as it holds the terminal, which is what makes the key
-bindable at all. Behind a `tmux`, `screen` or `ssh` configured to keep flow control, the key can be
-taken before it arrives, and then it does nothing here. Nothing is lost when that happens, because
-the line stays in the box.
+session turns that flow control off for as long as it holds the terminal. Behind a `tmux`, `screen`
+or `ssh` configured to keep flow control, the key can be taken before it arrives, and then it does
+nothing here. Nothing is lost when that happens, because the line stays in the box.
 :::
 
 ## The rows beneath the box
 
 They run in one order, nearest the box first:
 
-1. what the line in the box carries — attached files and pictures;
+1. what the line in the box carries: attached files and pictures;
 2. a line you have put away;
 3. prompts waiting for the turn in flight;
-4. what a half-typed line could still become — slash-command or `@path` completions.
+4. what a half-typed line could still become: slash-command or `@path` completions.
 
 ## Markers
 
@@ -317,28 +283,11 @@ Ctrl-O opens the scroller over the transcript, and Ctrl-T toggles the audit trai
 
 ## Watching a delegate, and reading what a command printed
 
-A [delegate's](../how-it-works.md#delegates) work is discarded by design: the planner is told a
-sentence, and the reading, the commands and the narration behind it end with the run. Drawn nowhere,
-that would leave you with one line about work you cannot see, done in a directory you own.
-
-Each one gets a **block of its own**, where the call that started it happened, holding the last three
-things it did and a count of the rest. The turn's own lines stay clear of it, and which block a line
-goes in is what the driver said rather than what the line says — several runs report at once, so
-where a line arrived says nothing about whose it is. A delegate that has finished collapses to the
-sentence the turn was told and the report it answered with; one that could not finish answered
-nothing, so its block carries the sentence alone. A report the planner was not allowed to read is
-drawn in the [marked block](transcript.md) every quarantined result uses, so you can see which of
-the two it was.
-
-**What a command printed has the same shape of problem.** The transcript has room for the first lines
-and a count, and "12 lines, quarantined" does not tell you what your agent just ran in a directory
-you own. So it gets the same answer rather than a second key to learn.
-
-**Ctrl-L opens the whole of it.** Where there is more than one row, a list is the way in — a panel
-over the transcript, a row each. Where there is one, its own lines open directly. Where there is
-nothing the key does nothing, since a mode over an empty screen puts you somewhere with nothing to
-read and something to get out of. The row beneath the box names the key and how many rows there are,
-counting the delegates and the commands together, for as long as the session has any.
+**Ctrl-L opens the whole of what a delegate did, and the whole of what a command printed.** Where
+there is more than one row, a list is the way in: a panel over the transcript, a row each. Where
+there is one, its own lines open directly. Where there is nothing the key does nothing. The row
+beneath the box names the key and how many rows there are, counting the delegates and the commands
+together, for as long as the session has any.
 
 | Key | What it does |
 |---|---|
@@ -349,37 +298,45 @@ counting the delegates and the commands together, for as long as the session has
 | q, Escape | back to the list from a delegate, then out |
 | Ctrl-C | close the mode, leaving the turn in flight running |
 
+In the transcript itself, each [delegate](../how-it-works.md#delegates) gets a **block of its own**,
+where the call that started it happened, holding the last three things it did and a count of the
+rest. The turn's own lines stay clear of it, and which block a line goes in is what the driver said
+rather than what the line says, since several runs report at once and where a line arrived says
+nothing about whose it is. A delegate that has finished collapses to the sentence the turn was told
+and the report it answered with; one that could not finish answered nothing, so its block carries the
+sentence alone. A report the planner was not allowed to read is drawn in the
+[marked block](transcript.md) every quarantined result uses, so you can see which of the two it was.
+What a command printed gets the same treatment: the transcript has room for the first lines and a
+count.
+
 **Every command the turn ran is a row**, after the delegates and in the order they ran, so a row's
 place does not move under you while you are stepping through it. Opening one draws what the command
 printed, as far back as is kept, and says so rather than dropping quietly where more was printed than
 was kept. Where the planner was kept from the output, every row of it carries the margin every
-quarantined block carries — and the row is there whether or not the planner read what it printed, and
+quarantined block carries. The row is there whether or not the planner read what it printed, and
 says which, that being the one thing about the bytes you cannot work out from them.
 
 The header and the footer name which kind of thing you are looking at: a delegate by its kind and its
-number, a command by the line that ran. One list holds both and the keys that move through it do not
-ask what a row is, so without that, stepping from a delegate onto a command reads as the same view
-showing different lines.
+number, a command by the line that ran.
 
 **The session is the first row of the list**, and choosing it closes the mode and puts the turn's
-view back where you left it. Every other destination the mode can reach is a row, so the way back is
-one too. Coming back to the list from a delegate puts the cursor on that delegate rather than on the
-session, because a press of Enter should not turn into an exit.
+view back where you left it. Coming back to the list from a delegate puts the cursor on that delegate
+rather than on the session, because a press of Enter should not turn into an exit.
 
-The mode takes every key, so nothing you type reaches a box you cannot see, and there is no way to
-talk to a delegate: it was given one task, has nobody to ask, and takes no line typed mid-turn. What
-is on the screen only moves when you ask — a delegate finishing leaves the view on it, and a
-delegate starting does not take the screen from an older one you are reading.
+The mode takes every key, so nothing you type reaches a box you cannot see. There is no way to talk
+to a delegate: it was given one task, has nobody to ask, and takes no line typed mid-turn. What is on
+the screen only moves when you ask. A delegate finishing leaves the view on it, and a delegate
+starting does not take the screen from an older one you are reading.
 
 A delegate keeps more of its work than its block draws, and drops its oldest once it has made several
 hundred calls, so arriving late at a very long run means reading from wherever that bound has reached.
 
 **None of this reaches a model and none of it is written down.** The planner that asked is told the
 report and nothing else, no delegate is part of the record a session is resumed from, and `/clear`
-forgets them and what the commands printed alike — so a resumed session has the reports and none of
-the work behind them. A screen is not a context: you own the directory and may see what your agent
-did in it, and what must not happen is those lines reaching a planner by any route, of which a record
-read back into a later turn would be one.
+forgets them and what the commands printed alike, so a resumed session has the reports and none of
+the work behind them. You own the directory and may see what your agent did in it. What must not
+happen is those lines reaching a planner by any route, of which a record read back into a later turn
+would be one.
 
 ## Long turns
 
@@ -389,4 +346,4 @@ loop has nothing else to end it.
 
 Where a bound applies, reaching it costs the turn its tools rather than ending it: the planner is
 told it has none left and answers with what it has. This is a bound on futility rather than a
-safety property — a gate refuses on the thousandth round what it refuses on the first.
+safety property. A gate refuses on the thousandth round what it refuses on the first.

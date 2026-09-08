@@ -6,31 +6,31 @@ description: Every tool the model may call, what it takes, and what it is allowe
 
 # Tools
 
-Twelve tools, and no way to add another from a configuration file. Each one splits its arguments
-into **routing** — the part that decides where the effect lands — and **content** — the part that is
-merely carried.
+There are twelve tools, and no way to add another from a configuration file. Each one splits its
+arguments into **routing**, the part that decides where the effect lands, and **content**, the part
+that is merely carried.
 
 | Tool | Routing | Content | Asks you? |
 |---|---|---|---|
-| [`read_file`](#read_file) | `path`, `path_ref` | — | only to trust a quarantined file |
-| [`list_files`](#list_files) | `directory`, `pattern`, `depth` | — | no |
-| [`search`](#search) | `pattern`, `directory`, `include` | — | no |
+| [`read_file`](#read_file) | `path`, `path_ref` | none | only to trust a quarantined file |
+| [`list_files`](#list_files) | `directory`, `pattern`, `depth` | none | no |
+| [`search`](#search) | `pattern`, `directory`, `include` | none | no |
 | [`write_file`](#write_file) | `path`, `path_ref` | `contents`, `contents_ref` | **yes, every time** |
 | [`edit_file`](#edit_file) | `path`, `path_ref` | `old_text`, `new_text` | **yes, every time** |
 | [`run`](#run) | `command`, compiled to a plan | stdin | **yes, unless vouched for** |
-| [`read_output`](#read_output) | `ref` | — | **yes** |
+| [`read_output`](#read_output) | `ref` | none | **yes** |
 | [`spawn_processor`](#spawn_processor) | `about` | `reads`, `instruction` | no |
-| [`spawn_agent`](#spawn_agent) | `kind` | `task`, `each` | not the call — but its writes and runs do |
-| [`load_skill`](#load_skill) | `name` | — | no |
-| [`ask_user`](#ask_user) | the questions | — | it *is* the question |
-| [`todo_write`](#todo_write) | — | `todos` | no |
+| [`spawn_agent`](#spawn_agent) | `kind` | `task`, `each` | not the call, but its writes and runs do |
+| [`load_skill`](#load_skill) | `name` | none | no |
+| [`ask_user`](#ask_user) | the questions | none | it *is* the question |
+| [`todo_write`](#todo_write) | none | `todos` | no |
 
 A thirteenth, [`schedule_next`](#schedule_next), is offered to a turn inside a self-paced
 [`/loop`](commands.md#loop-interval-prompt) and to no other turn.
 
 An unknown tool is reported to the planner rather than ignored.
 
-There is **no shell tool**, and there never will be: nothing the planner writes is handed to an
+There is **no shell tool**, and there never will be. Nothing the planner writes is handed to an
 interpreter. [`run`](#run) takes a command line, and bravebot compiles it itself. See
 [Shell mode](../using/shell-mode.md).
 
@@ -47,11 +47,11 @@ Reads a UTF-8 text file from the workspace and returns its lines.
 | `offset` | 1-based line to start at |
 | `limit` | maximum lines to return, capped so one read cannot fill the conversation |
 
-Long files come back one page at a time, and the result says so and gives the offset to continue from.
-A file that is not text is reported as binary.
+Long files come back one page at a time. The result says so and gives the offset to continue from. A
+file that is not text is reported as binary.
 
-**A read the planner may not see does not open the file.** Where the content would be quarantined, you
-are offered the chance to vouch for that one file at the moment it matters — see
+**A read the planner may not see does not open the file.** Where the content would be quarantined,
+you are offered the chance to vouch for that one file at the moment it matters. See
 [the quarantined-read prompt](../security/trust.md#the-quarantined-read-prompt).
 
 ## `list_files`
@@ -64,14 +64,15 @@ Lists files under a directory.
 | `pattern` | optional glob: `*`, `?` and `**` are supported, brace groups are not |
 | `depth` | optional; how many directory levels below `directory` to walk, `1` being that directory and no further |
 
-Without a depth the walk reaches every file underneath, which in a real repository is thousands of
-paths — paid for in the planner's context, again on every round that resends it, and again in each
-delegate handed the same question. A **bounded** listing names the directories it did not descend
-into alongside the files, so what comes back describes the shape of the tree rather than only the
-part of it that was read. The pattern does not hide them: it says which files are wanted, and a
-directory is where the answer might be rather than an answer.
+Set a `depth`. Without one the walk reaches every file underneath, which in a real repository is
+thousands of paths. You pay for them in the planner's context, again on every round that resends it,
+and again in each delegate handed the same question.
 
-A filename is content, so a listing of a directory nobody vouched for is quarantined — and it returns
+A **bounded** listing names the directories it did not descend into alongside the files, so what
+comes back describes the shape of the tree. The pattern does not hide those directories: it says
+which files are wanted, and a directory is where the answer might be rather than an answer.
+
+A listing of a directory nobody vouched for is quarantined, because a filename is content. It returns
 **one reference per entry**, not one for the listing. That is what lets the planner read a file,
 process it and write it back without ever being told what it is called.
 
@@ -88,26 +89,22 @@ Finds a **literal substring** in workspace files, and returns matching lines.
 | `include` | optional glob limiting which files are searched: `*`, `?`, `**` and brace groups like `**/*.{cc,h,mm}` |
 | `case_sensitive` | defaults to true |
 
-A list of patterns is alternation rather than a pattern language — every entry is still matched with
-a substring test, so the work is the sum of the patterns and never a power of the input, which is why
-there is no regular expression here. Brace groups in `include` are expanded before the walk for the
-same reason. Case is asked for rather than inferred: nothing about a pattern widens it, and a line is
-reported as written rather than as it was folded to match.
+There is no regular expression here. A list of patterns is alternation, not a pattern language: every
+entry is matched with a substring test, so the work is the sum of the patterns and never a power of
+the input. Brace groups in `include` are expanded before the walk. Case is asked for rather than
+inferred, and a line is reported as written rather than as it was folded to match.
 
 **Version control, build output, caches and vendored dependencies are not walked**, by name and
-without reading anything to decide it. A tree that mirrors what it depends on holds far more of that
-than of its own code, so a search for a common word would otherwise spend its whole budget inside a
-dependency mirror. The project's own `.gitignore` is deliberately not consulted: it would decide what
-to walk from a file in the tree being walked, and a tree that can hide files from a search can hide
-them from review.
+without reading anything to decide it. The project's own `.gitignore` is not consulted either: it
+would decide what to walk from a file in the tree being walked, and a tree that can hide files from a
+search can hide them from review.
 
 A result touching several files is trusted only if **every one of them** is. A truncated search tells
-the planner it is incomplete, and one that found nothing says which kind of nothing it is: no
+the planner it is incomplete. A search that found nothing says which kind of nothing it is: no
 matching lines in the files it read, or an `include` that selected no files at all. Those are
-opposite facts — the first is evidence about the tree, the second says nothing whatever about it —
-and drawn identically the planner reads one as the other and answers the question wrong. A pattern
-written as a regular expression, or a glob leaning on syntax the matcher does not have, is named for
-the same reason.
+opposite facts, and drawn identically the planner reads one as the other. A pattern written as a
+regular expression, or a glob leaning on syntax the matcher does not have, is named for the same
+reason.
 
 ## `write_file`
 
@@ -129,8 +126,8 @@ map.
 
 ## `edit_file`
 
-Replaces an exact passage in an existing file. **You approve every edit, as a diff** — which is why
-the agent prefers this to rewriting a whole body.
+Replaces an exact passage in an existing file. **You approve every edit, as a diff.** The agent
+prefers this to rewriting a whole body.
 
 | Parameter | |
 |---|---|
@@ -139,12 +136,12 @@ the agent prefers this to rewriting a whole body.
 | `new_text` | what goes in its place |
 | `replace_all` | replace every occurrence instead of requiring exactly one |
 
-An edit **refuses rather than guesses**: `old_text` must occur exactly once unless `replace_all` is
-set.
+`old_text` must occur exactly once unless `replace_all` is set. An edit **refuses rather than
+guesses**.
 
-An edit requires a **trusted** file. Locating a passage to replace is a comparison, and a comparison is
-a decision — which may be taken only from trusted content. To change a file the agent may not read,
-the route is `spawn_processor` plus `write_file`.
+An edit requires a **trusted** file, because locating a passage to replace is a decision and a
+decision may be taken only from trusted content. To change a file the agent may not read, the route
+is `spawn_processor` plus `write_file`.
 
 ## `run`
 
@@ -159,10 +156,9 @@ git log --oneline -50 | head -20
 ```
 
 The line is **compiled, never interpreted**. No shell sees it at any point: bravebot's own grammar is
-the only thing that reads it, and what comes out is an ordered plan — each step a resolved binary and
-a literal argument vector, together with every file the line would write — which is what then runs. A
-`;` or `|` inside quotes is part of an argument and stays part of it, because the only thing that
-ever split the line was the compiler and it has already finished.
+the only thing that reads it. What comes out is an ordered plan, each step a resolved binary and a
+literal argument vector, together with every file the line would write. That plan is what runs. A
+`;` or `|` inside quotes is part of an argument and stays part of it.
 
 A name is looked up on `PATH`; a path is taken relative to the workspace.
 
@@ -178,16 +174,16 @@ A name is looked up on `PATH`; a path is taken relative to the workspace.
 | per-command environment | `NAME=literal cmd` |
 
 Everything else is refused, as an error naming the part of the line that caused it, and **a refusal
-runs nothing** — there is no falling back to a shell and no running the prefix that did compile.
+runs nothing**. There is no falling back to a shell and no running the prefix that did compile.
 
 | Refused | Why |
 |---|---|
 | `$(…)`, backticks | a command whose text is computed is a destination nobody saw |
 | `$VAR`, `${…}` | the value is not in the line, so the plan is not in the line |
-| `$((…))` | arithmetic is a language, and a language needs an interpreter |
+| `$((…))` | arithmetic needs an interpreter |
 | `<(…)`, `>(…)` | the same, plus a file descriptor nobody named |
 | `&` | backgrounding is a parameter of a call, not a token in a line |
-| `<<`, `<<<` | a here-document is content wearing the shape of syntax |
+| `<<`, `<<<` | a here-document is content, not syntax |
 | `eval`, `source`, `.`, `exec`, `trap` | they put an interpreter back in the plan |
 | `if`, `while`, `for`, `case`, `function` | control flow is a program |
 | `!` | history expansion is text you typed reaching a line the planner wrote |
@@ -200,12 +196,12 @@ as one word.
 The prompt draws the plan: each step as the line wrote it, the binary that will actually run
 underneath, the directory it runs in, and **every file the line would create or replace**, listed
 rather than left to be worked out from the steps above. The line the planner wrote is shown above it
-and marked as context — comparing the two is what would catch a compiler that read the line wrong —
-but it is not what you are agreeing to.
+and marked as context. Compare the two to catch a compiler that read the line wrong, but the line is
+not what you are agreeing to.
 
-So two lines that compile alike are one thing to agree to, and one approval cannot be reused for the
-same steps joined differently, for the same steps writing somewhere else, or for the same steps in
-another directory.
+Two lines that compile alike are one thing to agree to. One approval cannot be reused for the same
+steps joined differently, for the same steps writing somewhere else, or for the same steps in another
+directory.
 
 **Every branch is endorsed before anything runs.** `a && b` may run `b`, `a || b` may run `b`, and
 `a ; b` will, so all of them are in the plan and all of them are approved up front. Nothing is put to
@@ -216,23 +212,23 @@ behind.
 
 Expansion happens against the tree at approval time, so what you read at the prompt is the file list
 rather than the pattern. A pattern matching nothing is an error rather than an argument passed
-through unchanged, which is what a shell does and is never what anybody writing one meant. `**` steps
-over the directories a listing steps over, so it does not descend into `.git` or `node_modules`.
+through unchanged. `**` steps over the directories a listing steps over, so it does not descend into
+`.git` or `node_modules`.
 
-It is bounded in both directions: a word standing for more than 100 arguments is refused with the
-count, and the walk gives up after 4,096 directories. An approval prompt nobody reads grants
+Expansion is bounded in both directions: a word standing for more than 100 arguments is refused with
+the count, and the walk gives up after 4,096 directories. An approval prompt nobody reads grants
 everything and asks nothing.
 
 ### A redirection is a write
 
 `> out.txt` is a file this line creates or truncates. It appears in the plan's write set, it is shown
-at the prompt, and it takes every rule a write takes — the permission rules, the trust map's answer
+at the prompt, and it takes every rule a write takes: the permission rules, the trust map's answer
 for that path, and the confinement that keeps a write inside the workspace. `>>` is a write, `<` is a
 read, and `2>&1` renames a stream and touches no file.
 
-A target that does not compile to exactly one literal path is refused, a pattern included, even where
-it matches one file today: a destination worked out from what is on disk moves when the tree does,
-and the plan would stop saying where the bytes go.
+A target must compile to exactly one literal path. A pattern is refused even where it matches one
+file today, because a destination worked out from what is on disk moves when the tree does, and the
+plan would stop saying where the bytes go.
 
 **A line that writes is put to you every time**, whatever you have vouched for. Vouching is keyed on
 a program and its arguments, and a destination is neither, so a remembered command cannot pick one up
@@ -241,9 +237,9 @@ unseen.
 ### Something that wants a terminal is refused before it starts
 
 `git rebase -i`, `git add -i`, an editor, a pager without `--no-pager`: refused when the line is
-compiled, with the thing to do instead. The list is a convenience rather than a guarantee — something
+compiled, with the thing to do instead. The list is a convenience rather than a guarantee. Something
 interactive that is not on it reaches [the time limit](#a-line-has-five-minutes) and comes back with
-what it printed, which is the same outcome by a slower road.
+what it printed.
 
 Standard input is empty, so a step that reads it gets nothing rather than the terminal.
 
@@ -251,43 +247,39 @@ Standard input is empty, so a step that reads it gets nothing rather than the te
 
 | | Label |
 |---|---|
-| the plan — programs, arguments, and the files it writes | `(T,pub)` — a person approves the compiled plan |
+| the plan (programs, arguments, and the files it writes) | `(T,pub)`, because a person approves the compiled plan |
 | standard input | may be untrusted; a person approves when it is private |
-| standard output and error | `(U,priv)` — quarantined |
+| standard output and error | `(U,priv)`, quarantined |
 | …for a line every step of which a person vouched for | `(T,priv)` |
 
 **Output nobody vouched for is not shown to the planner.** It comes back as a reference, like a file
-it may not read, and can be passed to `spawn_processor` or written to a file with `write_file`.
+it may not read, and can be passed to `spawn_processor` or written to a file with `write_file`. It is
+not capped, since none of it enters the conversation.
 
 Output the planner **may** read comes back as text, capped at 16 KiB. Past the cap the head and the
-tail are kept and the middle dropped, with a line in between saying how much went: a build log's
-verdict is at the end and its first error near the beginning, so keeping only the front answers
-neither question. The cap is on what enters the conversation rather than on what the command printed,
-and the whole of it stays available as a reference. Output the planner may not read is not capped at
-all, since none of it enters the conversation.
+tail are kept and the middle dropped, with a line in between saying how much went. The cap is on what
+enters the conversation rather than on what the command printed, and the whole of it stays available
+as a reference.
 
 ### What a program is handed
 
 A step gets the environment bravebot is running in, **less the credentials bravebot authenticates to
-its own backend with** — `SERVICES_KEY_AICHAT` and `BRAVE_SERVICES_KEY_ID`. Every step, not only the
+its own backend with**: `SERVICES_KEY_AICHAT` and `BRAVE_SERVICES_KEY_ID`. Every step, not only the
 first, and removed rather than blanked, so a program that tells an unset variable from an empty one
-sees what a machine that never held the credential sees.
-
-You approve the plan, the resolved binaries and the directory. The environment is not among those, so a
-credential travelling alongside them would be handed over without your ever having seen it, and "run
-`git log`" would be approved as an inspection of the repository.
+sees what a machine that never held the credential sees. You approve the plan, the resolved binaries
+and the directory. The environment is not among them.
 
 **The rest of your environment stays, and that is not an oversight.** `run aws s3 ls` and `run gh pr
 list` are ordinary requests, and no rule matching variable names can tell one of those from an
 exfiltration, so `AWS_PROFILE`, `GITHUB_TOKEN` and `NPM_TOKEN` are left where they are. What the run
-prompt tells you about the remainder is the truth: a run has the access your own shell has. Anything
-of your own you want withheld can be named in
+prompt tells you about the remainder is the truth: a run has the access your own shell has. Name
+anything of your own you want withheld in
 [`run.scrubEnv`](../customize/configuration.md#runscrubenv).
 
 :::note
 **This is not confinement.** A program that reaches the network is unpoliced and can send anything it
-can read — a file, the workspace, a credential of your own. What closes here is the narrow part of the
-gap: the credentials you could not have been shown at the prompt and had no way to withhold. Nothing
+can read: a file, the workspace, a credential of your own. What closes here is the narrow part of the
+gap, the credentials you could not have been shown at the prompt and had no way to withhold. Nothing
 is established about what the program then does, and the label on its output is unaffected.
 :::
 
@@ -298,12 +290,12 @@ environment, since it is meant to behave as your own terminal does.
 
 Every line is given 300 seconds. When that runs out the steps are killed, and **what they printed
 before that comes back exactly as it would from a line that ended on its own**, under the same
-label — reaching the limit ends a run rather than failing it. So a program that never exits, like a
+label. Reaching the limit ends a run rather than failing it, so a program that never exits, like a
 server told to serve a page, still gives you everything it printed. How long the run took comes back
 with the output, which is how you tell the two apart.
 
-Finishing inside the limit says nothing about what a program did, and being cut short neither
-raises nor lowers the label on its output.
+Being cut short neither raises nor lowers the label on the output. Finishing inside the limit says
+nothing about what a program did.
 
 See [Vouching for a command](../security/permissions.md#vouching-for-a-command) for what `a` grants.
 
@@ -316,22 +308,20 @@ the planner as text.
 |---|---|
 | `ref` | the reference a `run` handed back |
 
-This is why `which`, `find` and `uname` tell the planner nothing until it asks. It is an assertion
-about bytes rather than a relabelling, and it works only for output from `run` — a quarantined *file*
-is not readable this way.
+It works only for output from `run`. A quarantined *file* is not readable this way. This is why
+`which`, `find` and `uname` tell the planner nothing until it asks.
 
 ## `spawn_processor`
 
-Transforms quarantined content the planner was not shown.
+Transforms quarantined content the planner was not shown. It spawns an isolated model with no tools,
+no memory and nothing to read but the references named. Its output is quarantined as a new reference,
+which the planner does not see either.
 
 | Parameter | |
 |---|---|
-| `reads` | the references to give it, e.g. `["ref:0", "ref:1"]` — at least one |
+| `reads` | the references to give it, e.g. `["ref:0", "ref:1"]`; at least one |
 | `about` | which of those references this call is about; required when `reads` names more than one |
 | `instruction` | what to do with them and what to produce |
-
-Spawns an isolated model with no tools, no memory and nothing to read but the references named. Its
-output is quarantined as a new reference, which the planner does not see either.
 
 An answer is for **one** document and may be written **only** to the file the call was about. Where the
 planner said nothing and there was more than one input, the answer belongs nowhere and may be written
@@ -345,13 +335,8 @@ See [How Brave Bot works](../how-it-works.md#processors).
 
 ## `spawn_agent`
 
-Hands a sub-task to a [delegate](../how-it-works.md#delegates) — a second planner with a narrower set
-of capabilities — and gets back one report.
-
-The call answers as soon as the delegate has been approved, so the planner has its round back while
-the work goes on behind it, and what the delegate says arrives on its own later. Several delegates
-can be going at once, each numbered in the order the turn started them, and every report says whose
-work it describes rather than leaving that to be worked out from the words.
+Hands a sub-task to a [delegate](../how-it-works.md#delegates), a second planner with a narrower set
+of capabilities, and gets back one report.
 
 | Parameter | |
 |---|---|
@@ -365,21 +350,25 @@ work it describes rather than leaving that to be worked out from the words.
 | `checker` | reading, and running programs | finding out whether something works |
 | `worker` | reading, running programs, and writing files | finishing a sub-task |
 
-A delegate holds its kind's capabilities **narrowed by its parent's**, so delegation redistributes
-authority and never creates it, and a kind asking for more gets a delegate without it. What it is told
-about itself is a constant its kind chose: the planner supplies the task and nothing else, so there is
-no sentence it can write that changes what a delegate *is* rather than what it is doing.
+The call answers as soon as the delegate has been approved, so the planner has its round back while
+the work goes on behind it, and what the delegate says arrives on its own later. Several delegates
+can be going at once, each numbered in the order the turn started them, and every report says whose
+work it describes.
 
-**`each` fans one task out**, so the shared half is written once and only the differing part — one
-path per entry, say — is repeated. Every delegate it starts is one like any other: it is approved on
+A delegate holds its kind's capabilities **narrowed by its parent's**, so delegation redistributes
+authority and never creates it, and a kind asking for more gets a delegate without it. The planner
+supplies the task and nothing else. What a delegate is told about itself is a constant its kind
+chose, so there is no sentence the planner can write that changes what a delegate *is* rather than
+what it is doing.
+
+**`each` fans one task out**, so the shared half is written once and only the differing part (one
+path per entry, say) is repeated. Every delegate it starts is one like any other: it is approved on
 its own, takes its own number, and holds its own copy of what you vouched for, so a fan-out is
 several runs rather than one run several times. A call naming more than eight, or naming none, is
-refused and starts nothing. The ceiling is not a limit on authority — the same runs were always
-available one call at a time — but a field that turns one sentence into an unbounded number of runs
-is worth a bound.
+refused and starts nothing.
 
 The delegate cannot see the conversation the task came from, so a task that leaves something out is a
-delegate that never learns it — and it cannot come back for more, since there is no channel to ask
+delegate that never learns it. It cannot come back for more, since there is no channel to ask
 along. A run whose own context has met something untrusted cannot delegate at all.
 
 **Delegation saves context, never an approval.** Every write and every run a delegate makes reaches you
@@ -390,7 +379,7 @@ than about the run that happened to be going.
 Nothing but the report crosses back: the exchange, the tool results and the quarantine end with the
 delegate, and a reference minted inside one names nothing afterwards. A delegate is offered neither
 this tool nor [`ask_user`](#ask_user) nor a task list, so it cannot delegate again and puts no question
-of its own to you — what it could not settle goes in the report, and the planner asks.
+of its own to you. What it could not settle goes in the report, and the planner asks.
 
 :::note
 The confirmation for a write shows the path and the diff, as it always does, but it does not say that
@@ -412,22 +401,20 @@ guessed at. See [Skills](../customize/skills.md).
 
 ## `ask_user`
 
-Puts up to four questions to you and waits.
+Puts up to four questions to you and waits. More than four is refused whole rather than trimmed.
 
 | Parameter | |
 |---|---|
 | `questions` | at most four, each with a `header`, a `question`, optional `options`, and `multiple` |
 
-Questions are put one at a time. You may choose an option, answer in your own words, or skip — and a
+Questions are put one at a time. You may choose an option, answer in your own words, or skip. A
 skipped question is an answer to work with rather than a reason to ask again. An answer is remembered
 for the session, question by question.
 
-Refused whole rather than trimmed if there are more than four.
-
 **Asking stops once the planner's context has met something untrusted**, because at that point the
 question itself could have been shaped by content nobody vouched for. A quarantined read does not stop
-it asking, since a reference carries no instruction. Where nobody can be asked — a one-shot run — every
-question is declined rather than answered on your behalf.
+it asking, since a reference carries no instruction. Where nobody can be asked, as in a one-shot run,
+every question is declined rather than answered on your behalf.
 
 This tool is for what the planner cannot find out itself: which of two approaches, whether something
 is in scope, which of two plausible files you meant. Never for a fact about the machine.
@@ -440,35 +427,34 @@ Records the task list for what the planner is doing.
 |---|---|
 | `todos` | the complete list, each with `content` and `status` |
 
-The whole list every time — it replaces the previous one. There is no routing here, because nothing is
+The whole list every time: it replaces the previous one. There is no routing here, because nothing is
 touched. An unrecognised status reads as outstanding work.
 
 ## `schedule_next`
 
-Says when a self-paced [`/loop`](commands.md#loop-interval-prompt) should run again.
+Says when a self-paced [`/loop`](commands.md#loop-interval-prompt) should run again. It is offered to
+a tick of a self-paced loop and to nothing else; a call from any other turn is answered the way any
+unoffered name is.
 
 | Parameter | |
 |---|---|
-| `delay_seconds` | how long to wait — routing, and required |
-| `noop` | whether this tick found anything — routing, and required |
-| `reason` | what the turn is waiting on, in its own words — content |
+| `delay_seconds` | how long to wait; routing, and required |
+| `noop` | whether this tick found anything; routing, and required |
+| `reason` | what the turn is waiting on, in its own words; content |
 
 **There is no argument for what the next run asks.** The prompt is the line you typed when you started
-the loop, and it is sent again unchanged. That is what makes the call approvable on its own: "ask me
-that again in twenty minutes" can be read and agreed to without knowing what "that" is, where a field
-naming the next prompt would let a turn write its own next instruction.
+the loop, and it is sent again unchanged.
 
-Offered to a tick of a self-paced loop and to nothing else; a call from any other turn is answered the
-way any unoffered name is. The wait is held between a minute and an hour **before** it is reported
-back, so the number the planner is told is the number it is getting. A call missing the delay or the
-verdict is refused rather than filled in, since the count of quiet ticks you are shown is built from
-the second one. `reason` reaches your screen and stops there.
+The wait is held between a minute and an hour **before** it is reported back, so the number the
+planner is told is the number it is getting. A call missing the delay or the verdict is refused rather
+than filled in, since the count of quiet ticks you are shown is built from the verdict. `reason`
+reaches your screen and stops there.
 
 ---
 
 ## Before adding a tool
 
-The question asked of every new tool is: **what is its routing field?** A tool whose destination cannot
-be separated from its payload does not belong on this surface. That is also why the built-in tools stay
-native rather than arriving over MCP: an opaque call erases the split between the part that decides
-where a call lands and the part that is merely carried, and these tools depend on it.
+Every new tool must have a routing field. A tool whose destination cannot be separated from its
+payload does not belong on this surface. That is also why the built-in tools stay native rather than
+arriving over MCP: an opaque call erases the split between the part that decides where a call lands
+and the part that is merely carried, and these tools depend on it.

@@ -49,7 +49,7 @@ producing a binary that only works in the tree it came from. To build one delibe
 `BRAVEBOT_ALLOW_UNCONFIGURED_BUILD=1` and supply the variables at run time.
 
 The environment still wins when set, which is how a released binary is pointed at a local backend
-without rebuilding it. Baked values are masked so `strings` on the binary does not print them — that
+without rebuilding it. Baked values are masked so `strings` on the binary does not print them. That
 is obfuscation and not encryption, so a binary built with a live key should be treated as holding one.
 
 The cross-build container does not inherit the host environment, so `make all-platforms` forwards
@@ -61,16 +61,17 @@ Run `bravebot doctor` to check configuration and confinement without revealing t
 
 ## Agent configuration in this repo
 
-`agents/` is the checked-in source of truth for what an agent reads here: `AGENTS.md` and the skills
-under `agents/skills/`. Nothing discovers it there — Claude Code looks under `.claude/`, and bravebot
-reads `AGENTS.md` at the workspace root and skills from `.bravebot/skills` — so a fresh clone links
-the one source into both:
+Run `make init` in a fresh clone to link the checked-in agent configuration into the places tools
+read it from.
 
 ```sh
 make init
 ```
 
-That creates symlinks and nothing else:
+`agents/` is the source of truth for what an agent reads here: `AGENTS.md` and the skills under
+`agents/skills/`. Nothing discovers it there. Claude Code looks under `.claude/`, and bravebot reads
+`AGENTS.md` at the workspace root and skills from `.bravebot/skills`. `make init` creates symlinks and
+nothing else:
 
 ```
 .claude/skills/<name>    ->  agents/skills/<name>
@@ -79,14 +80,14 @@ That creates symlinks and nothing else:
 AGENTS.md                ->  agents/AGENTS.md
 ```
 
-The links are gitignored, so they are derived state and a skill is written once rather than copied
-once per tool. Re-running is idempotent and silent, a stale link is refreshed, and a real file
-somebody put in a discovery directory by hand is left alone. `python3 agents/setup.py list` shows the
-current state, and `unlink` removes only the links it owns.
+The links are gitignored, so a skill is written once rather than copied once per tool. Re-running is
+idempotent and silent, a stale link is refreshed, and a real file somebody put in a discovery
+directory by hand is left alone. `python3 agents/setup.py list` shows the current state, and `unlink`
+removes only the links it owns.
 
-`make init` does **not** grant trust. bravebot loads a workspace skill only from a path a person
-vouched for, and a script granting that on your behalf is exactly the inference that rule forbids, so
-expect to be asked about `.bravebot/skills` the first time you start it in this tree.
+`make init` does **not** grant trust. Expect to be asked about `.bravebot/skills` the first time you
+start bravebot in this tree. bravebot loads a workspace skill only from a path a person vouched for,
+and a script granting that on your behalf is exactly the inference that rule forbids.
 
 ## Which build wrote a session
 
@@ -98,8 +99,7 @@ bravebot 0.4.0 (f2a6e1a, modified)
 ```
 
 Both matter when reading a transcript back: a session that behaved oddly is usually being read against
-code that has moved since, and the alternative to a stamp is inferring the build from the transcript's
-own symptoms. Resuming a session recorded by a different build says so.
+code that has moved since. Resuming a session recorded by a different build says so.
 
 The stamp watches every crate's sources rather than only its own, so `modified` cannot go stale while
 another crate changes underneath it.
@@ -107,9 +107,9 @@ another crate changes underneath it.
 ## Testing the interface
 
 `cargo test` covers the interface a piece at a time: a key press becomes an action, an action is
-handled, a screen is drawn. What it cannot reach is the wiring between those pieces, and that is where
-the interface bugs have been. `contrib/drive_tui.py` runs a scripted session against a real terminal
-so those paths can be exercised, and `contrib/README.md` says how. It needs a backend and writes real
+handled, a screen is drawn. It cannot reach the wiring between those pieces, which is where the
+interface bugs have been. `contrib/drive_tui.py` runs a scripted session against a real terminal so
+those paths can be exercised, and `contrib/README.md` says how. It needs a backend and writes real
 sessions, so it is a tool to reach for deliberately rather than part of `make check`.
 
 ## Spec-enforced development
@@ -128,13 +128,13 @@ nobody.
   stays, marked withdrawn, and says what replaced it.
 - **Every clause carries an anchor**, so `labels.md#LABEL-3` is a link that keeps working. The anchor
   GitHub generates from a heading contains the title, so it breaks the moment somebody improves the
-  wording — which is the moment an issue pointing at that clause most needs the link to survive.
+  wording.
 - **`governs`** lists the paths this spec decides. Anything under no spec's `governs` is ordinary code.
 - **`guards`** lists symbols whose every use is review-required.
 - **`verified-by:`** lines name the tests that pin a clause. The coverage check reads them and fails
   when a name does not resolve to a test that exists.
 
-Clauses describe behaviour, not implementation: a clause naming a function becomes wrong the next time
+Clauses describe behaviour, not implementation. A clause naming a function becomes wrong the next time
 somebody renames one, and it pins the code that exists rather than the behaviour the code owes.
 
 ## Reviewing for the rule

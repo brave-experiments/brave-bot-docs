@@ -6,8 +6,8 @@ description: Import a Leo Premium subscription so requests go to the premium tie
 
 # Leo Premium
 
-If you have a Leo Premium subscription in a Brave install on this machine, Brave Bot can register
-itself against it and spend its own credentials on the premium tier.
+Brave Bot can register itself against a Leo Premium subscription in a Brave install on this machine
+and spend its own credentials on the premium tier.
 
 ```sh
 bravebot import-leo-creds            # from the stable Brave install
@@ -46,48 +46,39 @@ touches the store.
 ## Where they are kept
 
 In one file under `~/.bravebot`, created mode 0600 before anything is written to it and still 0600
-after a re-import over an existing one. Nothing asks you for a password.
+after a re-import over an existing one. Nothing asks you for a password, and the file is not
+encrypted at rest, as the browser these are imported from keeps the same secret unencrypted in its own
+profile.
 
 **One file, not one per channel.** You have one subscription however many Brave builds are installed,
 so importing from Nightly replaces what was imported from Stable rather than sitting beside it. The
 channel only says which browser profile to read the order id from, which is a fact about your machine
-rather than about the agent — so `--forget` takes no channel. Forgetting removes the file, and is not
+rather than about the agent, so `--forget` takes no channel. Forgetting removes the file, and is not
 an error when there was nothing to remove.
 
 A malformed or empty file is reported as such rather than treated as absent credentials, and a
 credential without a token is rejected on load. With no home directory there is nowhere a secret
 belongs, and that is reported rather than guessed at.
 
-**Why not the system keychain.** It was the keychain, and that was wrong on both halves of the trade.
-The browser these are imported from keeps the same secret unencrypted in its own profile, so a
-keychain here guarded a copy of something already readable in the file the copy came from. Nor did it
-hold against the threat it was written for — a program `run` launches reading the file — because
-those programs are [deliberately unconfined](../security/permissions.md), and anything that can read
-a file as you can already reach larger secrets on the same machine. What it cost was availability: it
-had one Linux backend, a desktop session's secret service, so a machine reached over SSH had no store
-to open at all and everybody in that position was silently on the free tier. And a password dialog,
-since the whole decrypted batch is held in memory for the session either way.
-
 ## When a subscription cannot be read
 
 Finding nothing has two causes, and they are not the same fact.
 
 **Nothing imported** is the free tier working as intended, and nothing is said about it. An endpoint
-belonging to no environment, such as a local one, is this case too — no credential belongs near it by
+belonging to no environment, such as a local one, is this case too. No credential belongs near it by
 design.
 
 **A batch that exists and cannot be spent** is reported to you, with the reason and what to do about
 it. That covers a file that could not be read, one another version wrote, and one imported for an
-environment this endpoint does not accept — a credential only verifies against the deployment that
+environment this endpoint does not accept. A credential only verifies against the deployment that
 signed it, so a batch from the wrong Brave channel is refused with the reason rather than passed
 over.
 
-The difference matters because of what happens next. The request goes out on the free tier, where the
-endpoint answers a premium model name by **substituting a weaker model rather than failing** — a 200
-and an ordinary reply. So a request that silently lost its credential still returns something that
-reads like an answer, and nothing on your screen would connect that to the store. The downgrade has
-to be said out loud, because its only other symptom is the agent appearing to get worse for no
-reason.
+The downgrade is said out loud because its only other symptom is the agent appearing to get worse for
+no reason. The request goes out on the free tier, where the endpoint answers a premium model name by
+**substituting a weaker model rather than failing**: a 200 and an ordinary reply. A request that
+silently lost its credential still returns something that reads like an answer, and nothing else on
+your screen would connect that to the store.
 
 ## Which tier a turn actually ran on
 
@@ -100,14 +91,14 @@ The opening screen draws the tier beside the confinement, from the configuration
 stored batch may be expired, exhausted, or issued for another environment, so finding one would not
 settle the tier either. A pane too narrow for the wordmark still reports both.
 
-Where the server reports using a model other than the one you asked for, **both are shown** — the
-choice you made and the model that actually answered — said once when it starts happening rather than
-every turn. `automatic` resolving to a concrete model is not a substitution: that is the server
-choosing per request, which is what `automatic` means.
+Where the server reports using a model other than the one you asked for, **both are shown**: the
+choice you made and the model that actually answered. This is said once when it starts happening
+rather than every turn. `automatic` resolving to a concrete model is not a substitution: that is the
+server choosing per request, which is what `automatic` means.
 
 ## Requirements and limits
 
-- **macOS and Linux**, including a machine with no desktop session — nothing here needs one. Windows
+- **macOS and Linux**, including a machine with no desktop session. Nothing here needs one. Windows
   is not supported.
 - The build must know the premium host. Without it, premium is unavailable.
 - A credential only works against the deployment that issued it, so import from the Brave channel
@@ -116,7 +107,8 @@ choosing per request, which is what `automatic` means.
 - Sign in to Leo in that Brave install first: a subscription that is not in the profile cannot be
   imported.
 - The stored batch is a bearer secret in a file you own. It is not encrypted at rest, which is what
-  the browser does with the same secret, and anything running as you can read it.
+  the browser does with the same secret, and anything running as you can read it. That includes a
+  program `run` launches, which is [deliberately unconfined](../security/permissions.md).
 
 ## Checking what you have
 

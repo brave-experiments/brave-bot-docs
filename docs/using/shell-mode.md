@@ -23,16 +23,14 @@ and the mode lasts one command.
 
 ## Nothing asks
 
-`! rm -rf build` simply runs. The approval prompt exists so that a person endorses argv the
-*planner* proposed — here you are the person it would have asked, so confirming your own keystroke
-would be theatre.
+`! rm -rf build` runs, with no approval prompt. The approval prompt exists so that a person endorses
+argv the *planner* proposed. Here you are the person it would have asked.
 
 ## The output reaches the model in full
 
-This is the difference from a program the planner ran itself. After `! cargo test` you can say "fix
-the first failure" and the planner has already read the errors — the output is trusted and private,
-not a reference. Output from a *failing* command reaches it too, since that is where the explanation
-is. A cancelled command records nothing.
+The planner reads the whole output, trusted and private, not as a reference. After `! cargo test` you
+can say "fix the first failure" and it has already read the errors. Output from a *failing* command
+reaches it too, since that is where the explanation is. A cancelled command records nothing.
 
 The label is a first label from provenance, exactly like the label on a program's output or on your
 own configuration. It is admissible for the reason a vouched-for command's output is: a person took
@@ -40,7 +38,7 @@ responsibility, and nothing inspected anything.
 
 ## Only a line a human typed
 
-Shell mode is reachable from one place — a key press in the input box — and nowhere else. Never argv
+Shell mode is reachable from one place, a key press in the input box, and nowhere else. Never argv
 the planner proposed, never text read from a file, never anything a processor produced, never a line
 reconstructed from a transcript.
 
@@ -50,9 +48,8 @@ via MCP. If it could ask for one, everything above is void.
 What it gets instead is [`run`](../reference/tools.md#run), which takes a command line and
 **compiles** it: bravebot's own grammar reads the line into the programs, arguments and destinations
 it names, refuses anything it cannot fully work out, and runs the result. That is shell syntax
-without a shell — no line the planner writes is ever handed to an interpreter, which is the half of
-this that carries the guarantee. Here, by contrast, `$SHELL` really does read the line, because you
-typed it.
+without a shell. No line the planner writes is ever handed to an interpreter. Here, by contrast,
+`$SHELL` really does read the line, because you typed it.
 
 ## The cost, stated plainly
 
