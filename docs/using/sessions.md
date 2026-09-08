@@ -149,6 +149,14 @@ refused.
 is a new session it asks the trust question again, restores no standing permissions, and closes any
 directory `/add-dir` had opened.
 
+## Taking the last turn back
+
+[`/undo`](../reference/commands.md#undo) rewinds the most recent turn: the files it wrote go back to
+what they held, and the conversation, the spend and the standing permissions go back with them. One
+turn is as far as it goes, and `/clear`, `/compact`, `/rename`, `/add-dir`, `/cd` and a shell-mode
+command each close the window — as does the next turn beginning. It cannot undo what a *program* the
+turn ran did, since the workspace never saw those writes.
+
 ## Prompt history
 
 Up walks backwards from the most recent prompt and stops at the oldest; Down walks forwards again.

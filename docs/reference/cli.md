@@ -106,6 +106,7 @@ are in [Reading the transcript](../using/transcript.md#the-scroller).
 | `/compact` | Summarise the conversation so far, keeping the recent part |
 | `/clear` | Start a new session here, keeping this one resumable |
 | `/export [path]` | Write the transcript out as a markdown file |
+| `/undo` | Rewind the last turn, on disk and in the conversation |
 | `/exit` | Leave |
 | `@<path>` | Include a workspace file as trusted context |
 | `!<line>` | Run a line in your own shell |

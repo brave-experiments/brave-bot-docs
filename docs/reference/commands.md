@@ -1,7 +1,7 @@
 ---
 sidebar_position: 2
 title: Slash commands
-description: The twelve commands the interface acts on itself, and the rules every one of them shares.
+description: The thirteen commands the interface acts on itself, and the rules every one of them shares.
 ---
 
 # Slash commands
@@ -21,6 +21,7 @@ A line beginning with `/` is acted on by the interface itself, in place of being
 | `/compact` | | Summarise the conversation so far, keeping the recent part |
 | `/clear` | | Start a new session here, keeping this one resumable |
 | `/export` | `[path]` | Write the transcript out as a markdown file |
+| `/undo` | | Rewind the last turn, on disk and in the conversation |
 | `/exit` | | Leave |
 
 Typing `/` offers the list, and Tab completes.
@@ -202,6 +203,38 @@ tree through a symlink is refused as well. Missing parent directories are create
 
 **Anything already at the path is refused rather than replaced**, a symlink whose target is missing
 included. The file is written readable by you alone, as the record it came from is.
+
+## `/undo`
+
+Puts the session back where it stood before the most recent turn. Every path that turn wrote through
+a file tool goes back to what it held first, and a file it created is removed. The conversation
+returns to its pre-turn state, and the turn count, the spend, the timing, the trust map, the
+commands you vouched for and the transcript go back with it; the turn's audit lines are dropped,
+since they decided about a turn that is no longer in the conversation. Rewinding past a session's
+first turn removes its record rather than leaving one with nothing in it.
+
+A turn that went wrong is the case with no clean recovery otherwise: `git checkout` takes your own
+uncommitted work with it, and `/clear` throws away the context that was worth keeping. Disk and
+conversation move together because either alone leaves the transcript describing a tree that is not
+there.
+
+**A rewind names any file it could not put back**, and the rest of the rewind still happens. What one
+turn keeps for this is bounded, so a very large file may be remembered as a path whose contents were
+not held — that path is reported as one that did not go back rather than treated as a file that was
+never there.
+
+**One turn is as far as it goes**, and the window closes as soon as the next turn begins. Anything
+else that changes the session outside a turn closes it too — `/clear`, `/compact`, `/rename`,
+`/add-dir`, `/cd`, and a shell-mode command — after which `/undo` says there is nothing left to undo
+rather than rewinding to a snapshot describing a different session.
+
+:::caution
+**A rewind sees file-tool writes and nothing else.** A turn that changed a file by running a program
+leaves nothing to put back: those changes stay on disk while the conversation says the turn never
+happened. And what goes back is what a path held *before the turn wrote to it*, so an edit you made
+yourself in between is lost. Nothing compares the file against what the turn left there, and nothing
+asks first.
+:::
 
 ## The rules every command shares
 
