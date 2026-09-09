@@ -387,12 +387,12 @@ Standard input is empty, so a step that reads it gets nothing rather than the te
 it may not read, and can be passed to `spawn_processor` or written to a file with `write_file`. It is
 not capped, since none of it enters the conversation.
 
-That result also tells the planner what would lift the quarantine: output comes back as text once a
-person has vouched for every stage of the exact command, and a single file is read with `read_file`.
-Only where a command produced it, so a quarantined *read* carries no advice about vouching for a
-command nobody ran. Without that sentence a planner reads one quarantined result as proof that
-programs are unreadable and stops running them, which is not what happened: the label is about who
-answered for the command.
+That result also tells the planner what would lift the quarantine, naming three things in the order
+they apply: **this** result through [`read_output`](#read_output), the next one once a person has
+vouched for every stage of the exact command, and a file through `read_file`. Only where a command
+produced it, so a quarantined *read* carries no advice about vouching for a command nobody ran.
+Without those a planner reads one quarantined result as proof that programs are unreadable and stops
+running them, which is not what happened: the label is about who answered for the command.
 
 **Every result says how the run ended**, in front of what the program printed: that every step
 exited zero, which step did not and with what code, or that the line outstayed
