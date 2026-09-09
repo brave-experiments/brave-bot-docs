@@ -412,7 +412,7 @@ thing to switch off by near-miss.
   "permissions": {
     "deny": ["Read(.env)", "Edit(src/**)", "Bash(curl *)"],
     "ask": ["Bash(git push *)"],
-    "allow": ["Bash(cargo test)", "Bash(ls *)"],
+    "allow": ["Bash(cargo test)", "Bash(ls *)", "WebFetch(domain:docs.rs)"],
     "additionalDirectories": ["../shared-lib"]
   }
 }
@@ -423,17 +423,24 @@ The same three lists Claude Code keeps, with the same spellings, so a block copi
 never trust a command's output, is on
 [Approvals and permissions](../security/permissions.md#rules-you-write-down-in-advance).
 
-A rule is `Tool` or `Tool(specifier)`, and names one of three **families**:
+A rule is `Tool` or `Tool(specifier)`, and names one of four **families**:
 
 | Family | Covers |
 |---|---|
 | `Read` | every tool that reads or enumerates a file |
 | `Edit` | every tool that changes one |
 | `Bash` | running a program |
+| `WebFetch` | fetching a URL |
 
 These are categories rather than tool names, as they are in Claude Code, so there is no rule spelled
 `Write` or `Glob`. `Bash` names no shell (there is none), and its specifier is matched against one
 step's program and arguments.
+
+**`WebFetch` takes `domain:` and nothing else.** `WebFetch(domain:example.com)` covers that host and
+its subdomains, and never `notexample.com`: the boundary is a label boundary. There is no URL-prefix
+form, since a rule matching a path would be answering a different question on every call. What a
+matching rule decides for a fetch, and what it does not, is
+[`fetch_url`](../reference/tools.md#fetch_url).
 
 **`deny`, then `ask`, then `allow`, and the first match decides.** Specificity does not enter into
 it: a broad deny beats a narrow allow, and a matching `ask` rule prompts even where a more specific

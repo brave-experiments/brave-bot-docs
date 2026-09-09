@@ -6,7 +6,7 @@ description: Every tool the model may call, what it takes, and what it is allowe
 
 # Tools
 
-There are twelve tools, and no way to add another from a configuration file. Each one splits its
+There are thirteen tools, and no way to add another from a configuration file. Each one splits its
 arguments into **routing**, the part that decides where the effect lands, and **content**, the part
 that is merely carried.
 
@@ -19,13 +19,14 @@ that is merely carried.
 | [`edit_file`](#edit_file) | `path`, `path_ref` | `old_text`, `new_text` | **yes, every time** |
 | [`run`](#run) | `command`, compiled to a plan | stdin | **yes, unless vouched for** |
 | [`read_output`](#read_output) | `ref` | none | **yes** |
+| [`fetch_url`](#fetch_url) | `url` | none | **yes, unless a rule names the host** |
 | [`spawn_processor`](#spawn_processor) | `about` | `reads`, `instruction` | no |
 | [`spawn_agent`](#spawn_agent) | `kind` | `task`, `each` | not the call, but its writes and runs do |
 | [`load_skill`](#load_skill) | `name` | none | no |
 | [`ask_user`](#ask_user) | the questions | none | it *is* the question |
 | [`todo_write`](#todo_write) | none | `todos` | no |
 
-A thirteenth, [`schedule_next`](#schedule_next), is offered to a turn inside a self-paced
+A fourteenth, [`schedule_next`](#schedule_next), is offered to a turn inside a self-paced
 [`/loop`](commands.md#loop-interval-prompt) and to no other turn.
 
 An unknown tool is reported to the planner rather than ignored.
@@ -337,6 +338,43 @@ the planner as text.
 
 It works only for output from `run`. A quarantined *file* is not readable this way. This is why
 `which`, `find` and `uname` tell the planner nothing until it asks.
+
+## `fetch_url`
+
+Fetches an `http` or `https` URL. **You approve every fetch, unless a rule names the host.**
+
+| Parameter | |
+|---|---|
+| `url` | the one URL to fetch |
+
+**What comes back is quarantined however you answer.** The body is a reference: the planner may hand
+it to [`spawn_processor`](#spawn_processor) or write it to a file with
+[`write_file`](#write_file), and it cannot read it or be told what it says. A page saying "ignore
+your previous instructions" says it to a processor with no tools.
+
+There is no answer at this prompt that trusts a body, because approving a fetch is consent to talk to
+a host and says nothing about what that host returns. `a` at a run prompt can trust output: you read
+one command and answered for both its effect and what it printed. A host answers every later request
+however it likes.
+
+The prompt draws the URL, and on a line of its own the host it will reach. The host is read out of the
+URL by the parser rather than taken from what the string looks like, so
+`https://example.com@evil.test/` cannot name one site to somebody skimming it and reach another.
+
+**Your answer is bound to that one URL and nothing is remembered.** The next fetch asks again, even
+on the same host. Standing permission is a
+[`WebFetch(domain:…)` rule](../customize/configuration.md#permissions) you wrote down in advance,
+which is naming a host rather than answering a question about one page. See
+[A fetch is approved one URL at a time](../security/permissions.md#a-fetch-is-approved-one-url-at-a-time).
+
+**A redirect may not leave the approved host.** Every hop goes through the same gate, and a hop
+elsewhere is refused unless a rule allows that host too, since the end of a redirect chain is
+somewhere nobody was shown. That check applies only while a fetch is in flight: reaching the model
+endpoint is this program operating rather than something a turn asked for, so a rule about a website
+cannot stop bravebot talking to its own backend.
+
+A body that is not valid UTF-8 is carried anyway rather than reported as an error, since nothing here
+reads it. Bodies are size-capped, and a truncated one says so.
 
 ## `spawn_processor`
 

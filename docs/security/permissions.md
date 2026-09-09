@@ -20,6 +20,7 @@ A prompt shows the thing itself, not a summary of it:
 | an edit | the diff |
 | a run | the compiled plan: every step, the binary each resolved to, the directory, and every file the line would write |
 | reading a command's output | the bytes, and the command that printed them |
+| a fetch | the URL, and on its own line the host it will reach |
 | trusting a file | the path and its first lines |
 
 You cannot endorse a destination you were not shown.
@@ -102,6 +103,21 @@ needs `~/.ssh` and the set of programs someone might ask for cannot be listed in
 exception is bravebot's **own** credentials, which are withheld from every program it runs: you
 approve an argv, never an environment, so a credential travelling alongside one would be handed over
 without your having seen it. See [`run`](../reference/tools.md#what-a-program-is-handed).
+
+## A fetch is approved one URL at a time
+
+No standing permission is offered at the fetch prompt. Your answer is bound to the URL you were
+shown, so the next fetch asks again even on the same host. An `a` here would be keyed to a host, and
+a host is not what was in front of you: you approved one page, and every later URL on that host is
+one you have not seen.
+
+To let a host through unasked, write the rule down in advance:
+`WebFetch(domain:docs.example.com)` in `allow` covers that host and its subdomains. A `deny` rule for
+a host refuses without asking, and refuses a redirect trying to reach it.
+
+**Approving a fetch never trusts what comes back.** The body stays quarantined whatever you answer,
+because consent to talk to a host is not a claim about what it returns. See
+[`fetch_url`](../reference/tools.md#fetch_url).
 
 ## Answering in advance: modes
 
