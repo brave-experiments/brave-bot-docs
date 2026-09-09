@@ -33,6 +33,130 @@ Enter on an empty line does nothing. Shift-Enter needs a terminal that reports t
 (Ghostty, Kitty, WezTerm) or one configured to send a newline; **Ctrl-J is the fallback that always
 works**, in every terminal and in shell mode too.
 
+With [vi editing](#editing-the-way-vi-does) chosen, Escape enters NORMAL mode instead of discarding
+the line, and the letters do what they do in vi.
+
+## Editing the way vi does
+
+[`/config`](../reference/commands.md#config) chooses between the ordinary box and vi's editing keys.
+The choice is written to `~/.bravebot`, so it outlives the session and applies in every directory,
+and [`editorMode`](../customize/configuration.md#editormode) in a settings file answers for somebody
+who has never made one.
+
+Vi editing has two modes over the same line. **INSERT** is the box everybody has. **NORMAL** takes a
+letter as an instruction, and a letter it has no instruction for does nothing at all rather than
+being typed. Every session opens in INSERT, whichever style is in force, and the mode is drawn
+beneath the box beside the mode that says how much the session asks. The ordinary box is in neither
+mode, and nothing about a mode is drawn at it.
+
+**Escape enters NORMAL mode and leaves the line exactly as it was.** Discarding a half-typed line is
+still Ctrl-C, and a turn in flight is still stopped first. Ctrl-`[` is the same request from a
+terminal that reports the modifier rather than sending the byte Escape already is. In the ordinary
+box Escape discards the line as it always has.
+
+### Getting back into INSERT mode
+
+| Key | Where the caret lands |
+|---|---|
+| `i`, `a` | before or after the character the caret is on |
+| `I`, `A` | the first character of the line, the end of the line |
+| `o`, `O` | a new line below, a new line above |
+
+Leaving INSERT mode puts the caret on a character rather than past the end of the line, since in
+NORMAL mode it sits on the character the next instruction acts on.
+
+`!` and `?` are instructions in NORMAL mode rather than the marks that arm
+[shell mode](shell-mode.md) and put the key list up. Both are a press of `i` away. Reading `!` as the
+mark would arm a shell from a press asking for something else, and there is no way out of a shell
+armed by accident except deleting back past the mark.
+
+### Motions
+
+| Keys | Where the caret goes |
+|---|---|
+| `h`, `l`, Space | one character left or right |
+| `w`, `e`, `b` | the start of the next word, the end of this word or the next, the start of this word or the previous |
+| `0`, `$`, `^` | the first column, the last character, the first character that is not a blank |
+| `gg`, `G` | the first line of the input, the last |
+| `f`, `F`, `t`, `T` then a character | the next or previous occurrence of it on this line, landing on it or stopping one short |
+| `;`, `,` | that jump again, and the same jump reversed |
+
+A jump looks only along the line the caret is on, and one that finds nothing leaves the caret where
+it was. `w` lands on the first character of the next word, rather than after the word it crossed
+where the word keys under Ctrl land.
+
+**`k`, `j` and `/` are the keys they spell rather than motions of their own.** `k` and `j` are Up and
+Down: they walk the rows of a paragraph, then your prompt history, then the transcript, exactly as
+the arrows do. `/` opens the search Ctrl-R opens, that being the only search here. While a key is
+waiting for the character to jump to, every press is that character, so `f/` jumps to a slash and
+`fj` to a `j`.
+
+### Operators
+
+`d` takes a stretch out, `c` takes it out and opens INSERT mode where it was, `y` keeps it and leaves
+the line alone, and `>` and `<` move the line a step from or towards the margin. Each waits for the
+stretch to act on:
+
+| Keys | The stretch |
+|---|---|
+| a motion | from the caret to wherever that motion would take it |
+| the operator's own letter doubled | the whole line |
+| `D`, `C`, `x`, `s` | to the end of the line, and the character under the caret |
+| `Y`, `S` | the whole line |
+
+So `dw`, `cw` and `yw` are one idea rather than three bindings, and `d$` and `dG` work without being
+listed. Whether the character a motion landed on is taken depends on the motion, as it does in vi:
+`de` takes the word's last letter where `dw` stops before the next word's first, and `cw` on a
+character that is not a blank behaves as `ce`, leaving the space after the word.
+
+`p` and `P` put the register back after and before the caret, and a stretch that was whole lines comes
+back as a line of its own. `J` makes this line and the one below into one, with a single space where
+the newline was. `u` puts back what the last change took, **one step and no further**. `.` does the
+last change again at the caret.
+
+The register is vi's unnamed one and the only one. It is not the system clipboard, which Ctrl-V owns
+and which you share with every other window you have open, so a yank here does not travel out of the
+box.
+
+### Text objects
+
+After an operator, `i` and `a` say the stretch is a thing rather than a distance, and the next press
+says which: `w` a word, `W` a run of anything that is not a blank, and a quote or either half of a
+bracket pair for what lies between them. `i` takes what is inside and `a` takes what surrounds it
+too. All on the line the caret is on.
+
+`ci(` is what you mean when you want the arguments replaced, and it works with the caret on the name
+in front of the bracket, where it usually is: a pair is the one enclosing the caret, or else the next
+one along the line. Either half names it, so `di(` and `di)` are the same request.
+
+`w` treats punctuation as a word of its own, so in `src/main.rs` the slashes belong to neither name.
+`W` is the same thing with punctuation folded in, which is why `aW` takes the whole path.
+
+### Marking a stretch out first
+
+`v` marks a stretch out character-wise and `V` line-wise, and **the whole of it is drawn while you
+choose it**, on every row it crosses. That is the point of having both this and an operator waiting
+for a motion: the stretch is on the screen while it is being chosen, and the next key acts on it.
+
+An operator here needs no extent: `x` is `d` and `s` is `c`, `r` replaces every selected character
+with one, and `~`, `u` and `U` change the case. Motions move the end the caret is at, `o` puts the
+caret at the other end, and a text object becomes the selection.
+
+The key that opened the mode closes it, the other of the two changes which kind is in force, and
+Escape abandons the selection. Every operator ends it, so nothing acts on a stretch that is no longer
+drawn.
+
+A selection is character-wise or line-wise and never a rectangle. A box ten rows tall holding one
+prompt is not where somebody edits columns.
+
+### These keys and a marker
+
+A [marker](#markers) is one thing to every key above. A motion crosses it whole and leaves the caret
+nowhere inside it. An operator takes it whole or not at all, and taking it takes the attachment off.
+A selection holding one is not replaced character by character, so `r` over such a selection does
+nothing: replacing the text either side and leaving the marker standing would be a line nobody could
+read.
+
 ## Composing in your editor
 
 **Ctrl-G** opens your editor on what is already in the box, and what you save replaces the line. It

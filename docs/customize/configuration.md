@@ -57,6 +57,7 @@ Everything that should outlive a session lives here:
 | `~/.bravebot/model` | the model chosen with `/model` |
 | `~/.bravebot/effort` | the effort level chosen with `/effort` |
 | `~/.bravebot/theme` | the theme chosen with `/theme` |
+| `~/.bravebot/editor-mode` | the editing style chosen with `/config` |
 | `~/.bravebot/themes/<name>.json` | themes you wrote yourself |
 | `~/.bravebot/settings.json` | long-lived settings (see [below](#settingsjson)) |
 
@@ -321,6 +322,7 @@ These keys are read, and anything else in the file is ignored rather than refuse
 | Key | What it holds |
 |---|---|
 | `model` | the model to request when nobody has chosen one ([below](#model)) |
+| `editorMode` | whether the input box edits the ordinary way or vi's ([below](#editormode)) |
 | `env` | variables, in Claude Code's own shape |
 | `permissions` | which actions to refuse, and which to ask about ([below](#permissions)) |
 | `provider` | an OpenAI-compatible gateway to reach ([below](#reaching-an-openai-compatible-gateway)) |
@@ -388,6 +390,20 @@ named for that tier, and otherwise that tier's name on the Brave roster. A tier 
 written, because a service has never heard of it. Any other name is used exactly as you wrote it.
 Bedrock refuses a model it does not recognise, and the aichat endpoint silently resets one to
 `automatic-brave-bot`, which is the key appearing to work while changing nothing.
+
+### `editorMode`
+
+```json
+{ "editorMode": "vim" }
+```
+
+`vim` gives the input box [vi's editing keys](../using/interactive-mode.md#editing-the-way-vi-does)
+and `emacs` gives the ordinary box. The word is read whatever its case. One naming neither style is
+no choice at all: the box stays the ordinary one and nothing fails to start.
+
+A choice made with [`/config`](../reference/commands.md#config) outranks this file, which answers for
+somebody who has never made one. The style is a preference about the person rather than a property of
+a checkout, which is why a file in a repository is the weaker claim.
 
 ### `run.scrubEnv`
 

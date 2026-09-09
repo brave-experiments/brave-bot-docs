@@ -1,7 +1,7 @@
 ---
 sidebar_position: 2
 title: Slash commands
-description: The thirteen commands the interface acts on itself, and the rules every one of them shares.
+description: The fourteen commands the interface acts on itself, and the rules every one of them shares.
 ---
 
 # Slash commands
@@ -14,6 +14,7 @@ A line beginning with `/` is acted on by the interface itself, in place of being
 | `/model` | | Choose which model to think with |
 | `/theme` | `[name]` | Choose the palette the interface is painted in |
 | `/effort` | `[level]` | Choose how hard to think before answering |
+| `/config` | | Choose a preference about the interface |
 | `/add-dir` | `<path>` | Open another directory, and trust it for this session |
 | `/cd` | `<path>` | Work in another directory from now on, and trust it for this session |
 | `/loop` | `[interval] <prompt>` | Send one prompt again and again until you stop it |
@@ -85,6 +86,22 @@ The choice is written to `~/.bravebot`, so it outlives the session and applies i
 [Choosing how hard to think](../customize/configuration.md#choosing-how-hard-to-think), which is also
 where the two cases worth knowing are: the models that read no level, and the Brave endpoint, which
 accepts one and discards it.
+
+## `/config`
+
+Opens a panel over the transcript for a preference about the interface. It lists the choices with
+what each one means and marks the one in force. Enter takes the row under the cursor and says so on
+the transcript; Escape leaves the setting alone, which is what makes the panel safe to open just to
+see what is set.
+
+It holds one choice today: whether the input box edits the ordinary way or
+[vi's](../using/interactive-mode.md#editing-the-way-vi-does). The choice reaches the transcript
+because it changes what the next keystroke does and the box gives no other sign until a letter has
+gone somewhere unexpected. Whichever style you choose, the box comes back taking letters as letters.
+
+The choice is written to `~/.bravebot`, so it outlives the session and applies in every directory.
+See [`editorMode`](../customize/configuration.md#editormode) for the settings key that answers for
+somebody who has never used this panel.
 
 ## `/add-dir <path>`
 
