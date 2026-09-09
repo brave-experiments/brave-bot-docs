@@ -57,6 +57,23 @@ configuration OK
 confinement …
 ```
 
+## Staying current
+
+A session that opens on a version something newer has replaced says so, once, under the trust
+question, and gives the line that updates the copy you are running: the npm command for an npm
+install, the script again for a script install. A build from source is told nothing, since neither
+line would update one.
+
+Nothing about it waits. The notice comes from an answer an earlier launch wrote down, and the
+request that refreshes it, at most one a day, runs behind the session and is for the next one. So a
+first run says nothing, and a release published this morning reaches somebody who last opened a
+session last night tomorrow.
+
+Every way this can fail is silence: no network, a registry that will not answer, an answer of an
+unexpected shape. A version that is not three numbers is never announced either, release candidates
+included. An [incognito session](using/sessions.md#a-session-that-leaves-nothing-behind) still
+reads an answer an ordinary session left, and neither records one nor asks.
+
 ## The first question: do you trust this directory?
 
 Brave Bot asks whether you trust the working directory before anything else.
