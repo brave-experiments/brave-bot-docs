@@ -6,7 +6,7 @@ description: Every tool the model may call, what it takes, and what it is allowe
 
 # Tools
 
-There are thirteen tools, and no way to add another from a configuration file. Each one splits its
+There are fourteen tools, and no way to add another from a configuration file. Each one splits its
 arguments into **routing**, the part that decides where the effect lands, and **content**, the part
 that is merely carried.
 
@@ -15,6 +15,7 @@ that is merely carried.
 | [`read_file`](#read_file) | `path`, `path_ref` | none | only to trust a quarantined file |
 | [`list_files`](#list_files) | `directory`, `pattern`, `depth` | none | no |
 | [`search`](#search) | `pattern`, `directory`, `include` | none | no |
+| [`lsp`](#lsp) | `operation`, `path`, `line`, `character` | none | **yes, to start a language server** |
 | [`write_file`](#write_file) | `path`, `path_ref` | `contents`, `contents_ref` | **yes, every time** |
 | [`edit_file`](#edit_file) | `path`, `path_ref` | `old_text`, `new_text` | **yes, every time** |
 | [`run`](#run) | `command`, compiled to a plan | stdin | **yes, unless vouched for** |
@@ -26,7 +27,7 @@ that is merely carried.
 | [`ask_user`](#ask_user) | the questions | none | it *is* the question |
 | [`todo_write`](#todo_write) | none | `todos` | no |
 
-A fourteenth, [`schedule_next`](#schedule_next), is offered to a turn inside a self-paced
+A fifteenth, [`schedule_next`](#schedule_next), is offered to a turn inside a self-paced
 [`/loop`](commands.md#loop-interval-prompt) and to no other turn.
 
 An unknown tool is reported to the planner rather than ignored.
@@ -119,6 +120,107 @@ the planner it is incomplete. A search that found nothing says which kind of not
 matching lines in the files it read, or an `include` that selected no files at all. Those are
 opposite facts, and drawn identically the planner reads one as the other. A glob leaning on syntax the
 matcher does not have is named for the same reason.
+
+## `lsp`
+
+Asks a language server about a symbol: where it is defined, what refers to it, what implements it,
+what calls it. **Starting a server is put to you.**
+
+| Parameter | |
+|---|---|
+| `operation` | one of `goToDefinition`, `findReferences`, `hover`, `documentSymbol`, `workspaceSymbol`, `goToImplementation`, `incomingCalls`, `outgoingCalls` |
+| `path` | workspace-relative file holding the symbol; required for every operation but `workspaceSymbol` |
+| `line`, `character` | 1-based position of the symbol, as a search or a read reported it |
+| `query` | for `workspaceSymbol`, the name to look for |
+
+This answers what [`search`](#search) cannot. A search for a name finds every comment and string that
+mentions it; this finds the declaration the compiler agrees on.
+
+**Nothing works out where a name is.** A position is two numbers the planner states, taken from a
+line it was already shown. A position that no longer holds the symbol answers with nothing found
+rather than an error, since a file changes under an agent and a stale line number is ordinary.
+
+The operation list is closed and every entry on it is a read. LSP is an open protocol and a server
+advertises methods of its own, one of which applies edits to your files, so forwarding a name would
+make what this tool can reach a property of whichever server you installed.
+
+### Which server, and what starting one costs
+
+| Language | Server |
+|---|---|
+| Rust | `rust-analyzer` |
+| TypeScript and JavaScript | `typescript-language-server` |
+| Python | `pyright-langserver` |
+| Go | `gopls` |
+
+The table is fixed and there is nothing to configure. The binary has to be installed and on your
+`PATH`.
+
+**A server runs with the access your own shell would give it, and is not confined.** The prompt says
+so in those words: it reads the whole tree and the dependency sources, and it runs the build tooling
+of its ecosystem. For Rust that means `build.rs` and proc macros out of `Cargo.lock` execute, which
+is code from your dependency tree running as you. Go's tooling builds to answer too. A Node or
+Python server reads and type-checks without running the project.
+
+Confinement is not an option withheld here. A server indexes *by* running that build tooling, so a
+profile denying it a subprocess and somewhere to write gives you a server whose index never settles,
+and every answer from one says it may be short. The choice is a server with your access or no
+working tool.
+
+What does not turn on your answer is the label on what comes back, and that is the half that
+matters. A server that can read the disk is not a server that can put words in the planner's context.
+
+A server is started by the first question that needs it, so a session that asks nothing about a
+language starts nothing.
+
+### A location is structure; the text at it is content
+
+A location is a path, a line, a column and the kind of symbol. **Those reach the planner whatever the
+trust map says about the file they name**, exactly as a line count does for a file it may not read.
+There is nowhere in a path and two integers for prose to sit, so somebody who owns `vendor/lib.js`
+cannot use `goToDefinition` to put a sentence in front of the planner.
+
+The **text** at a location takes the ordinary treatment, because it is bytes the file chose. Hover
+text, a signature and a docstring from a file nobody vouched for come back as a reference, so one
+result can be a visible list of locations whose text the planner may not read. Hover is where most of
+this tool's value is, which makes it weakest exactly where a codebase is least vouched for.
+
+A location is not made routing by having been returned. A read of a path that came back from here is
+gated as it would be had the planner guessed the path, and a write to it is put to you as a diff like
+any other. What somebody who owns a file in your tree gains is a say in which path and line the
+planner is told about, by arranging their code so a symbol resolves where they like. That costs at
+worst a wasted read of a file the planner could already read.
+
+### An answer says which kind of nothing it is
+
+A definition in a dependency, a toolchain source, or anywhere else outside the working directory
+comes back saying it is outside the workspace, with its path not spelled as though `read_file` would
+open it. Naming it does not make it readable: a read of it is refused as for any other path outside
+the tree.
+
+No server configured for the language, a missing binary, and a server that failed to start are three
+different answers, and **none of them is an empty result**. Nothing falls back to searching the tree.
+An absent server reported as "no references found" is a false negative that reads as proof, and a
+planner that believes nothing calls a function will delete it.
+
+An answer given while the server is still indexing says it may be short, in the same words a
+truncated search uses. A request waits for the index up to a bound and then answers from what there
+is rather than failing.
+
+### The index is cached, and it is not small
+
+A server keeps its index under `~/.bravebot/lsp/`, keyed by the workspace and never inside your tree,
+which is what makes the second session in a workspace fast. A question about a symbol should not
+change the tree you are working in.
+
+**Nothing prunes it.** A Rust workspace's index runs to a few hundred megabytes, and a machine that
+has been in many workspaces holds one for each. Deleting the directory costs the next session its
+indexing time and nothing else.
+
+Nothing in that cache is read as trusted, whatever else `~/.bravebot` is trusted for. The bytes
+derive from workspace files, so they carry those files' labels, and the only thing that reads them is
+the server. An [incognito session](../using/sessions.md#a-session-that-leaves-nothing-behind) writes
+no cache: its server still runs and still answers, and it re-indexes each time.
 
 ## `write_file`
 
