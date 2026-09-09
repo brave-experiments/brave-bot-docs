@@ -8,8 +8,8 @@
 # (agents/skills/update-docs) to fold it in. The skill rewrites the sha below; nothing
 # else should.
 #
-# build: take the tag back when a release push fails
-# 2026-09-08
-# https://github.com/brave-experiments/brave-bot/commit/5e088852049c7f05be9e8372f75212cc1d4e6e0c
+# feat(goal): work towards a condition until a judge says it holds
+# 2026-09-09
+# https://github.com/brave-experiments/brave-bot/commit/f2a2c0a401e06584357292f71a40e100a8a8cb0c
 
-5e088852049c7f05be9e8372f75212cc1d4e6e0c
+f2a2c0a401e06584357292f71a40e100a8a8cb0c
