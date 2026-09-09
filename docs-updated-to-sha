@@ -8,8 +8,8 @@
 # (agents/skills/update-docs) to fold it in. The skill rewrites the sha below; nothing
 # else should.
 #
-# feat(preamble): say where the planner is working, rather than let it find out
+# build: take the tag back when a release push fails
 # 2026-09-08
-# https://github.com/brave-experiments/brave-bot/commit/56e62076307759c73421aa587a038221f80a7806
+# https://github.com/brave-experiments/brave-bot/commit/5e088852049c7f05be9e8372f75212cc1d4e6e0c
 
-56e62076307759c73421aa587a038221f80a7806
+5e088852049c7f05be9e8372f75212cc1d4e6e0c
