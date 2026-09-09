@@ -20,6 +20,25 @@ The install downloads the release binary for your platform and verifies its chec
 and Windows are supported, on both x86_64 and arm64. To build from source instead, see
 [Development](development.md).
 
+On macOS and Linux there is an install script, for a machine with no npm on it:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/brave-experiments/brave-bot/main/install.sh | sh
+```
+
+It fetches the newest release for your platform, checks it against the published checksum, and
+writes nothing if the two differ. It puts the binary in `/usr/local/bin`, asking for sudo only if
+that directory is not yours to write to. `INSTALL_DIR` puts it somewhere else:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/brave-experiments/brave-bot/main/install.sh \
+  | INSTALL_DIR="$HOME/.local/bin" sh
+```
+
+Running the line again is how an install made this way is updated. The script records where it put
+the binary, so a second run with no directory named replaces that one rather than leaving two on
+your `PATH`.
+
 Configuration is baked into the released binary, so there is nothing to set up. Check what it will
 actually use:
 
