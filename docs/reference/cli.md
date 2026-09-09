@@ -101,12 +101,14 @@ are in [Reading the transcript](../using/transcript.md#the-scroller).
 | `/model` | Choose which model to think with |
 | `/theme [name]` | Choose the palette the interface is painted in |
 | `/effort [level]` | Choose how hard to think before answering |
+| `/config` | Choose a preference about the interface |
 | `/add-dir <path>` | Open another directory, and trust it for this session |
 | `/cd <path>` | Work in another directory from now on, and trust it for this session |
 | `/loop [interval] <prompt>` | Send one prompt again and again until you stop it |
 | `/goal <condition>` | Keep working until a condition you set is judged met |
 | `/rename <name>` | Call this conversation something else |
 | `/compact` | Summarise the conversation so far, keeping the recent part |
+| `/btw <question>` | Ask something beside the work, kept out of the conversation |
 | `/clear` | Start a new session here, keeping this one resumable |
 | `/export [path]` | Write the transcript out as a markdown file |
 | `/undo` | Rewind the last turn, on disk and in the conversation |
