@@ -6,7 +6,7 @@ description: Every tool the model may call, what it takes, and what it is allowe
 
 # Tools
 
-There are fourteen tools, and no way to add another from a configuration file. Each one splits its
+There are fifteen tools, and no way to add another from a configuration file. Each one splits its
 arguments into **routing**, the part that decides where the effect lands, and **content**, the part
 that is merely carried.
 
@@ -20,6 +20,7 @@ that is merely carried.
 | [`edit_file`](#edit_file) | `path`, `path_ref` | `old_text`, `new_text` | **yes, every time** |
 | [`run`](#run) | `command`, compiled to a plan | stdin | **yes, unless vouched for** |
 | [`read_output`](#read_output) | `ref` | none | **yes** |
+| [`job_output`](#job_output) | `job`, `kill` | none | no |
 | [`fetch_url`](#fetch_url) | `url` | none | **yes, unless a rule names the host** |
 | [`spawn_processor`](#spawn_processor) | `about` | `reads`, `instruction` | no |
 | [`spawn_agent`](#spawn_agent) | `kind` | `task`, `each` | not the call, but its writes and runs do |
@@ -27,7 +28,7 @@ that is merely carried.
 | [`ask_user`](#ask_user) | the questions | none | it *is* the question |
 | [`todo_write`](#todo_write) | none | `todos` | no |
 
-A fifteenth, [`schedule_next`](#schedule_next), is offered to a turn inside a self-paced
+A sixteenth, [`schedule_next`](#schedule_next), is offered to a turn inside a self-paced
 [`/loop`](commands.md#loop-interval-prompt) and to no other turn.
 
 An unknown tool is reported to the planner rather than ignored.
@@ -266,6 +267,7 @@ Runs a command line. **You approve the compiled plan before anything runs.**
 | Parameter | |
 |---|---|
 | `command` | one command line; a newline is refused, since this is a line and not a script |
+| `background` | start the line and hand back a job name instead of waiting ([below](#leaving-a-pipeline-running)) |
 
 ```
 git log --oneline -50 | head -20
@@ -429,6 +431,25 @@ nothing about what a program did.
 
 See [Vouching for a command](../security/permissions.md#vouching-for-a-command) for what `a` grants.
 
+### Leaving a pipeline running
+
+`background: true` starts the line without waiting for it and hands back a job name, which
+[`job_output`](#job_output) reads. This is for the program the five-minute limit cannot serve: a
+server told to serve serves, prints as it goes, and never exits, so waiting for one and killing it at
+the limit leaves no moment at which it is up and can be talked to.
+
+**Every gate is the one a foreground run passes, at the same point.** The rules, your approval, and
+the label the output will carry are all settled before anything starts. Being left running is not a
+reason to ask for less.
+
+**One pipeline, and no redirection.** A line with `&&` or `||` decides where to go next by waiting on
+the part before it, and nothing waits here; a redirection names a destination nothing is reading.
+Both are refused rather than half-honoured.
+
+**A job cannot outlive the turn that started it.** The turn owns the pipeline and ending the turn
+kills it. A background program still running afterwards would be an effect nobody is watching,
+nobody is being asked about, and nobody can stop.
+
 ## `read_output`
 
 Asks to be shown what a command printed. You see the output and decide; if you agree, it comes back to
@@ -440,6 +461,23 @@ the planner as text.
 
 It works only for output from `run`. A quarantined *file* is not readable this way. This is why
 `which`, `find` and `uname` tell the planner nothing until it asks.
+
+## `job_output`
+
+Reports what a [background job](#leaving-a-pipeline-running) has printed since the last look.
+
+| Parameter | |
+|---|---|
+| `job` | the job name a `run` handed back |
+| `kill` | stop the pipeline |
+
+Each look reports what is new, counted in bytes, and whether the job has ended. Asking about a job
+that does not exist says so.
+
+**The output keeps the label its plan was given** when the job started, rather than one worked out
+again at the moment it is read. What you have vouched for can change while a job runs, and a pipeline
+started before that must not have its output relabelled because of it. So a job's output is
+quarantined or not [on the same terms a foreground run's is](#the-output).
 
 ## `fetch_url`
 
