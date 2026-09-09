@@ -1,7 +1,7 @@
 ---
 sidebar_position: 2
 title: Slash commands
-description: The fourteen commands the interface acts on itself, and the rules every one of them shares.
+description: The fifteen commands the interface acts on itself, and the rules every one of them shares.
 ---
 
 # Slash commands
@@ -20,6 +20,7 @@ A line beginning with `/` is acted on by the interface itself, in place of being
 | `/loop` | `[interval] <prompt>` | Send one prompt again and again until you stop it |
 | `/rename` | `<name>` | Call this conversation something else |
 | `/compact` | | Summarise the conversation so far, keeping the recent part |
+| `/btw` | `<question>` | Ask something beside the work, kept out of the conversation |
 | `/clear` | | Start a new session here, keeping this one resumable |
 | `/export` | `[path]` | Write the transcript out as a markdown file |
 | `/undo` | | Rewind the last turn, on disk and in the conversation |
@@ -201,6 +202,27 @@ Summarises the conversation so far and keeps the recent part, on demand, at any 
 consulting the budget. The **request** is shortened, never the record: the replaced messages go to an
 archive that the transcript still reads and the session record still stores. See
 [Sessions](../using/sessions.md#long-conversations).
+
+## `/btw <question>`
+
+Asks something beside the work. A copy of the conversation goes out with your question on the end of
+it, and neither half comes back into the conversation: the planner has read neither your question nor
+the answer, and no later turn reads either.
+
+The answer opens in the mode
+[Ctrl-L](../using/interactive-mode.md#watching-a-delegate-reading-a-command-and-asking-something-aside)
+opens, as a row of its own before the delegates and the commands, which is the one screen it exists
+on. Nothing about it is drawn among the turn's own lines, because an exchange drawn in the transcript
+is one a reader takes the planner to have had.
+
+One request, and no tools in it. **An aside cannot be asked about**: there is no box to follow up in,
+so pressing further means a second `/btw`, over an exchange that still knows nothing of the first.
+
+**The record keeps both halves**, so a resume brings the answer back into that view and into no
+conversation. Where the exchange has already met something untrusted the answer is not written down:
+the row says so while the words are still on screen to copy, and a resume brings back the question
+alone. That is the same rule every message in the record passes, which is that nothing is written
+that the planner could not have held.
 
 ## `/clear`
 

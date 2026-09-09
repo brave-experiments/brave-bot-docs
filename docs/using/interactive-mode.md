@@ -405,13 +405,13 @@ See [Slash commands](../reference/commands.md) and [Adding context](context.md).
 Ctrl-O opens the scroller over the transcript, and Ctrl-T toggles the audit trail. See
 [Reading the transcript](transcript.md) and [The audit trail](../security/audit-trail.md).
 
-## Watching a delegate, and reading what a command printed
+## Watching a delegate, reading a command, and asking something aside
 
-**Ctrl-L opens the whole of what a delegate did, and the whole of what a command printed.** Where
-there is more than one row, a list is the way in: a panel over the transcript, a row each. Where
-there is one, its own lines open directly. Where there is nothing the key does nothing. The row
-beneath the box names the key and how many rows there are, counting the delegates and the commands
-together, for as long as the session has any.
+**Ctrl-L opens the whole of what a delegate did, the whole of what a command printed, and the answer
+to anything you asked with [`/btw`](../reference/commands.md#btw-question).** Where there is more
+than one row, a list is the way in: a panel over the transcript, a row each. Where there is one, its
+own lines open directly. Where there is nothing the key does nothing. The row beneath the box names
+the key and how many rows there are, counting them all together, for as long as the session has any.
 
 | Key | What it does |
 |---|---|
@@ -448,8 +448,17 @@ keeps the working mark because that is what it was doing: a server told to serve
 goes and never exits, so a cross beside it would say something about the program that is not true.
 The verdict comes from the exit codes and the clock, never from a line the program printed.
 
+**A question asked with `/btw` is a row too**, before the delegates and the commands and in the order
+they were asked. Opening one draws the question above the answer, and the row says whether the record
+kept the answer. It comes first because it is the only row that survives a resume: put last, every
+delegate a later turn spawned would be inserted above it and move its place.
+
+The view opens on an aside the moment it is answered, which is the one thing that opens this mode
+without your having pressed the key. You typed the question a moment ago, and an answer left behind a
+key nobody told you about is not an answer. Leaving puts the turn's own view back where it was.
+
 The header and the footer name which kind of thing you are looking at: a delegate by its kind and its
-number, a command by the line that ran.
+number, a command by the line that ran, an aside as an aside.
 
 **The session is the first row of the list**, and choosing it closes the mode and puts the turn's
 view back where you left it. Coming back to the list from a delegate puts the cursor on that delegate
@@ -463,12 +472,15 @@ starting does not take the screen from an older one you are reading.
 A delegate keeps more of its work than its block draws, and drops its oldest once it has made several
 hundred calls, so arriving late at a very long run means reading from wherever that bound has reached.
 
-**None of this reaches a model and none of it is written down.** The planner that asked is told the
-report and nothing else, no delegate is part of the record a session is resumed from, and `/clear`
-forgets them and what the commands printed alike, so a resumed session has the reports and none of
-the work behind them. You own the directory and may see what your agent did in it. What must not
-happen is those lines reaching a planner by any route, of which a record read back into a later turn
-would be one.
+**None of this reaches a model.** The planner that asked is told the report and nothing else, no
+delegate is part of the record a session is resumed from, and `/clear` forgets them and what the
+commands printed alike, so a resumed session has the reports and none of the work behind them. You
+own the directory and may see what your agent did in it. What must not happen is those lines reaching
+a planner by any route, of which a record read back into a later turn would be one.
+
+An aside is the one row written down, and it reaches no model either: the record keeps the question
+and the answer, a resume puts them back into this view, and there is no path from the record into a
+conversation.
 
 ## Long turns
 

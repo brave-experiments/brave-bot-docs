@@ -89,7 +89,9 @@ on, and the **standing permissions its user granted**:
 
 - the [trust map](../security/trust.md), including any rule a write recorded, which is what stops a
   resumed turn reading back a file an earlier turn of the same session poisoned;
-- the list of [commands you said to stop asking about](../security/permissions.md#vouching-for-a-command).
+- the list of [commands you said to stop asking about](../security/permissions.md#vouching-for-a-command);
+- every question you asked with [`/btw`](../reference/commands.md#btw-question), and the answers the
+  record could keep, which come back into the view Ctrl-L opens and into no conversation.
 
 Nothing else survives. A single-use endorsement is created by one approval, is bound to one value and
 is never written down, so a resumed turn cannot replay a write or a run an earlier turn was allowed.
@@ -131,6 +133,11 @@ enter that context on the next resume.
 
 A pasted picture *is* written down, because it was never quarantined. It is part of your own message,
 and a session that turned on a screenshot would be no use resumed without it.
+
+An answer to a [`/btw`](../reference/commands.md#btw-question) asked over an exchange that had met
+something untrusted is not written down, for the same reason: it is the planner's own words over such
+a context. The question is kept, the row on screen says the answer lasts as long as the window, and a
+resume brings back the question alone.
 
 ## Naming a session
 
