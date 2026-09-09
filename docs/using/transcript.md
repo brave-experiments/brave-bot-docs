@@ -40,6 +40,16 @@ This is how you tell a turn that ended from one that is hanging. A reply that as
 the turn, so one ending on `now let me look at the dispatch code` would otherwise leave a promise as
 the last thing on screen.
 
+**A turn that changed files and ran nothing says so.** Where a run was possible, files changed and no
+program was run, the end of the turn tells you plainly that nothing was built or tested. Nothing else
+on your screen distinguishes that diff from a checked one. It is not a reproach: plenty of turns have
+nothing to build, and one of those says nothing.
+
+The planner is asked the same question while the turn is still going, a set number of rounds after its
+first write, and pointed at a [checker delegate](../reference/tools.md#spawn_agent) where the log
+would be long and the answer is one sentence. Two audiences and two moments: the planner can still
+act, and you are about to.
+
 ## Themes
 
 `/theme` opens a picker on the palette the interface is painted in. Up and Down (or `k` and `j`)
