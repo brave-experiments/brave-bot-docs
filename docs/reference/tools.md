@@ -51,7 +51,20 @@ Reads a UTF-8 text file from the workspace and returns its lines.
 | `limit` | maximum lines to return, capped so one read cannot fill the conversation |
 
 Long files come back one page at a time. The result says so and gives the offset to continue from. A
-file that is not text is reported as binary.
+file that is not text is reported as binary, a picture being the exception.
+
+**A picture is quarantined whatever the trust map says, and only a processor looks at it.** A file
+whose extension names a picture or a PDF comes back as a reference saying what kind of thing it is,
+and vouching for the directory does not change that: what the trust map answers is whether a file's
+*text* may be read, and a picture has none. Handed to [`spawn_processor`](#spawn_processor) it arrives
+as a picture rather than as base64, so the model looks at it, and what the processor says back is
+quarantined like any other processor's answer.
+
+The reason is that a screenshot carries whatever words are in it, and a picture in the planner's
+context is restricted to one you put there yourself. A picture you dropped on the terminal is that;
+a path in model output is not. What kind of file it is comes from the extension and never from the
+bytes, so a file cannot become a picture by holding something that looks like one, and a picture
+cannot become text by being called `.txt`.
 
 **A read the planner may not see does not open the file.** Where the content would be quarantined,
 you are offered the chance to vouch for that one file at the moment it matters. See
