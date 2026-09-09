@@ -1,7 +1,7 @@
 ---
 sidebar_position: 2
 title: Slash commands
-description: The fifteen commands the interface acts on itself, and the rules every one of them shares.
+description: The sixteen commands the interface acts on itself, and the rules every one of them shares.
 ---
 
 # Slash commands
@@ -18,6 +18,7 @@ A line beginning with `/` is acted on by the interface itself, in place of being
 | `/add-dir` | `<path>` | Open another directory, and trust it for this session |
 | `/cd` | `<path>` | Work in another directory from now on, and trust it for this session |
 | `/loop` | `[interval] <prompt>` | Send one prompt again and again until you stop it |
+| `/goal` | `<condition>` | Keep working until a condition you set is judged met |
 | `/rename` | `<name>` | Call this conversation something else |
 | `/compact` | | Summarise the conversation so far, keeping the recent part |
 | `/btw` | `<question>` | Ask something beside the work, kept out of the conversation |
@@ -44,7 +45,8 @@ Reports everything the session knows about itself:
 - **every trust rule in force**, listed in full, each marked trusted or untrusted;
 - **every command you vouched for**, which now run unasked and whose output is read as trusted;
 - what a [`/loop`](#loop-interval-prompt) is repeating and when the next tick is due, where one is
-  running.
+  running, or what a [`/goal`](#goal-condition) is working towards and how many rounds it has
+  spent.
 
 The last three are the ones nothing else on your screen tells you. A vouched command is the one that
 stops appearing, and what happens next without anybody typing anything cannot be read off the
@@ -171,7 +173,7 @@ somebody reads it. Where you gave an interval, no turn can change it; a self-pac
 nothing is woken once more twenty minutes later, and a second silence ends the loop.
 
 Each tick is announced with its number, and with how many in a row have reported finding nothing.
-That count is the difference between a loop that is working and a loop with nothing to do. Four
+That count is the difference between a loop that is working and a loop with nothing to do. Five
 things end one, and each says so:
 
 | What | When |
@@ -179,6 +181,7 @@ things end one, and each says so:
 | you interrupt | Ctrl-C, reached after the turn in flight and the half-typed line, and before leaving |
 | a turn is stopped | any turn cancelled while a loop runs, tick or not |
 | the session moves on | `/clear`, and leaving |
+| a goal is set | [`/goal`](#goal-condition) replaces it, since a session works towards one thing at a time |
 | age | seven days after it started |
 
 **A loop is never written down.** It is not in the session record, so `--resume` restores none and it
@@ -189,6 +192,79 @@ prompts at somebody who opened a conversation only to read it.
 **A loop keeps spending.** Every tick is a turn with the whole conversation re-sent, and nothing bounds
 the total but the interval and the session's own life. A five-minute loop left open overnight is a
 hundred and fifty turns nobody read.
+:::
+
+## `/goal <condition>`
+
+Keeps the session working until a condition you wrote is judged met. When a turn ends the condition
+is put to a judge, and where it is not met yet the work goes back for another turn with the reason.
+
+```
+/goal cargo test exits 0 and the diff is committed
+/goal                              # say what the condition is, and how it is going
+/goal clear                        # take it off
+```
+
+`clear` takes a goal off only when it is the whole argument, so `/goal clear the build directory and
+the tests pass` is a condition like any other.
+
+**Setting a goal sends nothing.** A condition is not a prompt, so the session sits idle until you
+ask for something; what a goal does is keep that work going. Nothing here writes a first prompt for
+you, because there is no line you endorsed to send.
+
+**The condition is the one you typed.** It is settled the moment you press Enter, and nothing a turn
+reads, writes or returns can add to it, edit it or replace it. Only another `/goal` changes it. The
+condition is what decides when the session is allowed to stop, and a turn that could write its own
+would be deciding when it has finished.
+
+The check is one request with no tools over a copy of the conversation, the shape
+[`/btw`](#btw-question) uses, so the conversation the next turn resumes is the one that was already
+there. Nothing the judge said arrives as your words either: what carries the work on is a sentence
+written by this program, naming the condition and quoting the reason inside it.
+
+One answer carries the work on, and everything else ends the goal:
+
+| What came back | What happens |
+|---|---|
+| the condition is not met yet | another turn, with the reason |
+| the condition is met | the goal is over, and the reason is what you are shown |
+| the condition can never be met | the goal is over, and the reason says why |
+| an answer that is not one of those | the goal is over |
+| the check itself failed | the goal is over |
+
+A verdict is the first line of the answer and one of three words. Prose is not a verdict: reading
+one out of a sentence nobody constrained would let the judge's wording decide whether your session
+keeps working, and a sentence saying the condition is nearly met would read as either answer
+depending on which words were searched for.
+
+**Ten rounds and it gives up.** The last reason is kept, so a goal that has given up can still say
+what it kept hearing. Five things end one besides a verdict, and each says so:
+
+| What | When |
+|---|---|
+| you ask | `/goal clear` |
+| you interrupt | Ctrl-C, reached after the turn in flight and the half-typed line, and before leaving |
+| a turn is stopped | any turn cancelled while a goal is set |
+| the session moves on | `/clear`, and leaving |
+| the rounds run out | the tenth |
+
+A turn that failed is not one of them. A request that never came back says nothing about whether the
+work is finished, so the goal stays set and nothing is judged until there is a turn to judge.
+
+A check already in flight is one request and does not stop, but Escape and Ctrl-C still take the
+goal off, and nothing more is sent. A verdict about a goal you have just taken off is neither acted
+on nor reported.
+
+**A goal is never written down.** It is not in the session record, so `--resume` restores none and it
+does not outlive the process. A condition judged against yesterday's conversation would start
+working a session somebody opened only to read.
+
+:::caution
+**The judge reads the transcript, not the world.** It cannot run a command or open a file, so a
+condition holds when the conversation shows it being observed: a turn that fixes something and never
+checks the fix is sent back for not checking it. A condition no transcript could show, `the code is
+clean`, spends all ten rounds and gives up, and nothing warns you in advance. Every round re-sends
+the whole conversation, so ten rounds of a long session cost more than ten ordinary turns.
 :::
 
 ## `/rename <name>`

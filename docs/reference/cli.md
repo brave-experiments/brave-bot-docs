@@ -104,6 +104,7 @@ are in [Reading the transcript](../using/transcript.md#the-scroller).
 | `/add-dir <path>` | Open another directory, and trust it for this session |
 | `/cd <path>` | Work in another directory from now on, and trust it for this session |
 | `/loop [interval] <prompt>` | Send one prompt again and again until you stop it |
+| `/goal <condition>` | Keep working until a condition you set is judged met |
 | `/rename <name>` | Call this conversation something else |
 | `/compact` | Summarise the conversation so far, keeping the recent part |
 | `/clear` | Start a new session here, keeping this one resumable |
