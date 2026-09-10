@@ -107,6 +107,21 @@ The goal in plain words, the proposed plan verbatim, the frozen steps, and what 
 success **and on failure**, never behind a flag. A failed plan is printed on stderr even without
 `--trace`, and never shares stdout with the reply.
 
+## Which model a run asks for
+
+A run with no flag asks for the model a session opening in the same directory would: the choice
+`/model` recorded, then the configured one. Picking a model in a terminal is therefore enough to make
+your scripts use it.
+
+```sh
+bravebot --model opus "review the diff on this branch"
+```
+
+`--model` outranks that and everything else, and is the only way two scripts in the same checkout can
+ask for different models. Where the server answers with a different model from the one in force, both
+names go to stderr, and a run whose `--model` was substituted exits non-zero. See
+[`--model`](../reference/cli.md#--model-name).
+
 ## A one-shot turn is bounded
 
 A one-shot run carries a limit of 200 rounds of tool calls, where an interactive turn carries none.
@@ -125,5 +140,6 @@ all fail rather than exiting successfully with an explanation on stdout.
 | `--file <path>` | include a workspace file as trusted context; repeatable |
 | `-p`, `--print` | non-interactive; reads piped stdin as quarantined context |
 | `--trace` | print the audit trail to stderr |
+| `--model <name>` | the model this run asks for |
 
 The full set is in the [CLI reference](../reference/cli.md).

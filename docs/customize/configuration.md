@@ -86,7 +86,8 @@ rather than obeyed.
 opens a picker on the model currently in use, as a panel in the middle of the screen. The list comes
 from the endpoint rather than from a set compiled in, so it is whatever the backend actually offers
 today. The choice is written to `~/.bravebot/model`, so it outlives the session that made it and
-applies in every directory.
+applies in every directory. A one-shot run reads the same record, so a script uses the model you
+picked unless [`--model`](../reference/cli.md#--model-name) names another.
 
 **Type to narrow the list rather than arrowing through it.** A search matches the name shown, the name
 a request would carry and the service that answers, ignoring case and anywhere in any of them, and
@@ -381,8 +382,9 @@ nothing else: no rule there makes a path reachable, and no rule makes a command'
 ```
 
 The model to request when nobody has chosen one. This is the one key in the file that **outranks the
-model baked into the binary**. An exported `BRAVE_AI_CHAT_DEFAULT_MODEL` still wins over it, and a
-choice recorded by `/model` wins over both.
+model baked into the binary**. An exported `BRAVE_AI_CHAT_DEFAULT_MODEL` still wins over it, a choice
+recorded by `/model` wins over both, and [`--model`](../reference/cli.md#--model-name) on a one-shot
+run wins over everything.
 
 `opus`, `sonnet` and `haiku` name a **tier** rather than a model, since that is what a settings file
 written for another tool puts here. Each resolves to something reachable: the model your AWS account

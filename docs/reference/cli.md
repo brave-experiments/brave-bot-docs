@@ -44,6 +44,7 @@ Anything that is not a recognised flag or subcommand is treated as the task prom
 | `--file <path>` | include a workspace file as **trusted** context; repeatable |
 | `-p`, `--print` | non-interactive; reads piped stdin as quarantined context |
 | `--mode <turn\|manifest>` | how a one-shot is run; `turn` (the default) decides step by step, `manifest` plans the whole run first |
+| `--model <name>` | the model this run asks for; outranks every other way one is named ([below](#--model-name)) |
 | `--trace` | print the audit trail to stderr |
 | `--incognito` | write nothing to `~/.bravebot`: no history, no session record, no preference |
 | `--dangerously-skip-permissions` | bypass every permission check; recommended only for a sandbox with no internet access |
@@ -59,6 +60,31 @@ Anything that is not a recognised flag or subcommand is treated as the task prom
 It is the only way to reach the mode that answers every permission question, including the ones that
 decide trust, and the only way a run nobody is watching may write. See
 [modes](../security/permissions.md#answering-in-advance-modes) for what it costs.
+
+## `--model <name>`
+
+```sh
+bravebot --model opus "review the diff on this branch"
+```
+
+Names the model for one run, and outranks every other way one is named. Where no flag names one, a
+run asks for the model a session opening in the same directory would: the choice
+[`/model`](../customize/configuration.md#choosing-a-model) recorded, then an exported
+`BRAVE_AI_CHAT_DEFAULT_MODEL`, then the settings file's [`model`](../customize/configuration.md#model)
+key, then the model the build was made with. So a script uses the model you picked without your
+having to write it down twice, and the flag is the one route to a different one.
+
+`opus`, `sonnet` and `haiku` name a **tier** here, exactly as they do in a settings file, and resolve
+the same way. Any other name is sent as you wrote it. `--model` with no name after it, or a blank
+one, is refused and the run stops: a script that computed an empty variable asked for a model, and
+answering it with whatever was configured is the substitution this flag exists to rule out.
+
+**Where the server answers with a model other than the one in force, both names go to stderr**,
+whether the flag, your recorded choice or a settings file named it. Where `--model` named it, the run
+also **exits non-zero**, which is the part a script is certain to read. A run that named no model
+takes whatever was recorded or configured and does not fail over it. Two cases are neither reported
+nor failed: an entry that resolves per request, such as `automatic-brave-bot`, and a backend asked by
+an opaque handle, which never reports back the name it was given.
 
 ## `import-leo-creds`
 
@@ -133,7 +159,8 @@ that behaved oddly is usually being read against code that has moved since.
 ## Exit codes
 
 A failure exits non-zero: a configuration error, a refused argument, and a turn that could not run all
-fail rather than exiting successfully with an explanation on stdout.
+fail rather than exiting successfully with an explanation on stdout. So does a run whose
+[`--model`](#--model-name) was substituted by the server.
 
 ## Streams
 
