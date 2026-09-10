@@ -238,18 +238,22 @@ keeps working, and a sentence saying the condition is nearly met would read as e
 depending on which words were searched for.
 
 **Ten rounds and it gives up.** The last reason is kept, so a goal that has given up can still say
-what it kept hearing. Five things end one besides a verdict, and each says so:
+what it kept hearing. Four things end one besides a verdict, and each says so:
 
 | What | When |
 |---|---|
 | you ask | `/goal clear` |
 | you interrupt | Ctrl-C, reached after the turn in flight and the half-typed line, and before leaving |
-| a turn is stopped | any turn cancelled while a goal is set |
 | the session moves on | `/clear`, and leaving |
 | the rounds run out | the tenth |
 
-A turn that failed is not one of them. A request that never came back says nothing about whether the
-work is finished, so the goal stays set and nothing is judged until there is a turn to judge.
+**Stopping a turn leaves the condition set.** Neither a turn you cancelled nor one that failed is
+judged: a request that never came back says nothing about whether the work is finished, and an
+interrupted turn says only that you did not want that turn. The goal stays set, and what is judged is
+the next turn there is something to judge.
+
+That is what makes a goal steerable. Stop the turn, say something else, and the condition is still
+there; the press that ends the goal is the one you make with nothing running.
 
 A check already in flight is one request and does not stop, but Escape and Ctrl-C still take the
 goal off, and nothing more is sent. A verdict about a goal you have just taken off is neither acted
