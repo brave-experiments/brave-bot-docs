@@ -60,10 +60,20 @@ exited happily.
 ## Committing
 
 No co-attribution markers for Claude Code or other tools, in commits or pull requests: a
-commit is authored by the person running the tool and by nobody else. `make init` links
-`agents/claude-settings.json` to `.claude/settings.json`, and its empty `attribution`
-strings settle that before a session starts, which is what makes the rule hold on a
-scheduled runner that has not read this file yet.
+commit is authored by the person running the tool and by nobody else. Where that is
+enforced differs by tool, and this file is the last word for only one of them.
+
+- **Claude Code** appends a trailer unless a setting says otherwise, so `make init` links
+  `agents/claude-settings.json` to `.claude/settings.json` and its empty `attribution`
+  strings settle it before a session starts. That is what makes the rule hold on a
+  scheduled runner that has not read this file yet.
+- **bravebot** has no attribution setting to install. `.bravebot/settings.json` reads
+  `env`, `permissions`, `model`, `editorMode` and `provider` and ignores everything else,
+  and bravebot appends no trailer of its own, so the rule above is the whole of it.
+- **Codex** resolves attribution from the signed-in account, not from a file: there is no
+  `config.toml` key for it, and where the account has it on, Codex is told to ignore
+  instructions like this one. A Codex run that adds a trailer is turned off in the account
+  settings rather than in this repository.
 
 **One change per commit.** A commit is the unit somebody reads, reverts, and bisects on, so
 it has to stand up alone. If the message needs an "and" to describe what the commit does,
