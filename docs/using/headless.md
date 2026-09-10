@@ -33,6 +33,17 @@ made in your name. It does not lift the second half: the planner's questions are
 too, since they are not permissions. It is a mode for a container with no network and nothing in it
 worth losing. See [modes](../security/permissions.md#answering-in-advance-modes).
 
+## Reaching a second checkout
+
+```sh
+bravebot --add-dir /srv/other-checkout "how does their error type differ from ours?"
+```
+
+`--add-dir` makes a directory outside the working one reachable for the run, and may be given more
+than once. It vouches for nothing: files read there are quarantined like any others, because a run
+nobody is watching cannot be asked to trust a tree. See
+[`--add-dir`](../reference/cli.md#--add-dir-path).
+
 ## Piped input is untrusted and private, always
 
 Piped bytes are quarantined, and the planner is given a reference rather than the bytes. Nothing
@@ -138,6 +149,7 @@ all fail rather than exiting successfully with an explanation on stdout.
 | Flag | What it does |
 |---|---|
 | `--file <path>` | include a workspace file as trusted context; repeatable |
+| `--add-dir <path>` | make another directory reachable, trusting nothing in it; repeatable |
 | `-p`, `--print` | non-interactive; reads piped stdin as quarantined context |
 | `--trace` | print the audit trail to stderr |
 | `--model <name>` | the model this run asks for |

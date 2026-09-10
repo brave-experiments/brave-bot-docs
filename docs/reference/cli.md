@@ -42,6 +42,7 @@ Anything that is not a recognised flag or subcommand is treated as the task prom
 | Option | What it does |
 |---|---|
 | `--file <path>` | include a workspace file as **trusted** context; repeatable |
+| `--add-dir <path>` | make a directory outside the working one reachable for this run; repeatable ([below](#--add-dir-path)) |
 | `-p`, `--print` | non-interactive; reads piped stdin as quarantined context |
 | `--mode <turn\|manifest>` | how a one-shot is run; `turn` (the default) decides step by step, `manifest` plans the whole run first |
 | `--model <name>` | the model this run asks for; outranks every other way one is named ([below](#--model-name)) |
@@ -85,6 +86,26 @@ also **exits non-zero**, which is the part a script is certain to read. A run th
 takes whatever was recorded or configured and does not fail over it. Two cases are neither reported
 nor failed: an entry that resolves per request, such as `automatic-brave-bot`, and a backend asked by
 an opaque handle, which never reports back the name it was given.
+
+## `--add-dir <path>`
+
+```sh
+bravebot --add-dir /srv/other-checkout "how does their error type differ from ours?"
+```
+
+Opens a directory outside the working one for the length of the run, and may be given more than once.
+An absolute path outside the working directory is otherwise refused whatever else is true, so without
+this a task pointed at one checkout cannot read another at all.
+
+**It makes the directory reachable and vouches for nothing.** A file read there is quarantined on the
+same terms as a file nobody vouched for, and a write there is refused as any write in an unattended
+run is. A run nobody is watching holds no answer about the directory it works in, so a flag that
+trusted the tree beside it would leave that tree better trusted than the project. The interactive
+[`/add-dir`](../security/trust.md#add-dir) grants both halves, because a person typed it.
+
+The path must be absolute, must exist, must be a directory, and must not already sit inside the
+working one. Anything else is refused by name and the run stops before the turn, rather than failing
+further in over a file it was told it could open.
 
 ## `import-leo-creds`
 

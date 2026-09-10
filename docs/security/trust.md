@@ -131,6 +131,11 @@ It lasts the session, `--resume` carries both halves, and `/clear` closes it. A 
 inside the project is refused. A directory a resume cannot open again, because it has moved or gone,
 says so rather than being passed over.
 
+**The command-line [`--add-dir`](../reference/cli.md#--add-dir-path) grants only the first half.** A
+one-shot run can reach the directory and vouches for nothing in it, since the gesture behind the
+trusted half is a person typing the path in a session where they have already answered for the
+directory they are working in, and a run nobody is watching has answered nothing.
+
 ## Moving the working directory
 
 ```
