@@ -11,6 +11,7 @@ creating one symlink per entry, so a skill is written once and both tools see it
     .bravebot/skills/<name>  ->  agents/skills/<name>
     .claude/CLAUDE.md        ->  agents/AGENTS.md
     .claude/settings.json    ->  agents/claude-settings.json
+    .bravebot/settings.json  ->  agents/bravebot-settings.json
     AGENTS.md                ->  agents/AGENTS.md
 
 The generated links are gitignored and never committed, which is why this runs from
@@ -64,15 +65,20 @@ _FANOUT = [
 # file: bravebot reads it from the workspace root (crates/agent/src/preamble.rs), Claude
 # Code from `.claude/CLAUDE.md`.
 #
-# The settings file is linked because AGENTS.md alone cannot enforce the rule against
+# The settings files are linked because AGENTS.md alone cannot enforce the rule against
 # co-attribution markers: a scheduled run on a fresh runner reads no instructions until
-# after Claude Code has already decided what to append to a commit message. `attribution`
-# settles it before the session starts. It is named for Claude Code because only Claude
-# Code understands the schema; bravebot's own settings file shares the name and nothing
-# else, so this one is deliberately not linked into `.bravebot/`.
+# after the tool has already decided what to append to a commit message, and `attribution`
+# settles it before the session starts.
+#
+# One file per tool rather than one shared file, because the two schemas overlap in the
+# name alone. Claude Code acts on `attribution`; bravebot reads `env`, `permissions`,
+# `model`, `editorMode` and `provider` and ignores the rest, so its copy is inert until
+# bravebot gains the key. Codex has no file to link: its attribution is resolved from the
+# account it is signed in to.
 _FILES = [
     ('AGENTS.md', ['.claude/CLAUDE.md', 'AGENTS.md']),
     ('claude-settings.json', ['.claude/settings.json']),
+    ('bravebot-settings.json', ['.bravebot/settings.json']),
 ]
 
 # A child of a fanned-out source dir is only worth linking if it is a real entry rather

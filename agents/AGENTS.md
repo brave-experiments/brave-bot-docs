@@ -67,9 +67,11 @@ enforced differs by tool, and this file is the last word for only one of them.
   `agents/claude-settings.json` to `.claude/settings.json` and its empty `attribution`
   strings settle it before a session starts. That is what makes the rule hold on a
   scheduled runner that has not read this file yet.
-- **bravebot** has no attribution setting to install. `.bravebot/settings.json` reads
-  `env`, `permissions`, `model`, `editorMode` and `provider` and ignores everything else,
-  and bravebot appends no trailer of its own, so the rule above is the whole of it.
+- **bravebot** reads `.bravebot/settings.json`, which `make init` links from
+  `agents/bravebot-settings.json`. It carries the same `attribution` block and bravebot
+  ignores it: the keys it reads are `env`, `permissions`, `model`, `editorMode` and
+  `provider`, and it appends no trailer of its own. The file is there for the day that
+  changes; until then the rule above is the whole of it.
 - **Codex** resolves attribution from the signed-in account, not from a file: there is no
   `config.toml` key for it, and where the account has it on, Codex is told to ignore
   instructions like this one. A Codex run that adds a trailer is turned off in the account
