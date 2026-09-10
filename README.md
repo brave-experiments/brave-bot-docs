@@ -49,7 +49,8 @@ commit and commits that too.
 
 ### Agent configuration
 
-`agents/` is the checked-in source of truth for skills and `AGENTS.md`. No tool reads it
+`agents/` is the checked-in source of truth for skills, `AGENTS.md` and the Claude Code
+settings. No tool reads it
 directly. `make init` symlinks it into `.claude/` for Claude Code and `.bravebot/` for
 bravebot, so a skill is written once and both find it. The links are generated and
 gitignored; `make agents` shows their state and `make unlink` removes them.

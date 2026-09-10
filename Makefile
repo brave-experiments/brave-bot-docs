@@ -36,7 +36,8 @@ help:
 	@echo
 	@echo "  BRAVEBOT_REPO = $(BRAVEBOT_REPO)"
 
-# agents/ is the checked-in source of truth for skills and AGENTS.md, and no tool reads it:
+# agents/ is the checked-in source of truth for skills, AGENTS.md and the Claude Code
+# settings, and no tool reads it:
 # Claude Code looks under .claude/ and bravebot under .bravebot/ and the workspace root.
 # This creates the symlinks that bridge them. The links are gitignored, so a fresh clone
 # needs it once, and it is idempotent, so re-running costs nothing.

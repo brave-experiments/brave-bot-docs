@@ -59,7 +59,11 @@ exited happily.
 
 ## Committing
 
-No co-attribution markers for Claude Code or other tools, in commits or pull requests.
+No co-attribution markers for Claude Code or other tools, in commits or pull requests: a
+commit is authored by the person running the tool and by nobody else. `make init` links
+`agents/claude-settings.json` to `.claude/settings.json`, and its empty `attribution`
+strings settle that before a session starts, which is what makes the rule hold on a
+scheduled runner that has not read this file yet.
 
 **One change per commit.** A commit is the unit somebody reads, reverts, and bisects on, so
 it has to stand up alone. If the message needs an "and" to describe what the commit does,

@@ -10,6 +10,7 @@ creating one symlink per entry, so a skill is written once and both tools see it
     .claude/skills/<name>    ->  agents/skills/<name>
     .bravebot/skills/<name>  ->  agents/skills/<name>
     .claude/CLAUDE.md        ->  agents/AGENTS.md
+    .claude/settings.json    ->  agents/claude-settings.json
     AGENTS.md                ->  agents/AGENTS.md
 
 The generated links are gitignored and never committed, which is why this runs from
@@ -59,10 +60,19 @@ _FANOUT = [
     ('agents', ['.claude/agents']),
 ]
 
-# The one instructions file, under the name each tool looks for. bravebot reads it from
-# the workspace root (crates/agent/src/preamble.rs); Claude Code reads `.claude/CLAUDE.md`.
+# Single files, under the name each tool looks for. AGENTS.md is the one instructions
+# file: bravebot reads it from the workspace root (crates/agent/src/preamble.rs), Claude
+# Code from `.claude/CLAUDE.md`.
+#
+# The settings file is linked because AGENTS.md alone cannot enforce the rule against
+# co-attribution markers: a scheduled run on a fresh runner reads no instructions until
+# after Claude Code has already decided what to append to a commit message. `attribution`
+# settles it before the session starts. It is named for Claude Code because only Claude
+# Code understands the schema; bravebot's own settings file shares the name and nothing
+# else, so this one is deliberately not linked into `.bravebot/`.
 _FILES = [
     ('AGENTS.md', ['.claude/CLAUDE.md', 'AGENTS.md']),
+    ('claude-settings.json', ['.claude/settings.json']),
 ]
 
 # A child of a fanned-out source dir is only worth linking if it is a real entry rather
