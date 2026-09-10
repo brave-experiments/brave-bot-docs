@@ -1,14 +1,14 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const repository = 'https://github.com/brave-experiments/brave-bot';
+const repository = 'https://github.com/brave-experiments/bravebot';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Brave Bot',
   tagline: 'A general-purpose agent with structural resistance to indirect prompt injection',
   url: 'https://brave-experiments.github.io',
-  baseUrl: '/brave-bot-docs/',
+  baseUrl: '/bravebot-docs/',
   onBrokenLinks: 'throw',
   onBrokenAnchors: 'throw',
   markdown: {
@@ -18,7 +18,7 @@ const config = {
   },
   favicon: 'img/favicon.png',
   organizationName: 'brave-experiments',
-  projectName: 'brave-bot-docs',
+  projectName: 'bravebot-docs',
 
   presets: [
     [
@@ -28,7 +28,7 @@ const config = {
         docs: {
           routeBasePath: '/',
           sidebarPath: require.resolve('./sidebars.js'),
-          editUrl: 'https://github.com/brave-experiments/brave-bot-docs/edit/main/',
+          editUrl: 'https://github.com/brave-experiments/bravebot-docs/edit/main/',
         },
         blog: false,
         theme: {

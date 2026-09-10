@@ -1,6 +1,6 @@
-# The brave-bot commit this documentation is current as of.
+# The bravebot commit this documentation is current as of.
 #
-# Everything on this site describes behaviour specified clause by clause in brave-bot's
+# Everything on this site describes behaviour specified clause by clause in bravebot's
 # docs/specs. This file records how far along that history the site has been brought, so
 # the next update knows where to start reading.
 #
@@ -10,6 +10,6 @@
 #
 # feat(goal): work towards a condition until a judge says it holds
 # 2026-09-09
-# https://github.com/brave-experiments/brave-bot/commit/f2a2c0a401e06584357292f71a40e100a8a8cb0c
+# https://github.com/brave-experiments/bravebot/commit/f2a2c0a401e06584357292f71a40e100a8a8cb0c
 
 f2a2c0a401e06584357292f71a40e100a8a8cb0c

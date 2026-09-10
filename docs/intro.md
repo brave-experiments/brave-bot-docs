@@ -65,7 +65,7 @@ it reads.
 ## Status
 
 Brave Bot is experimental. It is developed in the open at
-[brave-experiments/brave-bot](https://github.com/brave-experiments/brave-bot), where the
-[mini-specs](https://github.com/brave-experiments/brave-bot/tree/main/docs/specs) are the source of
+[brave-experiments/bravebot](https://github.com/brave-experiments/bravebot), where the
+[mini-specs](https://github.com/brave-experiments/bravebot/tree/main/docs/specs) are the source of
 truth for how it behaves. Where this site and a spec disagree, believe the spec and please
-[file an issue](https://github.com/brave-experiments/brave-bot/issues).
+[file an issue](https://github.com/brave-experiments/bravebot/issues).

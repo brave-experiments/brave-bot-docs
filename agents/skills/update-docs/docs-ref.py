@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
-"""Track how far behind brave-bot this documentation site has fallen.
+"""Track how far behind bravebot this documentation site has fallen.
 
-Everything on this site describes behaviour specified clause by clause in brave-bot's
-`docs/specs`. `docs-updated-to-sha` at the repository root records the brave-bot commit
+Everything on this site describes behaviour specified clause by clause in bravebot's
+`docs/specs`. `docs-updated-to-sha` at the repository root records the bravebot commit
 the site has been brought up to, so an update knows where to start reading rather than
 re-reading the whole history.
 
-This script is the deterministic half of the update-docs skill. It resolves the brave-bot
+This script is the deterministic half of the update-docs skill. It resolves the bravebot
 checkout, reports what has landed since the recorded commit, and rewrites the record. No
 model is involved, so its output is reproducible and cheap.
 
-The brave-bot checkout is found, in order:
+The bravebot checkout is found, in order:
 
-    $BRAVE_BOT_REPO
-    ../brave-bot, beside this repository
+    $BRAVEBOT_REPO
+    ../bravebot, beside this repository
 
 Usage:
     python3 agents/skills/update-docs/docs-ref.py show
@@ -44,7 +44,7 @@ _REF_FILE = _ROOT / 'docs-updated-to-sha'
 # baseline is how far reading got, this is what reading decided to come back to.
 _DEFERRED_FILE = _ROOT / 'docs-deferred'
 
-_SOURCE_URL = 'https://github.com/brave-experiments/brave-bot'
+_SOURCE_URL = 'https://github.com/brave-experiments/bravebot'
 _SHA = re.compile(r'^[0-9a-f]{40}$')
 
 # A behaviour change is supposed to arrive with the spec clause that governs it, so these
@@ -68,14 +68,14 @@ def _git(repo: Path, *args: str) -> str:
 
 
 def _source_repo() -> Path:
-    env = os.environ.get('BRAVE_BOT_REPO')
-    candidate = Path(env).expanduser() if env else _ROOT.parent / 'brave-bot'
+    env = os.environ.get('BRAVEBOT_REPO')
+    candidate = Path(env).expanduser() if env else _ROOT.parent / 'bravebot'
     if not (candidate / '.git').exists():
         raise Problem(
-            f'No brave-bot checkout at {candidate}.\n'
+            f'No bravebot checkout at {candidate}.\n'
             f'Clone it beside this repository:\n'
-            f'    git clone {_SOURCE_URL}.git {_ROOT.parent / "brave-bot"}\n'
-            f'or point BRAVE_BOT_REPO at an existing one.')
+            f'    git clone {_SOURCE_URL}.git {_ROOT.parent / "bravebot"}\n'
+            f'or point BRAVEBOT_REPO at an existing one.')
     return candidate.resolve()
 
 
@@ -97,9 +97,9 @@ def read_ref() -> str:
 
 def write_ref(sha: str, subject: str, date: str) -> None:
     """Rewrite the record, keeping the commit link in step with the sha."""
-    _REF_FILE.write_text(f'''# The brave-bot commit this documentation is current as of.
+    _REF_FILE.write_text(f'''# The bravebot commit this documentation is current as of.
 #
-# Everything on this site describes behaviour specified clause by clause in brave-bot's
+# Everything on this site describes behaviour specified clause by clause in bravebot's
 # docs/specs. This file records how far along that history the site has been brought, so
 # the next update knows where to start reading.
 #
@@ -138,7 +138,7 @@ def write_deferred(entries: list[tuple[str, str]]) -> None:
         return
     body = '\n'.join(f'{sha} {reason}' for sha, reason in entries)
     _DEFERRED_FILE.write_text(
-        '# brave-bot commits reviewed by the update-docs skill and deliberately left for a\n'
+        '# bravebot commits reviewed by the update-docs skill and deliberately left for a\n'
         '# later run, with why. The baseline in docs-updated-to-sha cannot hold these: it\n'
         '# says everything before it was folded in, and the next span begins after it, so a\n'
         '# commit skipped mid-span would never be offered again.\n'
@@ -185,9 +185,9 @@ def show(_args) -> int:
     doc_behind = _git(repo, 'rev-list', '--count', f'{ref_sha}..{head_sha}', '--',
                       *_DOC_PATHS) if behind != '0' else '0'
 
-    print(f'brave-bot checkout   {repo}')
+    print(f'bravebot checkout   {repo}')
     print(f'docs current as of   {ref_sha[:9]}  {ref_date}  {ref_subject}')
-    print(f'brave-bot head       {head_sha[:9]}  {head_date}  {head_subject}')
+    print(f'bravebot head       {head_sha[:9]}  {head_date}  {head_subject}')
     print(f'link                 {_SOURCE_URL}/commit/{ref_sha}')
     print()
     deferred = read_deferred()
@@ -236,7 +236,7 @@ def changes(args) -> int:
 
     paths = [] if args.all else _DOC_PATHS
     scope = 'every path' if args.all else ' or '.join(_DOC_PATHS)
-    print(f'brave-bot {ref_sha[:9]}..{head_sha[:9]}, commits touching {scope}, oldest first')
+    print(f'bravebot {ref_sha[:9]}..{head_sha[:9]}, commits touching {scope}, oldest first')
     print(f'new ref once folded in: {head_sha}')
     print()
 
@@ -327,7 +327,7 @@ def main() -> int:
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest='command')
 
-    sub.add_parser('show', help='Where the docs stand against brave-bot.')
+    sub.add_parser('show', help='Where the docs stand against bravebot.')
 
     p_changes = sub.add_parser('changes', help='What has landed since the recorded commit.')
     p_changes.add_argument('--all',
@@ -338,7 +338,7 @@ def main() -> int:
                            help='Include commit bodies and per-commit file lists.')
 
     p_set = sub.add_parser('set', help='Record a new commit as the docs baseline.')
-    p_set.add_argument('rev', help='A sha, tag, or ref resolved in the brave-bot checkout.')
+    p_set.add_argument('rev', help='A sha, tag, or ref resolved in the bravebot checkout.')
 
     p_defer = sub.add_parser(
         'defer', help='Record a commit as reviewed but deliberately not documented yet.')

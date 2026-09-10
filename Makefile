@@ -3,11 +3,11 @@
 # The site is plain Docusaurus, so most targets here are thin wrappers over an npm script
 # and exist so there is one place to look. The two that are not are `init`, which installs
 # the checked-in agent configuration where each tool looks for it, and the docs-ref
-# targets, which track how far behind brave-bot this site has fallen.
+# targets, which track how far behind bravebot this site has fallen.
 
-# Where the brave-bot checkout lives. Exported because docs-ref.py reads it.
-BRAVE_BOT_REPO ?= ../brave-bot
-export BRAVE_BOT_REPO
+# Where the bravebot checkout lives. Exported because docs-ref.py reads it.
+BRAVEBOT_REPO ?= ../bravebot
+export BRAVEBOT_REPO
 
 DOCS_REF = python3 agents/skills/update-docs/docs-ref.py
 
@@ -29,12 +29,12 @@ help:
 	@echo "  make agents               Show which links make init would create, and their state"
 	@echo "  make unlink               Remove the links make init created"
 	@echo
-	@echo "Tracking brave-bot:"
-	@echo "  make docs-updated-to-sha  The brave-bot commit these docs are current as of"
-	@echo "  make docs-changes         What has landed in brave-bot since that commit"
+	@echo "Tracking bravebot:"
+	@echo "  make docs-updated-to-sha  The bravebot commit these docs are current as of"
+	@echo "  make docs-changes         What has landed in bravebot since that commit"
 	@echo "  make docs-changes-full    The same, with commit bodies and file lists"
 	@echo
-	@echo "  BRAVE_BOT_REPO = $(BRAVE_BOT_REPO)"
+	@echo "  BRAVEBOT_REPO = $(BRAVEBOT_REPO)"
 
 # agents/ is the checked-in source of truth for skills and AGENTS.md, and no tool reads it:
 # Claude Code looks under .claude/ and bravebot under .bravebot/ and the workspace root.

@@ -1,19 +1,19 @@
 ---
 name: update-docs
 description:
-  'Bring this documentation site up to date with brave-bot. Reads the recorded
-  baseline in docs-updated-to-sha, reviews what has landed in brave-bot since,
+  'Bring this documentation site up to date with bravebot. Reads the recorded
+  baseline in docs-updated-to-sha, reviews what has landed in bravebot since,
   folds the missing behaviour into the pages it belongs on, then records the new
   baseline and commits it. Triggers on: update docs, /update-docs, make
-  docs-changes, docs are out of date, sync docs with brave-bot, docs drift,
+  docs-changes, docs are out of date, sync docs with bravebot, docs drift,
   bump the docs ref.'
 argument-hint: '[rev] [--all] [dry-run]'
 allowed-tools: Bash(python3 agents/skills/update-docs/*), Bash(make docs-changes*), Bash(make docs-updated-to-sha*), Bash(make build*), Bash(git*), Bash(grep*), Bash(rg*), Read
 ---
 
-# Bring the docs up to date with brave-bot
+# Bring the docs up to date with bravebot
 
-[`docs-updated-to-sha`](../../../docs-updated-to-sha) records the brave-bot commit this site
+[`docs-updated-to-sha`](../../../docs-updated-to-sha) records the bravebot commit this site
 was last updated to. This skill documents what landed since then, then moves that record
 forward.
 
@@ -51,10 +51,10 @@ reasons, and exceptions come after it. Never build up to the point.
 
 ## Direction of the update
 
-brave-bot's specs are the source of truth. When this site and a spec disagree, this site is
+bravebot's specs are the source of truth. When this site and a spec disagree, this site is
 wrong. Fix the page, not the spec.
 
-This skill does not edit anything in the brave-bot repository. It reads that checkout and
+This skill does not edit anything in the bravebot repository. It reads that checkout and
 writes only here. If a spec looks wrong, say so in the summary and leave it alone.
 
 Do not invent behaviour. Every sentence added must trace to a clause or a commit in the span
@@ -77,8 +77,8 @@ python3 agents/skills/update-docs/docs-ref.py resolve <rev>     # that one is no
 
 `make docs-updated-to-sha` and `make docs-changes` run the first two.
 
-The script finds the brave-bot checkout at `$BRAVE_BOT_REPO`, or at `../brave-bot` beside
-this repository. If neither exists it says how to clone one. It reads brave-bot's
+The script finds the bravebot checkout at `$BRAVEBOT_REPO`, or at `../bravebot` beside
+this repository. If neither exists it says how to clone one. It reads bravebot's
 `origin/main` rather than whatever branch that checkout is on, so unmerged work is never
 documented as shipped.
 
@@ -97,11 +97,11 @@ If it says up to date, stop and say so.
 Otherwise fetch first, so head means head:
 
 ```sh
-git -C "${BRAVE_BOT_REPO:-../brave-bot}" fetch origin
+git -C "${BRAVEBOT_REPO:-../bravebot}" fetch origin
 ```
 
 Note the `new ref once folded in` sha that `changes` prints. The baseline moves to that value
-at the end. It is fixed now: a commit that lands in brave-bot mid-run is not part of this pass.
+at the end. It is fixed now: a commit that lands in bravebot mid-run is not part of this pass.
 
 ### 2. Read what landed
 
@@ -113,7 +113,7 @@ Read the commit bodies. They explain why a behaviour changed and name the specs 
 Then read those specs at the new head, not at the baseline:
 
 ```sh
-git -C ../brave-bot show <new-ref>:docs/specs/<spec>.md
+git -C ../bravebot show <new-ref>:docs/specs/<spec>.md
 ```
 
 The spec as it now stands is what the page must match. A diff tells you where to look, not
@@ -138,7 +138,7 @@ is about.
 These fail the gate every time:
 
 - how the project is built, released, tested, reviewed, or specified;
-- how a contributor sets up their checkout, their editor, or the agents that work on brave-bot;
+- how a contributor sets up their checkout, their editor, or the agents that work on bravebot;
 - a refactor, a rename, or an internal boundary moving;
 - a fix that makes something behave the way a reader already assumed it did;
 - a behaviour that landed but is not yet reachable. The commit body reads like a feature, but
@@ -188,7 +188,7 @@ good result.
 
 For every change that passes, find the page that owns it. The mapping is stable:
 
-| A brave-bot spec about | Belongs on |
+| A bravebot spec about | Belongs on |
 |---|---|
 | labels, who may read what | [security/trust.md](../../../docs/security/trust.md) |
 | routing, where an effect may land | [security/permissions.md](../../../docs/security/permissions.md) |
@@ -274,7 +274,7 @@ moves in a commit of its own, touching nothing else:
 ```sh
 python3 agents/skills/update-docs/docs-ref.py set <new-ref>
 git add docs-updated-to-sha
-git commit -m "docs: track brave-bot up to <short-sha>"
+git commit -m "docs: track bravebot up to <short-sha>"
 ```
 
 If this run documented something an earlier one deferred, clear it in the same commit:

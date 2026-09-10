@@ -1,21 +1,21 @@
-# brave-bot-docs
+# bravebot-docs
 
-The documentation site for [brave-bot](https://github.com/brave-experiments/brave-bot), a
+The documentation site for [bravebot](https://github.com/brave-experiments/bravebot), a
 general-purpose agent with structural resistance to indirect prompt injection. Docusaurus,
 deployed to GitHub Pages from `main`.
 
 ## The rule that overrides everything
 
-**brave-bot's `docs/specs` is the source of truth for behaviour. This site is downstream of
+**bravebot's `docs/specs` is the source of truth for behaviour. This site is downstream of
 it.** Where the two disagree, this site is wrong: fix the page rather than documenting
 around the clause.
 
 That has a consequence worth stating plainly. Nothing here is a place to decide what
 bravebot does. A page that describes behaviour no spec pins down has invented it, and
 somebody will read it as a promise. If a spec does not settle a question, the answer is to
-raise it against brave-bot, not to write something reasonable here.
+raise it against bravebot, not to write something reasonable here.
 
-[`docs-updated-to-sha`](../docs-updated-to-sha) records the brave-bot commit this site was
+[`docs-updated-to-sha`](../docs-updated-to-sha) records the bravebot commit this site was
 last brought up to. `make docs-changes` shows what has landed since, and the
 [update-docs](skills/update-docs/SKILL.md) skill folds it in and moves the record. Only
 that skill rewrites the record.
@@ -73,7 +73,7 @@ committing it.
 ## Conventions
 
 - This site's prose uses em-dashes and the surrounding pages are written that way. That is
-  a deliberate difference from brave-bot's own convention, which forbids them. Match the
+  a deliberate difference from bravebot's own convention, which forbids them. Match the
   file you are in.
 - British or American spelling: match the page.
 - Comments in the build config and scripts explain **why**, never what.

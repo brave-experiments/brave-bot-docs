@@ -253,5 +253,5 @@ Two working directories can share a session store. The directory name is derived
 character outside a small set to `-`, which is lossy, so `/a/b`, `/a-b` and `/a b` all reduce to the
 same name. Because a resume restores standing permissions, permissions granted in one of those
 directories would be offered in another. This is
-[a known bug](https://github.com/brave-experiments/brave-bot/issues), not a design decision.
+[a known bug](https://github.com/brave-experiments/bravebot/issues), not a design decision.
 :::

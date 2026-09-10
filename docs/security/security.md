@@ -131,6 +131,6 @@ See [Leo Premium](../customize/premium.md#where-they-are-kept).
 ## Reporting a problem
 
 Brave Bot is experimental and developed in the open. Please report security issues through the
-[repository](https://github.com/brave-experiments/brave-bot/issues), and see the
-[mini-specs](https://github.com/brave-experiments/brave-bot/tree/main/docs/specs) for the clause-level
+[repository](https://github.com/brave-experiments/bravebot/issues), and see the
+[mini-specs](https://github.com/brave-experiments/bravebot/tree/main/docs/specs) for the clause-level
 statement of everything on this page.

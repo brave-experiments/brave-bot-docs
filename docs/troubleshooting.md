@@ -134,7 +134,7 @@ being read against code that has moved since.
 ## Still stuck
 
 Bugs and questions go to
-[the issue tracker](https://github.com/brave-experiments/brave-bot/issues). The
-[mini-specs](https://github.com/brave-experiments/brave-bot/tree/main/docs/specs) state each
+[the issue tracker](https://github.com/brave-experiments/bravebot/issues). The
+[mini-specs](https://github.com/brave-experiments/bravebot/tree/main/docs/specs) state each
 behaviour as a numbered clause and name the tests that pin it, so they are usually the fastest way to
 find out whether something is intended.

@@ -23,7 +23,7 @@ and Windows are supported, on both x86_64 and arm64. To build from source instea
 On macOS and Linux there is an install script, for a machine with no npm on it:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/brave-experiments/brave-bot/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/brave-experiments/bravebot/main/install.sh | sh
 ```
 
 It fetches the newest release for your platform, checks it against the published checksum, and
@@ -31,7 +31,7 @@ writes nothing if the two differ. It puts the binary in `/usr/local/bin`, asking
 that directory is not yours to write to. `INSTALL_DIR` puts it somewhere else:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/brave-experiments/brave-bot/main/install.sh \
+curl -fsSL https://raw.githubusercontent.com/brave-experiments/bravebot/main/install.sh \
   | INSTALL_DIR="$HOME/.local/bin" sh
 ```
 

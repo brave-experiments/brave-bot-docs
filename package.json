@@ -1,6 +1,6 @@
 {
-  "name": "brave-bot-docs",
-  "homepage": "https://brave-experiments.github.io/brave-bot-docs/",
+  "name": "bravebot-docs",
+  "homepage": "https://brave-experiments.github.io/bravebot-docs/",
   "version": "0.1.0",
   "private": true,
   "description": "Documentation for Brave Bot, a general-purpose agent with structural resistance to indirect prompt injection.",
@@ -53,11 +53,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/brave-experiments/brave-bot-docs.git"
+    "url": "git+https://github.com/brave-experiments/bravebot-docs.git"
   },
   "author": "Brave Software",
   "license": "MPL-2.0",
   "bugs": {
-    "url": "https://github.com/brave-experiments/brave-bot/issues"
+    "url": "https://github.com/brave-experiments/bravebot/issues"
   }
 }

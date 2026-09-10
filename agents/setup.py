@@ -18,7 +18,7 @@ The generated links are gitignored and never committed, which is why this runs f
 It is idempotent: re-running only creates links that are missing or stale, and it never
 clobbers a real file or directory somebody placed in a discovery dir by hand.
 
-This is the same script brave-bot uses, kept in step with it deliberately: a skill moved
+This is the same script bravebot uses, kept in step with it deliberately: a skill moved
 between the two repositories should need no edits to be discovered.
 
 It does not touch the trust map. bravebot loads a workspace skill only from a path a
