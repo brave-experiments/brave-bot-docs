@@ -8,8 +8,8 @@
 # (agents/skills/update-docs) to fold it in. The skill rewrites the sha below; nothing
 # else should.
 #
-# feat(goal): work towards a condition until a judge says it holds
+# refactor: rename the repository from brave-bot to bravebot
 # 2026-09-09
-# https://github.com/brave-experiments/bravebot/commit/f2a2c0a401e06584357292f71a40e100a8a8cb0c
+# https://github.com/brave-experiments/bravebot/commit/43d7bf3ad5bd97f159b966958e40f855cc5dc64b
 
-f2a2c0a401e06584357292f71a40e100a8a8cb0c
+43d7bf3ad5bd97f159b966958e40f855cc5dc64b
