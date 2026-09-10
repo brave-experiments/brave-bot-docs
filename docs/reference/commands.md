@@ -263,6 +263,12 @@ on nor reported.
 does not outlive the process. A condition judged against yesterday's conversation would start
 working a session somebody opened only to read.
 
+**A condition only somebody else can satisfy is waited for inside the turn.** Where the work is a
+file you have yet to write, the turn sleeps and looks again rather than answering to be sent back:
+one round of the ten costs a whole turn plus a judge's reading of the conversation, and a wait costs
+a command. A command is killed at five minutes, so a longer wait is repeated sleeps, and a condition
+hours away is not what a goal is for.
+
 :::caution
 **The judge reads the transcript, not the world.** It cannot run a command or open a file, so a
 condition holds when the conversation shows it being observed: a turn that fixes something and never
