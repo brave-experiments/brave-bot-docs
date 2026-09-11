@@ -8,8 +8,8 @@
 # (agents/skills/update-docs) to fold it in. The skill rewrites the sha below; nothing
 # else should.
 #
-# refactor: rename the repository from brave-bot to bravebot
-# 2026-09-09
-# https://github.com/brave-experiments/bravebot/commit/43d7bf3ad5bd97f159b966958e40f855cc5dc64b
+# bedrock: make the merged Converse support work, and name an AWS account in a settings block (#211)
+# 2026-09-10
+# https://github.com/brave-experiments/bravebot/commit/940d5bd1f246914ee1f2db7670a551203494306f
 
-43d7bf3ad5bd97f159b966958e40f855cc5dc64b
+940d5bd1f246914ee1f2db7670a551203494306f
