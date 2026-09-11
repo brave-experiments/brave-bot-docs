@@ -148,6 +148,11 @@ listing that could not be fetched all leave the level to go out and be judged at
 that does advertise the parameter says it reads one without saying which words it accepts, so a model
 may reject or silently round a level it does not know.
 
+**On AWS Bedrock the answer arrives as a refusal.** Nothing there describes a model's parameters, so
+a level goes out to be judged. A model that refuses the field is asked again without it and is sent
+no level for the rest of the session, and the interface reports it as reading none rather than going
+on showing your level as in force. What one model refuses says nothing about another.
+
 :::caution
 **The Brave endpoint accepts the level and discards it.** A nonsense value is answered exactly as a
 real one is, and a model that reports a reasoning-token count reports the same count whatever level
