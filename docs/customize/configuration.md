@@ -33,7 +33,7 @@ named as never transmitted.
 
 It reports **every backend this build can reach**, not just one. A machine with an AWS account
 configured shows a second `offers` block with its region, profile and tiers (see
-[Reaching Claude on AWS Bedrock](#reaching-claude-on-aws-bedrock)), and a configured
+[Reaching a model through AWS Bedrock](#reaching-a-model-through-aws-bedrock)), and a configured
 [gateway](#reaching-an-openai-compatible-gateway) shows a third, with its endpoint, its models, and
 whether a credential was found for it. The `settings` line names which keys your settings file set,
 and never their values. A file that sets no variables says so rather than being reported as an absent
@@ -120,7 +120,7 @@ The list is drawn for a person, and the names in it never reach a model. What yo
 
 With an AWS account or a gateway configured the picker offers those models alongside this list rather
 than instead of it, each under its own heading. See
-[Reaching Claude on AWS Bedrock](#reaching-claude-on-aws-bedrock) and
+[Reaching a model through AWS Bedrock](#reaching-a-model-through-aws-bedrock) and
 [Reaching an OpenAI-compatible gateway](#reaching-an-openai-compatible-gateway).
 
 ## Choosing how hard to think
@@ -262,7 +262,7 @@ without rebuilding it.
 | `BRAVEBOT_SUBPROCESS_ENV_SCRUB` | `0` hands a program the agent runs bravebot's own credentials ([`run.scrubEnv`](#runscrubenv)) |
 
 Six more name an AWS account rather than this build. See
-[Reaching Claude on AWS Bedrock](#reaching-claude-on-aws-bedrock).
+[Reaching a model through AWS Bedrock](#reaching-a-model-through-aws-bedrock).
 
 To point a release build at a backend running locally:
 
@@ -524,9 +524,9 @@ The rules are read **once per session**, so a file you edit while a session is o
 one. A session with no `permissions` block behaves exactly as one did before the block existed: every
 gate asks what it asked before, and nothing is refused for being unmentioned.
 
-## Reaching Claude on AWS Bedrock
+## Reaching a model through AWS Bedrock
 
-Set these variables to reach Claude through your own AWS account:
+Set these variables to reach models through your own AWS account:
 
 | Variable | What it sets |
 |---|---|
@@ -537,19 +537,22 @@ Set these variables to reach Claude through your own AWS account:
 | `ANTHROPIC_DEFAULT_SONNET_MODEL` | the model the Sonnet tier names |
 | `ANTHROPIC_DEFAULT_HAIKU_MODEL` | the model the Haiku tier names |
 
-Three services can answer a request: the aichat endpoint Brave runs, Claude on AWS Bedrock through
-your own AWS account, and an [OpenAI-compatible gateway](#reaching-an-openai-compatible-gateway) you
+Three services can answer a request: the aichat endpoint Brave runs, AWS Bedrock through your own
+AWS account, and an [OpenAI-compatible gateway](#reaching-an-openai-compatible-gateway) you
 configured. Every build can reach Brave; the other two are what you configure.
 
 Each tier takes either a model id or an inference-profile ARN. With `AWS_PROFILE` unset the AWS CLI
 resolves credentials as it would for any other command, which is what a machine on instance
 credentials already relies on.
 
-**Claude models only, despite Bedrock hosting many others.** A request is sent as the Anthropic
-Messages API, which is the format Claude answers and other models on Bedrock do not. Nothing local
-checks the name you set. An ARN for Llama, Mistral, Titan or Nova is signed and sent like any other,
-and Bedrock rejects the request body. Point a tier at a non-Claude model and every request on it
-fails remotely.
+**Any model your account can reach, whoever makes it.** A request is built in the body Bedrock
+states for every provider it hosts rather than in one provider's own, so a tier can name a Claude,
+an OpenAI, a Nova or a Llama model, or an inference profile standing for one, and nothing here has
+to work out which provider is behind it. Nothing local checks the name you set, and Bedrock refuses
+one your account cannot reach.
+
+**The tier words stay `opus`, `sonnet` and `haiku`.** They name a slot in your configuration rather
+than a model family, so a tier is whichever model you pointed it at.
 
 **A tier you do not name is left out rather than guessed at.** An ARN cannot be derived from a model
 name. Set one tier and one tier is offered.
