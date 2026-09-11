@@ -326,7 +326,7 @@ These keys are read, and anything else in the file is ignored rather than refuse
 | `editorMode` | whether the input box edits the ordinary way or vi's ([below](#editormode)) |
 | `env` | variables, in Claude Code's own shape |
 | `permissions` | which actions to refuse, and which to ask about ([below](#permissions)) |
-| `provider` | an OpenAI-compatible gateway to reach ([below](#reaching-an-openai-compatible-gateway)) |
+| `provider` | an OpenAI-compatible gateway ([below](#reaching-an-openai-compatible-gateway)), or an AWS account ([below](#naming-more-than-three-models)) |
 | `run.scrubEnv` | further variables to keep from a program the agent runs ([below](#runscrubenv)) |
 
 In `env`, only string values: a number or a boolean is skipped rather than coerced, so write `"1"` and
@@ -579,6 +579,50 @@ If one service cannot say what it offers, the models known from your configurati
 offered; a choice is refused only when nothing is left to choose. That is the position somebody
 offline is most likely to be in.
 
+### Naming more than three models
+
+The tier variables name three models. A `provider` block keyed `amazon-bedrock` names as many as
+your file lists, each under the id a request sends:
+
+```json
+{
+  "provider": {
+    "amazon-bedrock": {
+      "options": { "region": "us-west-2", "profile": "my-profile" },
+      "models": {
+        "openai.gpt-5.6-sol": {},
+        "arn:aws:bedrock:us-west-2:…:application-inference-profile/abc": {
+          "name": "Sol on Bedrock",
+          "limit": { "context": 1050000, "output": 128000 }
+        }
+      }
+    }
+  }
+}
+```
+
+`options.region` is **required**, for the reason `AWS_REGION` is: a guessed region is a request that
+fails somewhere far from the mistake. An entry without one configures no service at all.
+`options.profile` picks which credentials sign, exactly as `AWS_PROFILE` does, and is optional on the
+same terms.
+
+**There is no credential to name here.** Bedrock takes a signature over the request rather than a
+bearer token, so this entry reads neither `env` nor `options.apiKey`. Which AWS credentials sign
+comes from the profile, resolved at the moment a request needs it.
+
+**This adds to the tier variables rather than replacing them.** A name either of them offers reaches
+your account, and everything else on the page above holds unchanged: the models are offered in
+`/model` alongside Brave's roster, the default does not move, and each is marked free.
+
+A model named this way has no tier, so its picker row carries the `name` you gave it and falls back
+to the id where you gave none. Write one: an inference-profile ARN is not a name anybody reads. A
+model named here is also chosen by that id exactly as written, without the gateway's
+[`id/name` prefix](#naming-one) in front of it.
+
+`limit.context` states that model's window, which is worth setting here because the figure otherwise
+assumed is [deliberately low](#the-assumed-context-window). Following opencode, it needs `output`
+beside it or it is not read.
+
 ### Signing in
 
 Where AWS has no usable session, the sign-in happens **before the turn starts**, and only for the
@@ -598,12 +642,15 @@ Every configured tier is assumed to have a 131,072-token window. Nothing at AWS 
 window, and an inference-profile ARN does not say which model it resolves to, so one deliberately low
 figure stands in for all of them. Being wrong upward would stop the shortening of a conversation
 altogether: every round asks, no round qualifies, and the session runs to exhaustion. Set
-`BRAVEBOT_CONTEXT_BUDGET` if you know your model's real window and want to use it.
+`BRAVEBOT_CONTEXT_BUDGET` if you know your model's real window and want to use it, or state it per
+model with [`limit.context`](#naming-more-than-three-models).
 
 ## Reaching an OpenAI-compatible gateway
 
-A `provider` block names a gateway, the models it offers and where its credential lives. The models
-it ends up with are offered in `/model` beside Brave's roster and any AWS tiers. It takes nothing away
+A `provider` block names a gateway, the models it offers and where its credential lives. An entry
+keyed `amazon-bedrock` names [an AWS account](#naming-more-than-three-models) instead, which is
+reached by signing rather than by a token; everything below is about the other entries. The models
+a gateway ends up with are offered in `/model` beside Brave's roster and any AWS tiers. It takes nothing away
 from those rosters and does not move the default: what answers when nobody has chosen stays what it
 was, and the conversation budget stays where it was too.
 
