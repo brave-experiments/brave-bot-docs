@@ -64,6 +64,21 @@ Everything that should outlive a session lives here:
 An imported Leo Premium subscription is kept here too, in a file only you can read. See
 [Leo Premium](premium.md#where-they-are-kept).
 
+**Nobody else on the machine can read any of it.** On Unix, every directory bravebot makes under
+`~/.bravebot` is reachable by you alone and every file it writes there is readable by you alone,
+whichever part of the program is doing the writing. The history is the reason: it holds every prompt
+you have typed, which means the paths you were working on, your branch names, and whatever you
+pasted into one. A directory or file an older version left open to the machine is narrowed the next
+time something writes to it, so an upgrade is enough.
+
+Narrowing stops at `~/.bravebot`, and a symbolic link out of it is stepped over rather than
+followed. What else is in your home directory is not this program's business, and somebody keeping
+their sessions on another volume has put the target outside what bravebot was given.
+
+A file **you** put there keeps the mode you gave it. `settings.json`, your standing instructions and
+your skills are read rather than written, so nothing changes them; the directory's own mode is what
+keeps them private.
+
 Every operation here degrades to doing nothing. A missing home directory, a read-only disk or a
 corrupt file does not stop a session starting.
 
